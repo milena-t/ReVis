@@ -27,13 +27,11 @@ Results can be plotted in a stacked histogram (plot mode) or returned as tsv fil
 
 ------------------------- quick start
 
-python3 repeatmasker_window_analysis.py --masker_outfile your_assembly.fna.ori.out --masker_out_gff your_assembly.fna.out.gff --species_name Your_species --window_length 1e6 --verbose --plot
+python3 ReVis.py --masker_outfile your_assembly.fna.ori.out --masker_out_gff your_assembly.fna.out.gff --species_name Your_species --window_length 1e6 --plot_overlap_filtered --verbose --plot
 
 ------------------------- dependencies
 
  *  On uppmax, load biopython/1.80-py3.10.8 to use argparse (base python doesn't include it).
- *  The parse_repeats.py file that contains the dataclass for the repeat files, the parse_gff.py file contains other utilities
-        (keep in the same directory as this script or in $PATH to make the import work!). 
  *  Libraries imported in this script and in parse_repeats.py and parse_gff.py:
         - sys, re, os, subprocess, argparse
         - tqdm, random, time
@@ -55,9 +53,7 @@ covered by each repeat category (NOT overlap filtered, so there can be more bp c
 of masked bp or even the window length) and also the number of bp and ratio covered by coding regions (exons). If the masked
 assembly is given it will also include the number of unmasked bp in each window.
 
-It takes as input two of the repeatmasker output files, and since I didn't exactly test this rigorously, 
-it would probably be good if they were in the same directory and didn't have their names changed from what 
-repeatmasker named them by default (in case i have a hardcoded string in a filename somewhere i forgot to remove).
+It takes as input two of the repeatmasker output files, *.ori.out (but just *.out also works, only slower), and *.out.gff
 
 The runtime depends on the overall repeat content and on how fragmented the assembly is. I have tried my best to optimize, 
 but if your assembly is long and fragmented, it takes long to loop through many small contigs, and if there are many repeats, 

@@ -44,10 +44,10 @@ python3 repeatmasker_window_analysis.py --masker_outfile your_assembly.fna.ori.o
 ------------------------- documentation
 
 This script analyzes repeatmasker output. You can run in two modes, plot mode or table mode. Plot mode returns 
-a plot with a stacked histogram of all the repeat categories (overlap filtered! Repeat annotations can be nested within each other, 
+a plot with a stacked histogram of all the repeat categories (overlap filtered! Repeat annotations can be on top of each other, 
 where two or more repeats cover the same stretch of sequence, which can result in a >100% repeat coverage in some rep_windows. 
-I am filtering out repeat categories that overlap with others so that each base is only covered by one repeat annotation.
-This filtering likely warps the category proportion in some windows, because it is likely that there are more bases of some categories 
+You can filter out repeat categories that overlap with others so that each base is only covered by one repeat annotation.
+This filtering warps the category proportion in some windows, because it is likely that there are more bases of some categories 
 removed than others. See get_repeat_abundance function documentation for details). If you include a genome annotation, 
 a line for the number of annotated genes in the same windows is added. You can add up to two annotations to compare them.
 Table mode returns the same by-window information as a tsv file with the proportion of basepairs in each window 

@@ -284,7 +284,7 @@ if __name__ == "__main__":
             print(f"\n\tPLOT mode --> the output will be a png file\n")
 
         # get repeat abundances in windows
-        species_abundances, species_categories = rep_windows.get_assembly_repeat_abundances(out_filepath, window_length, gff_filepath=gff_filepath, verbose=args.verbose, statistics=args.statistics, filter_overlap_previous_=args.plot_overlap_filtered, statistics_outfile_name=statistics_outfile_name, statistics_outfile_name=statistics_outfile_name)
+        species_abundances, species_categories = rep_windows.get_assembly_repeat_abundances(out_filepath, window_length, gff_filepath=gff_filepath, verbose=args.verbose, statistics=args.statistics, filter_overlap_previous_=args.plot_overlap_filtered, statistics_outfile_name=statistics_outfile_name)
         
         # get gene density
         species_gene_abundances ={}

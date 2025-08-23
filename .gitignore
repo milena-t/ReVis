@@ -1,3 +1,11 @@
+## genomics
+*.fa
+*.fa.gz
+*.fna
+*.fasta
+*.gff
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

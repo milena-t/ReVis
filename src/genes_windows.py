@@ -1,0 +1,311 @@
+from statistics import mean
+
+import parse_gff as gff
+import repeats_windows as rep_windows
+import genes_windows as gen_windows
+from tqdm import tqdm
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+from matplotlib.ticker import FuncFormatter
+import pandas as pd
+import random
+import time
+import re
+
+
+def get_assembly_gene_numbers(annotation_filepath, gff_filepath, window_length, statistics_outfile_name, verbose = True, statistics = False, calc_gene_density = False):
+
+    """ 
+    get a data structure that contains all the gene numbers separated by contig for an assembly
+    { contig : { 
+        window_1 : { 
+            "Gene" : number of anntoated genes (!! total number of annotated genes, not bp covered)
+            },
+        window_2 : { 
+            "Gene" : number of anntoated genes
+            }
+        } 
+    }
+
+    Use merge_gene_windows to get the average number of anntoated genes over several windows to increase readability of the graph later.
+    This then means that e.g. window_1 to window_5 have the same value, which is the average over all the previously different values of these windows
+
+    Use get_assembly_gene_abundances for getting actual bp covered by coding regions in each window
+    """ 
+
+    
+    if verbose:
+        print(f"\ncalculate gene densities across the windows")
+        print(f"set window length for genes: {int(window_length)} bp")
+        assembly_length_incl = 0
+
+
+    # contig_lengths = get_contig_lengths(gff_filepath)
+    ## no need to check for len(contig_lengths) > 0 here that already happens for the repeat abundances
+    
+    contig_lengths = rep_windows.get_contig_lengths(gff_filepath)
+    num_contigs = len(contig_lengths)
+    assembly_length = sum([lengths[1] for lengths in contig_lengths.values()])
+
+    contig_lengths = {contig : length for contig, length in contig_lengths.items() if length[1]>window_length}
+    incl_length = sum([lengths[1] for lengths in contig_lengths.values()])
+    
+    if verbose:
+        incl_perc = (incl_length/assembly_length) * 100
+        print(f"{incl_length} bp are in are shorter than the window length and therefore excluded. ({assembly_length} bp in total, {incl_perc:.2f} % of assembly included)")
+        print(f"\n \t -  parse the species annotation: ")
+    
+    annotation = gff.parse_gff3_by_contig(annotation_filepath, verbose=verbose)
+    
+    if verbose: 
+        print(f"\n")
+
+    all_categories:list[str] = [] # should only be ["Gene"] but double check
+    gene_abundances = {} 
+
+    num_contigs = len(contig_lengths)
+    gene_length = 0
+
+    if statistics:
+        with open(statistics_outfile_name, "a") as stats_out:
+            stats_out.write(f"\n{annotation_filepath}\n")
+            for num_curr, contig in enumerate(contig_lengths.keys()):
+                assembly_length_incl += contig_lengths[contig][1]
+
+                windows_contig = gen_windows.get_window_intervals(contig_lengths[contig], window_length)
+                contig_genes = annotation[contig]
+                
+                contig_abundances, contig_categories, overlap_removed_bp = rep_windows.get_contig_abundances(contig_genes, windows_contig, verbose=statistics, gene_number = True, calc_gene_density = calc_gene_density, filter_overlap_previous_=False)
+                
+                # print(contig_abundances)
+                
+                contig_gene_bp = int(sum([sum(list(window_abundances.values())) for window_abundances in contig_abundances.values()]))
+                gene_length += contig_gene_bp
+
+                gene_numbers = [list(gene_no.values())[0] if len(list(gene_no.values()))>0 else 0 for gene_no in list(contig_abundances.values()) ]
+                # print(gene_numbers)
+                mean_genes_in_window = mean(gene_numbers)
+                num_windows = len(contig_abundances)
+                est_mean_genes_in_window = len(contig_genes)/num_windows
+                
+                all_categories.extend(contig_categories)
+                gene_abundances[contig] = contig_abundances
+            
+                print(f"\t -->  ( contig {num_curr+1}/{num_contigs} ) {contig} :  {len(contig_genes)} annotated genes (the number of separately annotated features, not bp) in {contig_lengths[contig][1]} bp ")
+                stats_out.write(f"( contig {num_curr+1}/{num_contigs} ) {contig} :  {len(contig_genes)} annotated genes (the number of separately annotated features, not bp) in {contig_lengths[contig][1]} bp\n")
+                print(f"\t      \t( {mean_genes_in_window:.2f} genes on avg. per window are computed. for evenly distributed genes the estimate would be {est_mean_genes_in_window:.2f}")
+                stats_out.write(f"\t( {mean_genes_in_window:.2f} genes on avg. per window are computed. for evenly distributed genes the estimate would be {est_mean_genes_in_window:.2f}\n")
+                # contig_repeat_percentage = (contig_gene_bp/contig_lengths[contig][1]) *100
+                # print(f"\t{contig_repeat_percentage:.2f}% genes ( {contig_gene_bp} / {contig_lengths[contig][1]} ) bp")
+                # print(f"\t{contig_categories}")
+    
+    else: # show progress bar if not verbose
+        print(f" \t -  creating windows for parsed contigs\n")
+
+        for contig in tqdm(contig_lengths.keys()):
+            assembly_length_incl += contig_lengths[contig][1]
+
+            windows_contig = gen_windows.get_window_intervals(contig_lengths[contig], window_length)
+            contig_genes = annotation[contig]
+            
+            contig_abundances, contig_categories, overlap_removed_bp = rep_windows.get_contig_abundances(contig_genes, windows_contig, verbose=False, gene_number = True, calc_gene_density = calc_gene_density, filter_overlap_previous=False)
+            
+            # print(contig_abundances)
+            if verbose:
+                contig_gene_bp = int(sum([sum(list(window_abundances.values())) for window_abundances in contig_abundances.values()]))
+                gene_length += contig_gene_bp
+            
+            all_categories.extend(contig_categories)
+            gene_abundances[contig] = contig_abundances
+    
+    all_categories = list(set(all_categories))
+
+    if verbose:
+        print(f"\n\tIn total, there are {len(all_categories)} unique feature categories: {all_categories} (should be only one for the genes)")
+        cds_percentage = (gene_length/assembly_length_incl) * 100
+        # print(f"\t{assembly_length_incl} bp of sequence were parsed, of which {gene_length} bp were annotated as genes ({cds_percentage:.2f}%)")
+    
+    return gene_abundances, all_categories
+
+
+
+
+
+
+def get_assembly_gene_abundances(annotation_filepath, gff_filepath, window_length, statistics_outfile_name, verbose = True, statistics = False, calc_gene_density = False):
+
+    """ 
+    get a data structure that contains all the gene numbers separated by contig for an assembly
+    { contig : { 
+        window_1 : { 
+            "Gene" : number of coding basepairs (!! not the number of annotated genes)
+            },
+        window_2 : { 
+            "Gene" : number of coding basepairs
+            }
+        } 
+    }
+
+    Use merge_gene_windows to get the average number of anntoated genes over several windows to increase readability of the graph later.
+    This then means that e.g. window_1 to window_5 have the same value, which is the average over all the previously different values of these windows
+    """ 
+
+    
+    if verbose:
+        print(f"\ncalculate gene densities across the windows")
+        print(f"set window length for genes: {int(window_length)} bp")
+        assembly_length_incl = 0
+
+
+    # contig_lengths = get_contig_lengths(gff_filepath)
+    ## no need to check for len(contig_lengths) > 0 here that already happens for the repeat abundances
+    
+    contig_lengths = gen_windows.get_contig_lengths(gff_filepath)
+    num_contigs = len(contig_lengths)
+    assembly_length = sum([lengths[1] for lengths in contig_lengths.values()])
+
+    contig_lengths = {contig : length for contig, length in contig_lengths.items() if length[1]>window_length}
+    incl_length = sum([lengths[1] for lengths in contig_lengths.values()])
+    
+    if verbose:
+        incl_perc = (incl_length/assembly_length) * 100
+        print(f"{incl_length} bp are in are shorter than the window length and therefore excluded. ({assembly_length} bp in total, {incl_perc:.2f} % of assembly included)")
+        print(f"\n \t -  parse the species annotation: ")
+    
+    annotation = gff.parse_gff3_by_contig(annotation_filepath, verbose=verbose, featurecategory = gff.FeatureCategory.Exon)
+    
+    if verbose: 
+        print(f"\n")
+
+    all_categories:list[str] = [] # should only be ["Gene"] but double check
+    gene_abundances = {} 
+
+    num_contigs = len(contig_lengths)
+    cds_length = 0
+
+    all_windows:dict = {} # { contig : [[start1,end1] , [start2,end2] , ...]}
+
+    if statistics:
+        with open(statistics_outfile_name, "a") as stats_out:
+            stats_out.write(f"\n{annotation_filepath}\n")
+            for num_curr, contig in enumerate(contig_lengths.keys()):
+                assembly_length_incl += contig_lengths[contig][1]
+
+                windows_contig = gen_windows.get_window_intervals(contig_lengths[contig], window_length)
+                all_windows[contig] = windows_contig
+
+                contig_genes = annotation[contig]
+                
+                contig_abundances, contig_categories, overlap_removed_bp = rep_windows.get_contig_abundances(contig_genes, windows_contig, verbose=statistics, gene_number = True, gene_density = True, calc_gene_density = calc_gene_density, filter_overlap_previous=False)
+                
+                contig_gene_bp = int(sum([sum(list(window_abundances.values())) for window_abundances in contig_abundances.values()]))
+                cds_length += contig_gene_bp
+
+                gene_numbers = [list(gene_no.values())[0] if len(list(gene_no.values()))>0 else 0 for gene_no in list(contig_abundances.values()) ]
+                # print(gene_numbers)
+                mean_genes_in_window = mean(gene_numbers)
+                num_windows = len(contig_abundances)
+                est_mean_genes_in_window = len(contig_genes)/num_windows
+                
+                all_categories.extend(contig_categories)
+                gene_abundances[contig] = contig_abundances
+            
+                print(f"\t -->  ( contig {num_curr+1}/{num_contigs} ) {contig} :  {len(contig_genes)} annotated cds (the number of separately annotated features, not bp) in {contig_lengths[contig][1]} bp ")
+                stats_out.write(f"( contig {num_curr+1}/{num_contigs} ) {contig} :  {len(contig_genes)} annotated cds (the number of separately annotated features, not bp) in {contig_lengths[contig][1]} bp\n")
+                cds_percentage = cds_length / contig_lengths[contig][1]
+                print(f"\t      \t( total length of cds: {cds_length} ,  {cds_percentage:.2f} % ) ")
+                stats_out.write(f"\t( total length of cds: {cds_length} ,  {cds_percentage:.2f} % )\n")
+                # contig_repeat_percentage = (contig_gene_bp/contig_lengths[contig][1]) *100
+                # print(f"\t{contig_repeat_percentage:.2f}% genes ( {contig_gene_bp} / {contig_lengths[contig][1]} ) bp")
+                # print(f"\t{contig_categories}")
+    
+    else: # show progress bar if not verbose
+        print(f" \t -  creating windows for parsed contigs\n")
+
+        for contig in tqdm(contig_lengths.keys()):
+            assembly_length_incl += contig_lengths[contig][1]
+
+            windows_contig = gen_windows.get_window_intervals(contig_lengths[contig], window_length)
+            all_windows[contig] = windows_contig
+
+            contig_genes = annotation[contig]
+            
+            contig_abundances, contig_categories, overlap_removed_bp = rep_windows.get_contig_abundances(contig_genes, windows_contig, verbose=False, gene_number = True, gene_density=True, calc_gene_density = calc_gene_density, filter_overlap_previous=False)
+            
+            # print(contig_abundances)
+            if verbose:
+                contig_gene_bp = int(sum([sum(list(window_abundances.values())) for window_abundances in contig_abundances.values()]))
+                cds_length += contig_gene_bp
+            
+            all_categories.extend(contig_categories)
+            gene_abundances[contig] = contig_abundances
+    
+    all_categories = list(set(all_categories))
+
+    if verbose:
+        print(f"\n\tIn total, there are {len(all_categories)} unique feature categories: {all_categories} (should be only one for the genes)")
+        cds_percentage = (cds_length/assembly_length_incl) * 100
+        # print(f"\t{assembly_length_incl} bp of sequence were parsed, of which {cds_length} bp were annotated as genes ({cds_percentage:.2f}%)")
+    
+    return gene_abundances, all_categories, all_windows
+
+
+
+
+
+def average_over_gene_window_abundances(gene_abundances, merge_gene_windows):
+    """
+    uses the output from get_assembly_gene_numbers and returns a dictionary of the same dimensions 
+    but where every [merge_gene_windows] are grouped and averaged so that they each contain the mean number of genes between all of them
+    """
+
+    genes_mean = gene_abundances
+
+    for contig in gene_abundances.keys():
+        num_windows = len(gene_abundances[contig].keys())
+        windows_in_last_section = num_windows%merge_gene_windows
+        
+        # print(f"{contig} :  {num_windows} windows")
+        for window_ind in range(0, num_windows, merge_gene_windows):
+            # print(window_ind)
+            window_interval_genes:list[float] = []
+            
+            windows_in_interval = merge_gene_windows
+            if window_ind+windows_in_interval > num_windows:
+                windows_in_interval =   num_windows - window_ind
+
+            # get mean from original gene abundances
+            for window in range(window_ind, window_ind+windows_in_interval):
+                try:
+                    window_interval_genes.append(list(gene_abundances[contig][window].values())[0])
+                    # print(f"\t{window} :  {list(gene_abundances[contig][window].values())[0]}")
+                except:
+                    window_interval_genes.append(0)
+                    # print(f"\t{window} :  0")
+            mean_interval_genes = int(mean(window_interval_genes))
+            # print(mean_interval_genes)
+
+            # fill new dictionary with mean abundances
+            for window in range(window_ind, window_ind+windows_in_interval):
+                genes_mean[contig][window]["Gene"] = mean_interval_genes
+                # print(f"\t{window} :  {mean_interval_genes}")
+        
+    return genes_mean
+
+    
+
+def get_max_genes_in_window(gene_abundances):
+    """
+    see how many genes are in the window with the most genes to easily scale the Y axis for the gene line when plotting
+    """
+    max_genes = 0
+    for contig in gene_abundances.keys():
+        contig_abundances = gene_abundances[contig]
+        for window in contig_abundances.keys():
+            try:
+                if contig_abundances[window]["Gene"] > max_genes:
+                    max_genes = contig_abundances[window]["Gene"]
+            except:
+                pass
+    return max_genes
+        

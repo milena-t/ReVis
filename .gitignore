@@ -4,6 +4,7 @@
 *.fna
 *.fasta
 *.gff
+*.out
 
 
 # Byte-compiled / optimized / DLL files

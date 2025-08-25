@@ -16,7 +16,7 @@ def random_hex_color():
 
 
 
-def plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, transparent_bg, gene_numbers = {}, gene_numbers2 = {}, species_name = "", y_label = "repeat abundance", filename = ""):
+def plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, transparent_bg, gene_numbers = {}, gene_numbers2 = {}, species_name = "", y_label = "repeat abundance", output_dir  = ""):
 
     print("\n* start plotting...")
     
@@ -24,10 +24,9 @@ def plot_repeat_abundance(species_abundances, species_categories, gff_filepath, 
         species_name = gff.split_at_second_occurrence(gff_filepath.split("/")[-1])
         #species_name = species_name.replace("_", ". ")
 
-    if len(filename)==0:
-        filename = f"repeat_abundance_in_{species_name}.png"
-        if len(gene_numbers)>0:
-            filename = f"repeat_abundance_with_gene_numbers_in_{species_name}.png"
+    filename = f"{output_dir}repeat_abundance_in_{species_name}.png"
+    if len(gene_numbers)>0:
+        filename = f"{output_dir}repeat_abundance_with_gene_numbers_in_{species_name}.png"
 
     # Width of the bars
     # width = 0.35

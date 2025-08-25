@@ -92,7 +92,7 @@ which also increases the runtime. In any case, the longest runtime i managed to 
     (Include this! If not included it will try to parse it automatically from the start of filenames, 
     which will probably only work for how i named my files)""")
     parser.add_argument('--window_length', type=float, required = True, help="window length (scientific notation like 1e6 is ok)")
-    parser.add_argument('--out_dir', type=float, help="path to output directory. If not given all files will be saved in current working directory")
+    parser.add_argument('--out_dir', type=str, help="path to output directory. If not given all files will be saved in current working directory")
     parser.add_argument('--merge_gene_windows', type=int, help="""If an annotation is included to show gene density, 
     the gene density is likely difficult to interpret visually if you show it for each repeat-window.
     Here you can choose how many windows you would like to average over, 
@@ -128,6 +128,8 @@ which also increases the runtime. In any case, the longest runtime i managed to 
         args.gene_density = False
     if not args.merge_gene_windows:
         args.merge_gene_windows = 5
+    if args.out_dir[-1] != "/":
+        args.out_dir = f"{args.out_dir}/"
 
     return args
 
@@ -278,7 +280,7 @@ if __name__ == "__main__":
             species_gene_abundances, speices_gene_categories = gen_windows.get_assembly_gene_numbers(args.annotation_gff, gff_filepath, window_length, verbose = True, calc_gene_density = args.gene_density, statistics_outfile_name=statistics_outfile_name)
             avg_species_gene_abundances = gen_windows.average_over_gene_window_abundances(species_gene_abundances, args.merge_gene_windows)
             # print(avg_species_gene_abundances)
-            plot_windows.plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, transparent_bg = plot_transparent_backrgound, gene_numbers = species_gene_abundances, species_name=args.species_name)
+            plot_windows.plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, transparent_bg = plot_transparent_backrgound, gene_numbers = species_gene_abundances, species_name=args.species_name, output_dir = args.out_dir)
 
         elif include_annotation and include_second_annotation:
             # first annotation
@@ -288,11 +290,11 @@ if __name__ == "__main__":
             species_gene_abundances2, speices_gene_categories2 = gen_windows.get_assembly_gene_numbers(args.annotation_gff2, gff_filepath, window_length, verbose = True, statistics=args.statistics, calc_gene_density = args.gene_density, statistics_outfile_name=statistics_outfile_name)
             avg_species_gene_abundances2 = gen_windows.average_over_gene_window_abundances(species_gene_abundances2, args.merge_gene_windows)
             # print(avg_species_gene_abundances)
-            plot_windows.plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, transparent_bg = plot_transparent_backrgound, gene_numbers = species_gene_abundances, gene_numbers2 = species_gene_abundances2, species_name=args.species_name)
+            plot_windows.plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, transparent_bg = plot_transparent_backrgound, gene_numbers = species_gene_abundances, gene_numbers2 = species_gene_abundances2, species_name=args.species_name, output_dir = args.out_dir)
 
 
         else:
-            plot_windows.plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, transparent_bg = plot_transparent_backrgound, species_name=args.species_name)
+            plot_windows.plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, transparent_bg = plot_transparent_backrgound, species_name=args.species_name, output_dir = args.out_dir)
             pass
 
         print(f"plot white background: {args.plot_white_background}")
@@ -332,7 +334,7 @@ if __name__ == "__main__":
 
         ## save to tsv
   
-        outfile_name = f"repeat_statistics_{species_name}_table.tsv"
+        outfile_name = f"{args.out_dir}repeat_statistics_{species_name}_table.tsv"
         
         output_df.to_csv(outfile_name, sep="\t", header=True, index=False)
         print(f"\table saved in the current working directory directory as: {outfile_name}")

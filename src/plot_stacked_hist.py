@@ -16,7 +16,7 @@ def random_hex_color():
 
 
 
-def plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, transparent_bg, gene_numbers = {}, gene_numbers2 = {}, species_name = "", y_label = "repeat abundance", output_dir  = ""):
+def plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, transparent_bg, gene_numbers = {}, gene_numbers2 = {}, species_name = "", y_label = "repeat abundance", output_dir  = "", plot_overlap_filtered = True):
 
     print("\n* start plotting...")
     
@@ -341,12 +341,13 @@ def plot_repeat_abundance(species_abundances, species_categories, gff_filepath, 
 
     # make space for legend on the left
     x_limits = plt.xlim()
-    new_lower_limit = x_limits[0] - 0.15 * (x_limits[1] - x_limits[0])
+    new_lower_limit = x_limits[0] - 0.17 * (x_limits[1] - x_limits[0])
     if len(gene_numbers)>0:
-        new_lower_limit = x_limits[0] - 0.17 * (x_limits[1] - x_limits[0])
+        new_lower_limit = x_limits[0] - 0.2 * (x_limits[1] - x_limits[0])
     ax.set_xlim(new_lower_limit, x_limits[1])
-
-    ax.set_ylim(0, 105)
+    
+    if plot_overlap_filtered:
+        ax.set_ylim(0, 105)
 
     plt.tight_layout()
 

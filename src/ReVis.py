@@ -130,6 +130,8 @@ which also increases the runtime. In any case, the longest runtime i managed to 
         args.merge_gene_windows = 5
     if args.out_dir[-1] != "/":
         args.out_dir = f"{args.out_dir}/"
+    if not args.plot_overlap_filtered:
+        args.out_dir = f"{args.out_dir}no_overlap_filtered_"
 
     return args
 
@@ -280,7 +282,7 @@ if __name__ == "__main__":
             species_gene_abundances, speices_gene_categories = gen_windows.get_assembly_gene_numbers(args.annotation_gff, gff_filepath, window_length, verbose = True, calc_gene_density = args.gene_density, statistics_outfile_name=statistics_outfile_name)
             avg_species_gene_abundances = gen_windows.average_over_gene_window_abundances(species_gene_abundances, args.merge_gene_windows)
             # print(avg_species_gene_abundances)
-            plot_windows.plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, transparent_bg = plot_transparent_backrgound, gene_numbers = species_gene_abundances, species_name=args.species_name, output_dir = args.out_dir)
+            plot_windows.plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, transparent_bg = plot_transparent_backrgound, gene_numbers = species_gene_abundances, species_name=args.species_name, output_dir = args.out_dir, plot_overlap_filtered = args.plot_overlap_filtered)
 
         elif include_annotation and include_second_annotation:
             # first annotation
@@ -290,14 +292,14 @@ if __name__ == "__main__":
             species_gene_abundances2, speices_gene_categories2 = gen_windows.get_assembly_gene_numbers(args.annotation_gff2, gff_filepath, window_length, verbose = True, statistics=args.statistics, calc_gene_density = args.gene_density, statistics_outfile_name=statistics_outfile_name)
             avg_species_gene_abundances2 = gen_windows.average_over_gene_window_abundances(species_gene_abundances2, args.merge_gene_windows)
             # print(avg_species_gene_abundances)
-            plot_windows.plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, transparent_bg = plot_transparent_backrgound, gene_numbers = species_gene_abundances, gene_numbers2 = species_gene_abundances2, species_name=args.species_name, output_dir = args.out_dir)
+            plot_windows.plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, transparent_bg = plot_transparent_backrgound, gene_numbers = species_gene_abundances, gene_numbers2 = species_gene_abundances2, species_name=args.species_name, output_dir = args.out_dir, plot_overlap_filtered = args.plot_overlap_filtered)
 
 
         else:
-            plot_windows.plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, transparent_bg = plot_transparent_backrgound, species_name=args.species_name, output_dir = args.out_dir)
+            plot_windows.plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, transparent_bg = plot_transparent_backrgound, species_name=args.species_name, output_dir = args.out_dir, plot_overlap_filtered = args.plot_overlap_filtered)
             pass
 
-        print(f"plot white background: {args.plot_white_background}")
+        print(f"output directory: {args.out_dir}")
 
 
     elif args.table:

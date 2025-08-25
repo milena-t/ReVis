@@ -137,7 +137,7 @@ which also increases the runtime. In any case, the longest runtime i managed to 
 
 
 
-def make_dict_to_list_for_pandas(abundances_dict, abundances_categories, windows_dict, gene_abundances = {}, gene_abundances2 = {}, unmasked_bp_dict = {}, verbose = False):
+def make_dict_to_list_for_pandas(abundances_dict, abundances_categories, windows_dict, unmasked_bp_dict, gene_abundances = {}, gene_abundances2 = {}, verbose = False):
     """ 
     take the dictionary with repeats
     {  
@@ -199,14 +199,11 @@ def make_dict_to_list_for_pandas(abundances_dict, abundances_categories, windows
                 cds_bp2 = 0
 
             # get unmasked bp 
-            if len(unmasked_bp_dict)>0:
-                try:
-                    unmasked_bp = int(unmasked_bp_dict[contig][window_ind])
-                except:
-                    print(unmasked_bp_dict[contig][window_ind])
-                    raise RuntimeError
-            else:
-                unmasked_bp = 0
+            try:
+                unmasked_bp = int(unmasked_bp_dict[contig][window_ind])
+            except:
+                print(unmasked_bp_dict[contig][window_ind])
+                raise RuntimeError
 
             # start to make the line in the output file
             abundances_line = [contig, window_ind, window_length, cds_bp, cds_bp/unmasked_bp, cds_bp2, cds_bp2/unmasked_bp, unmasked_bp]
@@ -326,7 +323,7 @@ if __name__ == "__main__":
             raise RuntimeError(f"Table mode requires a genome annotation! ")
 
         if args.assembly_path:
-            unmasked_dict = gen_windows.get_masked_bp_in_window(args.assembly_path, window_length, verbose=args.verbose)
+            unmasked_dict = rep_windows.get_masked_bp_in_window(args.assembly_path, window_length, verbose=args.verbose)
             
 
         output_df = make_dict_to_list_for_pandas(species_abundances, species_categories, gene_abundances = species_gene_abundances, gene_abundances2 = species_gene_abundances2, windows_dict = all_windows, unmasked_bp_dict = unmasked_dict, verbose = args.verbose) ## --> this function does not work properly yet

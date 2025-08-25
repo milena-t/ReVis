@@ -1,15 +1,11 @@
 from dataclasses import dataclass
 # dataclass generates stuff like __init__() for classes automatically 
-from enum import Enum
 import time
 import pandas as pd
 from tqdm import tqdm
 import subprocess as sp
 import tempfile
 import os
-import parse_gff as gff
-
-
 
 
 @dataclass

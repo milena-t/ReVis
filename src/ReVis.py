@@ -92,6 +92,7 @@ which also increases the runtime. In any case, the longest runtime i managed to 
     (Include this! If not included it will try to parse it automatically from the start of filenames, 
     which will probably only work for how i named my files)""")
     parser.add_argument('--window_length', type=float, required = True, help="window length (scientific notation like 1e6 is ok)")
+    parser.add_argument('--out_dir', type=float, help="path to output directory. If not given all files will be saved in current working directory")
     parser.add_argument('--merge_gene_windows', type=int, help="""If an annotation is included to show gene density, 
     the gene density is likely difficult to interpret visually if you show it for each repeat-window.
     Here you can choose how many windows you would like to average over, 
@@ -99,6 +100,7 @@ which also increases the runtime. In any case, the longest runtime i managed to 
     put 1 if you don't want any averaging""")
 
     parser.add_argument('--plot_overlap_filtered', action="store_true", help="use the overlap-filtered repeats for plotting")
+    parser.add_argument('--plot_white_background', action="store_true", help="the plot does NOT have a transparent background, but white instead")
 
     parser.add_argument('--verbose', action="store_true", help="print progress in the command line (recommended, on by default)")
     parser.add_argument('--statistics', action="store_true", help="""print contig-specific repeat statistics (optional, increases output length quite a bit, off by default)
@@ -240,8 +242,9 @@ if __name__ == "__main__":
 
     window_length = args.window_length
     statistics = args.statistics
-
-        
+    plot_transparent_backrgound = True
+    if args.plot_white_background:
+        plot_transparent_backrgound = False
 
     if len(args.species_name)==0:
         species_name = gff.split_at_second_occurrence(gff_filepath.split("/")[-1])
@@ -275,7 +278,7 @@ if __name__ == "__main__":
             species_gene_abundances, speices_gene_categories = gen_windows.get_assembly_gene_numbers(args.annotation_gff, gff_filepath, window_length, verbose = True, calc_gene_density = args.gene_density, statistics_outfile_name=statistics_outfile_name)
             avg_species_gene_abundances = gen_windows.average_over_gene_window_abundances(species_gene_abundances, args.merge_gene_windows)
             # print(avg_species_gene_abundances)
-            plot_windows.plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, gene_numbers = species_gene_abundances, species_name=args.species_name)
+            plot_windows.plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, transparent_bg = plot_transparent_backrgound, gene_numbers = species_gene_abundances, species_name=args.species_name)
 
         elif include_annotation and include_second_annotation:
             # first annotation
@@ -285,13 +288,14 @@ if __name__ == "__main__":
             species_gene_abundances2, speices_gene_categories2 = gen_windows.get_assembly_gene_numbers(args.annotation_gff2, gff_filepath, window_length, verbose = True, statistics=args.statistics, calc_gene_density = args.gene_density, statistics_outfile_name=statistics_outfile_name)
             avg_species_gene_abundances2 = gen_windows.average_over_gene_window_abundances(species_gene_abundances2, args.merge_gene_windows)
             # print(avg_species_gene_abundances)
-            plot_windows.plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, gene_numbers = species_gene_abundances, gene_numbers2 = species_gene_abundances2, species_name=args.species_name)
+            plot_windows.plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, transparent_bg = plot_transparent_backrgound, gene_numbers = species_gene_abundances, gene_numbers2 = species_gene_abundances2, species_name=args.species_name)
 
 
         else:
-            plot_windows.plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, species_name=args.species_name)
+            plot_windows.plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, transparent_bg = plot_transparent_backrgound, species_name=args.species_name)
             pass
 
+        print(f"plot white background: {args.plot_white_background}")
 
 
     elif args.table:

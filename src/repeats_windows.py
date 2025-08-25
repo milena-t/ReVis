@@ -142,7 +142,7 @@ def get_contig_abundances(contig_repeats:list[gff.FeatureCategory.Repeat], windo
     overlap_removed_bp = 0
 
     for window_num, window_list in enumerate(windows):
-        repeats_dict, overlap_filtered_bp = get_repeat_abundance(contig_repeats, window_list, summarize_categories=True, gene_number = gene_number, gene_density=gene_density, filter_overlap_previous__ = filter_overlap_previous, calc_gene_density = calc_gene_density)
+        repeats_dict, overlap_filtered_bp = get_repeat_abundance(contig_repeats, window_list, gene_number = gene_number, gene_density=gene_density, filter_overlap_previous__ = filter_overlap_previous, calc_gene_density = calc_gene_density)
         overlap_removed_bp += overlap_filtered_bp
         # print(f" --> test list: {window_list}, {len(repeats_dict)}") # TODO related to the no_placement stuff above
         repeat_abundances[window_num] = repeats_dict

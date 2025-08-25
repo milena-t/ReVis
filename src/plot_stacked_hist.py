@@ -15,31 +15,8 @@ def random_hex_color():
     return "#{:06x}".format(random.randint(0, 0xFFFFFF))
 
 
-def get_window_intervals(contig_coords:list[int], window_length:int) -> list[list[int]]:
-    """
-    get the intervals of the non-overlapping windows in a list of lists like this:
-    [ [window1_start, window1_end] ,  [window2_start, window2_end] ,  ... ]
-    """
-    contig_end = contig_coords[1]
-    contig_start = contig_coords[0]
 
-    windows_list: list[list[int]] = []
-    curr_window_start = contig_start
-    curr_window_end = window_length
-
-    while curr_window_end < contig_end:
-        windows_list.append([curr_window_start, curr_window_end])
-        curr_window_start = curr_window_end+1
-        curr_window_end = curr_window_start+window_length-1
-    
-    windows_list.append([curr_window_start, contig_end])
-
-    return(windows_list)
-
-
-
-
-def plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, gene_numbers = {}, gene_numbers2 = {}, species_name = "", y_label = "repeat abundance", filename = ""):
+def plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, transparent_bg, gene_numbers = {}, gene_numbers2 = {}, species_name = "", y_label = "repeat abundance", filename = ""):
 
     print("\n* start plotting...")
     
@@ -195,7 +172,7 @@ def plot_repeat_abundance(species_abundances, species_categories, gff_filepath, 
 
 
     for contig in contig_lengths.keys():
-        window_intervals = get_window_intervals(contig_lengths[contig], window_length)
+        window_intervals = gen_windows.get_window_intervals(contig_lengths[contig], window_length)
         window_centers = [window[0]+ 0.5*window_length for window in window_intervals]
         window_abundances = species_abundances[contig]
 
@@ -217,7 +194,7 @@ def plot_repeat_abundance(species_abundances, species_categories, gff_filepath, 
 
         if include_genes_line:
 
-            window_intervals_genes = get_window_intervals(contig_lengths[contig], window_length)
+            window_intervals_genes = gen_windows.get_window_intervals(contig_lengths[contig], window_length)
             window_centers_genes = [window[0]+ 0.5*window_length for window in window_intervals]
 
             genes_window = gene_numbers[contig]
@@ -374,7 +351,7 @@ def plot_repeat_abundance(species_abundances, species_categories, gff_filepath, 
 
     plt.tight_layout()
 
-    plt.savefig(filename, dpi = 300, transparent = True)
+    plt.savefig(filename, dpi = 300, transparent = transparent_bg)
     print("\tFigure saved in the current working directory directory as: "+filename)
 
     # plt.show()

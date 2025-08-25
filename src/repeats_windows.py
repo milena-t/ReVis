@@ -219,7 +219,9 @@ def get_assembly_repeat_abundances(out_filepath:str, window_length:int, filter_o
     repeat_abundances = {} 
 
     num_contigs = len(contig_lengths)
-    if statistics:
+
+
+    if statistics_outfile_name != "":
         with open(statistics_outfile_name, "a") as stats_out:
             stats_out.write(f"\n{out_filepath}\n")
 

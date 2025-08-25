@@ -88,7 +88,7 @@ which also increases the runtime. In any case, the longest runtime i managed to 
     masked assembly, so that the number of masked/unmasked bases can be computed properly. It should be the assembly that was masked in this repeatmasker
     run and also the assembly that is the basis for the annotation""")
 
-    parser.add_argument('--species_name', type=str, help="""species identifier string, like 'C_maculatus' 
+    parser.add_argument('--species_name', type=str, help="""species identifier string, like 'C_maculatus', '_' will be replaced with '. ' 
     (Include this! If not included it will try to parse it automatically from the start of filenames, 
     which will probably only work for how i named my files)""")
     parser.add_argument('--window_length', type=float, required = True, help="window length (scientific notation like 1e6 is ok)")

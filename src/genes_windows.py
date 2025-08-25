@@ -2,7 +2,6 @@ from statistics import mean
 
 import parse_gff as gff
 import repeats_windows as rep_windows
-import genes_windows as gen_windows
 from tqdm import tqdm
 
 
@@ -103,7 +102,7 @@ def get_assembly_gene_numbers(annotation_filepath, gff_filepath, window_length, 
             for num_curr, contig in enumerate(contig_lengths.keys()):
                 assembly_length_incl += contig_lengths[contig][1]
 
-                windows_contig = gen_windows.get_window_intervals(contig_lengths[contig], window_length)
+                windows_contig = get_window_intervals(contig_lengths[contig], window_length)
                 contig_genes = annotation[contig]
                 
                 contig_abundances, contig_categories, overlap_removed_bp = rep_windows.get_contig_abundances(contig_genes, windows_contig, verbose=statistics, gene_number = True, calc_gene_density = calc_gene_density, filter_overlap_previous_=False)
@@ -136,7 +135,7 @@ def get_assembly_gene_numbers(annotation_filepath, gff_filepath, window_length, 
         for contig in tqdm(contig_lengths.keys()):
             assembly_length_incl += contig_lengths[contig][1]
 
-            windows_contig = gen_windows.get_window_intervals(contig_lengths[contig], window_length)
+            windows_contig = get_window_intervals(contig_lengths[contig], window_length)
             contig_genes = annotation[contig]
             
             contig_abundances, contig_categories, overlap_removed_bp = rep_windows.get_contig_abundances(contig_genes, windows_contig, verbose=False, gene_number = True, calc_gene_density = calc_gene_density, filter_overlap_previous=False)
@@ -191,7 +190,7 @@ def get_assembly_gene_abundances(annotation_filepath, gff_filepath, window_lengt
     # contig_lengths = get_contig_lengths(gff_filepath)
     ## no need to check for len(contig_lengths) > 0 here that already happens for the repeat abundances
     
-    contig_lengths = gen_windows.get_contig_lengths(gff_filepath)
+    contig_lengths = get_contig_lengths(gff_filepath)
     num_contigs = len(contig_lengths)
     assembly_length = sum([lengths[1] for lengths in contig_lengths.values()])
 
@@ -222,7 +221,7 @@ def get_assembly_gene_abundances(annotation_filepath, gff_filepath, window_lengt
             for num_curr, contig in enumerate(contig_lengths.keys()):
                 assembly_length_incl += contig_lengths[contig][1]
 
-                windows_contig = gen_windows.get_window_intervals(contig_lengths[contig], window_length)
+                windows_contig = get_window_intervals(contig_lengths[contig], window_length)
                 all_windows[contig] = windows_contig
 
                 contig_genes = annotation[contig]
@@ -256,7 +255,7 @@ def get_assembly_gene_abundances(annotation_filepath, gff_filepath, window_lengt
         for contig in tqdm(contig_lengths.keys()):
             assembly_length_incl += contig_lengths[contig][1]
 
-            windows_contig = gen_windows.get_window_intervals(contig_lengths[contig], window_length)
+            windows_contig = get_window_intervals(contig_lengths[contig], window_length)
             all_windows[contig] = windows_contig
 
             contig_genes = annotation[contig]

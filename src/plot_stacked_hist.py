@@ -279,6 +279,7 @@ def plot_repeat_abundance(species_abundances, species_categories, gff_filepath, 
     # convert x axis to Mb
     # Set the primary x-axis formatter to convert bp to Mb
     ax.xaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x < 0 else f'{x / 1e6:.0f} Mb'))
+    ax3.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x == 0 else int(x)))
 
     # add contig names
     # Set the secondary x-axis ticks and labels

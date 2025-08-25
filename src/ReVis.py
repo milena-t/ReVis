@@ -299,8 +299,6 @@ if __name__ == "__main__":
             plot_windows.plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, transparent_bg = plot_transparent_backrgound, species_name=args.species_name, output_dir = args.out_dir, plot_overlap_filtered = args.plot_overlap_filtered)
             pass
 
-        print(f"output directory: {args.out_dir}")
-
 
     elif args.table:
 
@@ -308,7 +306,7 @@ if __name__ == "__main__":
             print(f"\n\tTABLE mode --> the output will be a tsv file\n")
 
         #turn off the overlap filtering for making the table! this is necessary when you want to do reliable statistics on 
-        species_abundances, species_categories = rep_windows.get_assembly_repeat_abundances(out_filepath, window_length, gff_filepath=gff_filepath, verbose=args.verbose, statistics=args.statistics, filter_overlap_previous_=False)
+        species_abundances, species_categories = rep_windows.get_assembly_repeat_abundances(out_filepath, window_length, gff_filepath=gff_filepath, verbose=args.verbose, statistics=args.statistics, filter_overlap_previous_=False, statistics_outfile_name=statistics_outfile_name)
 
         # get gene density
         species_gene_abundances ={}
@@ -325,7 +323,7 @@ if __name__ == "__main__":
             species_gene_abundances2, speices_gene_categories2, all_windows = gen_windows.get_assembly_gene_abundances(args.annotation_gff2, gff_filepath, window_length, verbose = True, statistics=args.statistics, calc_gene_density = args.gene_density, statistics_outfile_name=statistics_outfile_name)
 
         else:
-            pass
+            raise RuntimeError(f"Table mode requires a genome annotation! ")
 
         if args.assembly_path:
             unmasked_dict = gen_windows.get_masked_bp_in_window(args.assembly_path, window_length, verbose=args.verbose)

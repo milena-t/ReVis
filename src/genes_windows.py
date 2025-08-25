@@ -74,7 +74,7 @@ def get_assembly_gene_numbers(annotation_filepath, gff_filepath, window_length, 
     # contig_lengths = get_contig_lengths(gff_filepath)
     ## no need to check for len(contig_lengths) > 0 here that already happens for the repeat abundances
     
-    contig_lengths = rep_windows.get_contig_lengths(gff_filepath)
+    contig_lengths = get_contig_lengths(gff_filepath)
     num_contigs = len(contig_lengths)
     assembly_length = sum([lengths[1] for lengths in contig_lengths.values()])
 

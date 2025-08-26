@@ -113,8 +113,6 @@ which also increases the runtime. In any case, the longest runtime i managed to 
     args = parser.parse_args()
 
     # make defaults
-    if not args.verbose:
-        args.verbose = True
     if not args.statistics:
         args.statistics = False
     if not args.masker_out_gff:

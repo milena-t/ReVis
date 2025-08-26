@@ -14,101 +14,82 @@ from matplotlib.ticker import FuncFormatter
 from matplotlib.lines import Line2D
 
 import argparse
+import time
 
 def parse_args():
     # Create the parser
     program_description = """
-A script to calculate repeat abundance in non-overlapping windows over an entire assembly from repeatmasker output.
-Results can be plotted in a stacked histogram (plot mode) or returned as tsv files (table mode). 
+    TODO write documentation
+    Files that need to be included to compute the tables from scratch:
+    * repeats_out (takes both .out and .ori.out and then acts accordingly, like base ReVis)
+    * annotations_gff
+    * orthogroups_orthofinder
+    * CAFE_sig_OGs
 
+    Other flags to include:
+    * bp (how many bp up- and downstream of a transcript to compute and plot)
+    * gene family size percentile (recommended! for the sig. table, only genes that are part of actually expanding gene families (not just all sig. evolving orthogroups) are included)
+    * species name (matching one in the orthofinder output!!!)
 
-------------------------- quick start
+    ## TODO:
+    * implement options for gene/transcript ID list input as well, in case someone doesn't use orthofinder or CAFE
 
-python3 ReVis.py --masker_outfile your_assembly.fna.ori.out --masker_out_gff your_assembly.fna.out.gff --species_name Your_species --window_length 1e6 --plot_overlap_filtered --verbose --plot
-
-------------------------- dependencies
-
- *  On uppmax, load biopython/1.80-py3.10.8 to use argparse (base python doesn't include it).
- *  Libraries imported in this script and in parse_repeats.py and parse_gff.py:
-        - sys, re, os, subprocess, argparse
-        - tqdm, random, time
-        - dataclasses, enum, pandas, tempfile, SeqIO
-        - matplotlib
-        (they can all be installed through pip. Sorry if I forgot any, I'm sure the compiler will tell you)
-
-------------------------- documentation
-
-This script analyzes repeatmasker output. You can run in two modes, plot mode or table mode. Plot mode returns 
-a plot with a stacked histogram of all the repeat categories (overlap filtered! Repeat annotations can be on top of each other, 
-where two or more repeats cover the same stretch of sequence, which can result in a >100% repeat coverage in some rep_windows. 
-You can filter out repeat categories that overlap with others so that each base is only covered by one repeat annotation.
-This filtering warps the category proportion in some windows, because it is likely that there are more bases of some categories 
-removed than others. See get_repeat_abundance function documentation for details). If you include a genome annotation, 
-a line for the number of annotated genes in the same windows is added. You can add up to two annotations to compare them.
-Table mode returns the same by-window information as a tsv file with the proportion of basepairs in each window 
-covered by each repeat category (NOT overlap filtered, so there can be more bp covered by all repeats in a window than the number
-of masked bp or even the window length) and also the number of bp and ratio covered by coding regions (exons). If the masked
-assembly is given it will also include the number of unmasked bp in each window.
-
-It takes as input two of the repeatmasker output files, *.ori.out (but just *.out also works, only slower), and *.out.gff
-
-The runtime depends on the overall repeat content and on how fragmented the assembly is. I have tried my best to optimize, 
-but if your assembly is long and fragmented, it takes long to loop through many small contigs, and if there are many repeats, 
-it takes long to sum all of them up per window. Short windows increase the total number of windows computed and plotted, 
-which also increases the runtime. In any case, the longest runtime i managed to achieve with my data was 3:30 min.
-
-------------------------- good luck! 
-
+    tables that need to be included if they were previously computed and should only be plotted:
+    * "background" repeat abundance
+        * all_before_transcript
+        * all_after_transcript
+    * "foreground" repeat abundance: one of two options
+        * sig_before_transcript
+        * sig_after_transcript
+    This can be one of two kinds. they are formatted the same, but can be computed one of two ways
+    * CAFE5-significant repeat abundances (all orthogroups)
+    * CAFE5-significant repeats abundances (only genes that are in actually expanding orthogroups) 
 """
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,description=program_description)
-
-    # Add the arguments
-    parser.add_argument('--masker_outfile', type=str, required=True, help="""repeatmasker output file ending in .out 
-    (I really recommend .ori.out, but both work, the other one is just slower)""")
-    parser.add_argument('--masker_out_gff', type=str, help="""repeatmasker output file ending in .out.gff
-    If not given it will be assumed to have the same basename as .out and inferred automatically.
-    (which is true if you didn't change anything about the repeatmasker outfile names.) 
-    (This technically contains the same information as the .out file, but it also has "sequence region" annotations
-    which have all the contig lengths. These would otherwise have to be extracted from the assembly and this is just faster.)""")
-
-    # output format: mutually exclusive group of arguments, either table or plot
-    output = parser.add_mutually_exclusive_group(required=True)
-    output.add_argument("--table", action="store_true", help = """The output of the program is the tsv file with all values""")
-    output.add_argument("--plot", action="store_true", help = """The output of the program is the plot""")
     
-    parser.add_argument('--annotation_gff', type=str, help="""If you want to include a line that shows the gene density in each window, 
-    you can give an annotation based on the same assembly (with matching contig names!)""")
-    parser.add_argument('--annotation_gff2', type=str, help="""You can include a second annotation as well if you want to and show to different lines.""")
-    parser.add_argument('--gene_density', action="store_true", help="""If you give an annotation, by default you will get the number of genes per window, 
-    but you may also calculate the ratio: number of genes / window length with this option""")
-    parser.add_argument('--assembly_path', type=str, help="""If you want to compute the table with all the per-window values you need to include the
-    masked assembly, so that the number of masked/unmasked bases can be computed properly. It should be the assembly that was masked in this repeatmasker
-    run and also the assembly that is the basis for the annotation""")
-
-    parser.add_argument('--species_name', type=str, help="""species identifier string, like 'C_maculatus', '_' will be replaced with '. ' 
-    (Include this! If not included it will try to parse it automatically from the start of filenames, 
-    which will probably only work for how i named my files)""")
-    parser.add_argument('--window_length', type=float, required = True, help="window length (scientific notation like 1e6 is ok)")
+    # make tables or only plot
+    output = parser.add_mutually_exclusive_group(required=True)
+    output.add_argument("--compute_tables", action="store_true", help = """it will compute all the tables required for plotting and then also make the plot""")
+    output.add_argument("--plot", action="store_true", help = """it will ONLY plot and you have to pass the table filepaths as input 
+                        (if you go more than 1kb up/downstream, computing the tables will take a long time)""")
+    
     parser.add_argument('--out_dir', type=str, help="path to output directory. If not given all files will be saved in current working directory")
-    parser.add_argument('--merge_gene_windows', type=int, help="""If an annotation is included to show gene density, 
-    the gene density is likely difficult to interpret visually if you show it for each repeat-window.
-    Here you can choose how many windows you would like to average over, 
-    default = 5
-    put 1 if you don't want any averaging""")
+    
+    # arguments for computing the tables
+    parser.add_argument('--masker_outfile', type=str, help="""repeatmasker output file ending in .out 
+    (I really recommend .ori.out, but both work, the other one is just slower)""")
+    parser.add_argument('--annotation_gff', type=str, help="""genome annotation based on the same assembly as the repeatmasker output""")
+    parser.add_argument('--orthogroups', type=str, help="""hierarchical orthogroups file computed by orthofinder (N0.tsv) matching the results from CAFE5""")
+    parser.add_argument('--CAFE5_results', type=str, help="""family_results.txt file from CAFE5 with orthogroup names matching the orthofinder output""")
+    
+    # arguments for given tables, only do the plotting
+    parser.add_argument('--all_before_transcript', type=str, help="""when only plotting: table with background repeat abundance before genes ('all' genes)""")
+    parser.add_argument('--all_after_transcript', type=str, help="""when only plotting: table with background repeat abundance after genes ('all' genes)""")
+    parser.add_argument('--sig_before_transcript', type=str, help="""when only plotting: table with foreground repeat abundance before genes ('significant' genes)""")
+    parser.add_argument('--sig_after_transcript', type=str, help="""when only plotting: table with foreground repeat abundance after genes ('significant' genes)""")
+    
+
+    parser.add_argument('--species_name', type=str, help="""species identifier string, MUST match one species name in the orthofinder output""")
+    parser.add_argument('--bp', type=float, required = True, help="how many bp up and downstream of the transcript borders should be included")
+    parser.add_argument('--GF_size_percentile', type=int, help="""only gene families in the upper nth percentile of gene family size are
+                        included in the significant gene families. This helps ensure that only gene families that are really expanding
+                        in species_name specifically are included, and not the ones that are significant because they are expanding in other species.
+                        The default is 90%, which includes almost all gene families except the ones with only 1 or 0 members in most cases""")
 
     parser.add_argument('--plot_white_background', action="store_true", help="the plot does NOT have a transparent background, but white instead")
-
     parser.add_argument('--verbose', action="store_true", help="print progress in the command line (recommended, on by default)")
 
 
     # Parse the arguments
     args = parser.parse_args()
 
+    ## make defaults
+    if not args.verbose:
+        args.verbose = True
+    if not args.GF_size_percentile:
+        args.GF_size_percentile = 90
+
     return args
-
-
-
-
 
 
 def filter_sig_OGs_by_size(orthoDB_orthogroups:dict, species:str, q:int, verbose=False):
@@ -456,8 +437,13 @@ def tables_filepaths():
 
 if __name__ == "__main__":
 
-    # read infile paths 
-    repeats_out, repeats_out_work, orthoDB_annotations, orthoDB_annotations_work, orthogroups_native, orthogroups_orthoDB, sig_native, sig_orthoDB = filepaths()
+    start_time_complete = time.perf_counter()
+    args = parse_args()
+
+    repeats_out = args.masker_outfile
+    orthoDB_annotations = args.annotation_gff
+    orthogroups_orthoDB = args.orthogroups
+    sig_orthoDB = args.CAFE5_results
 
     ##########################################################
     ######### make TE abundance tables for plotting ##########
@@ -481,7 +467,9 @@ if __name__ == "__main__":
 
     
     ########
-    ## tables for significant transcripts
+    ## tables for significant transcripts.
+    ## in any species, only plot orthogroups where the GF size is not in the bottom 10 percent of that species (essentially excl. GF size 0 and 1)
+    ## so that the comparison really only shows gene families that are expanding.
     ########
     size_percentile_threshold = 90
     

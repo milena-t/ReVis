@@ -48,6 +48,7 @@ def write_dict_to_file(dict, filename, header = "", separator = ""):
             else:
                 outfile.write(f"{key}{separator}{value_str}\n")
         print("file saved in current working directory as: "+filename)
+    return filename
     
 def read_dict_from_file(filepath):
     out_dict = {}

@@ -5,7 +5,9 @@ Visualize the repeat content across a genome in a stacked histogram of the diffe
 
 # Quick start
 
+```bash
 python3 ReVis.py --masker_outfile your_assembly.fna.ori.out --masker_out_gff your_assembly.fna.out.gff --species_name Your_species --window_length 1e6 --plot_overlap_filtered --verbose --plot
+```
 
 # Documentation
 

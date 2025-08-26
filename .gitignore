@@ -6,6 +6,8 @@
 *.gff
 *.out
 
+*.tsv
+*.txt
 # *.png
 
 # Byte-compiled / optimized / DLL files

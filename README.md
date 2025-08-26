@@ -25,7 +25,7 @@ python3 ReVis.py \
 These are quickstart options, see all possible options with the `-h` flag or at the end of this documentation.
 ### Files
 
-* Repeatmasker outfiles:
+* Repeatmasker outfiles (do not change file extensions!!):
   * `your_assembly.fna.ori.out`
   * `your_assembly.fna.out.gff`
 * Optional:

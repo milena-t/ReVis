@@ -9,6 +9,25 @@ Visualize the repeat content across a genome in a stacked histogram of the diffe
 python3 ReVis.py --masker_outfile your_assembly.fna.ori.out --masker_out_gff your_assembly.fna.out.gff --species_name Your_species --window_length 1e6 --plot_overlap_filtered --verbose --plot
 ```
 
+## Input options
+
+These are quickstart options, see all possible options with the `-h` flag or below.
+### Files
+
+* Repeatmasker outfiles:
+  * `your_assembly.fna.ori.out`
+  * `your_assembly.fna.out.gff`
+* Masked assembly: `assembly.fna.masked`
+* Optional:
+  * genome annotation 1
+  * genome annotation 2
+  
+### Parameters
+
+* Species name (formatted like D_melanogaster for *Drosophila melanogaster*)
+* window length (basepairs, can be in scientific notation like 1e6 for 1Mb)
+* plot or table mode
+
 # Documentation
 
 download the latest release and just run `ReVis.py` like a normal python script. The dependencies are listed in `requirements.txt`, they are only commonly used python packages and can be installed with pip. 
@@ -61,3 +80,50 @@ it takes long to sum all of them up per window. Short windows increase the total
 which also increases the runtime. In any case, the longest runtime i managed to achieve with my data was 3:30 min.
 
 Good luck!
+
+## Detailed flags
+```
+-h, --help            show this help message and exit
+  --masker_outfile MASKER_OUTFILE
+                        repeatmasker output file ending in .out 
+                            (I really recommend .ori.out, but both work, the other one is just slower)
+  --masker_out_gff MASKER_OUT_GFF
+                        repeatmasker output file ending in .out.gff
+                            If not given it will be assumed to have the same basename as .out and inferred automatically.
+                            (which is true if you didn't change anything about the repeatmasker outfile names.) 
+                            (This technically contains the same information as the .out file, but it also has "sequence region" annotations
+                            which have all the contig lengths. These would otherwise have to be extracted from the assembly and this is just faster.)
+  --table               The output of the program is the tsv file with all values
+  --plot                The output of the program is the plot
+  --annotation_gff ANNOTATION_GFF
+                        If you want to include a line that shows the gene density in each window, 
+                            you can give an annotation based on the same assembly (with matching contig names!)
+  --annotation_gff2 ANNOTATION_GFF2
+                        You can include a second annotation as well if you want to and show to different lines.
+  --gene_density        If you give an annotation, by default you will get the number of genes per window, 
+                            but you may also calculate the ratio: number of genes / window length with this option
+  --assembly_path ASSEMBLY_PATH
+                        If you want to compute the table with all the per-window values you need to include the
+                            masked assembly, so that the number of masked/unmasked bases can be computed properly. It should be the assembly that was masked in this repeatmasker
+                            run and also the assembly that is the basis for the annotation
+  --species_name SPECIES_NAME
+                        species identifier string, like 'C_maculatus', '_' will be replaced with '. ' 
+                            (Include this! If not included it will try to parse it automatically from the start of filenames, 
+                            which will probably only work for how i named my files)
+  --window_length WINDOW_LENGTH
+                        window length (scientific notation like 1e6 is ok)
+  --out_dir OUT_DIR     path to output directory. If not given all files will be saved in current working directory
+  --merge_gene_windows MERGE_GENE_WINDOWS
+                        If an annotation is included to show gene density, 
+                            the gene density is likely difficult to interpret visually if you show it for each repeat-window.
+                            Here you can choose how many windows you would like to average over, 
+                            default = 5
+                            put 1 if you don't want any averaging
+  --plot_overlap_filtered
+                        use the overlap-filtered repeats for plotting
+  --plot_white_background
+                        the plot does NOT have a transparent background, but white instead
+  --verbose             print progress in the command line (recommended, on by default)
+  --statistics          print contig-specific repeat statistics (optional, increases output length quite a bit, off by default)
+                            Prints repeat information (and gene numbers if applicable) for each contig, mostly for debugging purposes
+```

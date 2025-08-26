@@ -3,7 +3,11 @@
 Visualize the repeat content across a genome in a stacked histogram of the different repeat categories. The repeat content is shown in non-overlapping windows, and optionally a line of the gene numbers (mean over multiple windows) can be included.
 ![B. siliquastri repeat landscape](example_data/repeat_abundance_with_gene_numbers_in_b_siliquastri.png) 
 
-# Quick start
+It is also possible to look at the surroundings of specific genes, and assess the repeat content in the upstream and downstream regions of a list of genes compared to a wider set to assess differences. This is not as user-friendly as the histograms right now but I am working on it. See detailed information below.
+
+# ReVis Histograms
+
+## Quick start
 
 ```bash
 python3 ReVis.py \
@@ -18,7 +22,7 @@ python3 ReVis.py \
 
 ## Input options
 
-These are quickstart options, see all possible options with the `-h` flag or below.
+These are quickstart options, see all possible options with the `-h` flag or at the end of this documentation.
 ### Files
 
 * Repeatmasker outfiles:
@@ -134,3 +138,11 @@ Good luck!
   --statistics          print contig-specific repeat statistics (optional, increases output length quite a bit, off by default)
                             Prints repeat information (and gene numbers if applicable) for each contig, mostly for debugging purposes
 ```
+
+# ReVis transcript surroundings
+
+There is also the option to look at the repeat proportion of the sequences up and downstream of a list of genes. This requires a list of all genes you want to use as "background", and then a different list (potentially a subset of the first one) that you want to contrast with that. Here, I do *not* use windows, this is looking at the repeat abundance at individual bp positions up and downstream of gene borders.
+I wrote this code to use on the results of a CAFE5 analysis based on orthofinder, so this is the kind of file format it expects, but it's probably not too difficult to modify. 
+
+The script works like this: 
+* make a table for the surrounding n bases upstream and downstream of each gene where each base is a row and each column is the sum of how often this base is annotated as the TE-category across all transcripts

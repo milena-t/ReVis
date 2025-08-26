@@ -3,4 +3,3 @@ biopython==1.83
 matplotlib==3.8.4
 pandas==2.3.2
 tqdm==4.66.1
-tqdm==4.66.2

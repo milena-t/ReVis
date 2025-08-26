@@ -20,7 +20,7 @@ import argparse
 
 def parse_args():
     # Create the parser
-    program_description = """\n
+    program_description = """
 A script to calculate repeat abundance in non-overlapping windows over an entire assembly from repeatmasker output.
 Results can be plotted in a stacked histogram (plot mode) or returned as tsv files (table mode). 
 

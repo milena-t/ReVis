@@ -28,18 +28,23 @@ def get_all_repeat_categories(repeats_dict):
 
 
 
-def make_cumulative_TE_table(orthogroups_path:str, n:int, species:str, repeats_annot_path:str, genome_annot_path:str, sig_orthogroups = [], count_transcripts = False):
+def make_cumulative_TE_table(orthogroups_path, n:int, species:str, repeats_annot_path:str, genome_annot_path:str, sig_orthogroups = [], count_transcripts = False, verbose=True):
     """
     make a table for the surrounding n bases upstream and downstream of each gene where each base is a row 
     and each column is the sum of how often this base is annotated as the TE-category across all transcripts
 
     optionally: provide a sig_orthogroups list to not include all transcripts that are in orthogroups_path
+    orthogroups_path can also be a list of transcript IDs to be considered, then reading the orthogroups is skipped entirely
     
     if count_transcripts=True it only returns a list that includes all the transcripts that were included in the computtion
     """
-    orthoDB_orthogroups = OGs.parse_orthogroups_dict(orthogroups_path, sig_orthogroups, species=species)
-    all_transcript_IDs = get_sig_transcripts(orthoDB_orthogroups)
-    print(f"{species} --> {len(orthoDB_orthogroups)} orthogroups with {len(all_transcript_IDs)} transcripts (includes orthogroups with no members in {species}")
+    if type(orthogroups_path) == str:
+        orthoDB_orthogroups = OGs.parse_orthogroups_dict(orthogroups_path, sig_orthogroups, species=species)
+        all_transcript_IDs = get_sig_transcripts(orthoDB_orthogroups)
+        if verbose:
+            print(f"{species} --> {len(orthoDB_orthogroups)} orthogroups with {len(all_transcript_IDs)} transcripts (includes orthogroups with no members in {species}")
+    elif type(orthogroups_path) == list:
+        all_transcript_IDs = orthogroups_path
 
     print(f"\t*  parse gene-annotation {genome_annot_path}")
     genes_dict = gff.parse_gff3_general(genome_annot_path, verbose=False, keep_feature_category=gff.FeatureCategory.Transcript)
@@ -66,7 +71,8 @@ def make_cumulative_TE_table(orthogroups_path:str, n:int, species:str, repeats_a
     contigs_with_no_repeats = [] 
 
     all_transcripts_list = []
-    print(f"\t*  calculate transcript surroundings")
+    if verbose:
+        print(f"\t*  calculate surroundings for {len(all_transcript_IDs)} genes")
     for transcript_id in tqdm(all_transcript_IDs):
         try:
             transcript = genes_dict[transcript_id]
@@ -74,7 +80,7 @@ def make_cumulative_TE_table(orthogroups_path:str, n:int, species:str, repeats_a
                 all_transcripts_list.append(transcript_id)
                 continue
         except:
-            # raise RuntimeError(f"{transcript_id} can not be found in {genome_annot_path}")
+            raise RuntimeError(f"{transcript_id} can not be found in {genome_annot_path}. Are you using the correct annotation?")
             missing_in_annot_transcripts.append(transcript_id)
             print(f"\ttranscript: {transcript_id}")
             continue

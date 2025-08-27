@@ -20,7 +20,7 @@ def parse_args():
     # Create the parser
     program_description = """
 ----------------- Quick start:
-python3 ReVis_transcript_surroundings.py
+python3 ReVis_transcript_surroundings.py --compute_tables --out_dir ../../example_data --masker_outfile ../../example_data/bruchidius_siliquastri_repeats.fna.out --annotation_gff ../../example_data/bruchidius_siliquastri.gff --orthogroups ../../example_data/N0.tsv --CAFE5_results ../../example_data/CAFE5_Base_family_results.txt --species_name B_siliquastri --bp 500 --GF_size_percentile 90 --verbose
 
 Files that need to be included to compute the tables from scratch:
 * repeats_out (takes both .out and .ori.out and then acts accordingly, like base ReVis)
@@ -54,6 +54,7 @@ This can be one of two kinds. they are formatted the same, but can be computed o
     output = parser.add_mutually_exclusive_group(required=True)
     output.add_argument("--compute_tables", action="store_true", help = """it will compute all the tables required for plotting and then also make the plot""")
     output.add_argument("--plot", action="store_true", help = """it will ONLY plot and you have to pass the table filepaths as input (if you go more than 1kb up/downstream, computing the tables will take a long time)""")
+    output.add_argument("--compute_tables_from_list", action="store_true", help = """it will compute all the tables from two lists of transcript IDs, a foreground and a background list (or a 'significant' and 'all' list respectively)""")
     
     parser.add_argument('--out_dir', type=str, help="path to output directory. If not given all files will be saved in current working directory")
     
@@ -62,7 +63,9 @@ This can be one of two kinds. they are formatted the same, but can be computed o
     parser.add_argument('--annotation_gff', type=str, help="""genome annotation based on the same assembly as the repeatmasker output""")
     parser.add_argument('--orthogroups', type=str, help="""hierarchical orthogroups file computed by orthofinder (N0.tsv) matching the results from CAFE5""")
     parser.add_argument('--CAFE5_results', type=str, help="""family_results.txt file from CAFE5 with orthogroup names matching the orthofinder output""")
-    
+    parser.add_argument('--all_list', type=str, help="""path to csv file containing a list of gene or transcript IDs from annotation_gff to be used in the all table (background table).""")
+    parser.add_argument('--sig_list', type=str, help="""path to csv file containing a list of gene or transcript IDs from annotation_gff to be used in the sig table (foreground table).""")
+
     # arguments for given tables, only do the plotting
     parser.add_argument('--all_before_table', type=str, help="""when only plotting: table with background repeat abundance before genes ('all' genes)""")
     parser.add_argument('--all_after_table', type=str, help="""when only plotting: table with background repeat abundance after genes ('all' genes)""")
@@ -86,12 +89,18 @@ This can be one of two kinds. they are formatted the same, but can be computed o
         args.GF_size_percentile = 90
     if not args.bp:
         args.bp = 500
+    if args.out_dir[-1] != "/":
+        args.out_dir = f"{args.out_dir}/"
     
     ## enforce plotting or tables computation
     if args.compute_tables:
-        for required in ["masker_outfile", "annotation_gff", "orthogroups", "CAFE5_results"]:
+        for required in ["masker_outfile", "annotation_gff", "orthogroups", "CAFE5_results", "species_name"]:
             if getattr(args, required) is None:
                 parser.error(f"--{required} is required when using --compute_tables")
+    elif args.compute_tables_from_list:
+        for required in ["masker_outfile", "annotation_gff", "all_list", "sig_list"]:
+            if getattr(args, required) is None:
+                parser.error(f"--{required} is required when using --compute_tables_from_list")
     elif args.plot:
         for required in ["all_before_table", "all_after_table","sig_before_table", "sig_after_table"]:
             if getattr(args, required) is None:
@@ -244,205 +253,6 @@ def plot_TE_abundance(before_filepath:str, after_filepath:str, sig_transcripts:i
 
 
 
-def filepaths():
-
-    repeats_dir = "/Users/milena/work/repeatmasking/repeat_gffs/"
-    repeats_out = {
-        "A_obtectus" : f"{repeats_dir}A_obtectus_assembly_genomic.fna.out",
-        "A_verrucosus" : f"{repeats_dir}A_verrucosus_assembly_genomic.fna.out",
-        "B_siliquastri" : f"{repeats_dir}B_siliquastri_assembly_genomic.fna.out",
-        # "C_analis" : f"{repeats_dir}C_analis_assembly_genomic.fna.out",
-        "C_chinensis" : f"{repeats_dir}C_chinensis_assembly_genomic.fna.out",
-        "C_maculatus" : f"{repeats_dir}C_maculatus_assembly_genomic.fna.out",
-        "C_septempunctata" : f"{repeats_dir}C_septempunctata_assembly_genomic.fna.out",
-        "D_melanogaster" : f"{repeats_dir}D_melanogaster_assembly_genomic.fna.out",
-        "D_ponderosae" : f"{repeats_dir}D_ponderosae_assembly_genomic.fna.out",
-        "I_luminosus" : f"{repeats_dir}I_luminosus_assembly_genomic.fna.out",
-        "P_pyralis" : f"{repeats_dir}P_pyralis_assembly_genomic.fna.out",
-        "R_ferrugineus" : f"{repeats_dir}R_ferrugineus_assembly_genomic.fna.out",
-        "T_castaneum" : f"{repeats_dir}T_castaneum_assembly_genomic.fna.out",
-        "T_molitor" : f"{repeats_dir}T_molitor_assembly_genomic.fna.out",
-        "Z_morio" : f"{repeats_dir}Z_morio_assembly_genomic.fna.out",
-    }
-
-    repeats_dir_work = "/Users/miltr339/work/repeatmasking/repeat_gffs/"
-    repeats_out_work = {
-        "A_obtectus" : f"{repeats_dir_work}A_obtectus_masking.ori.out",
-        "A_verrucosus" : f"{repeats_dir_work}A_verrucosus_masking.ori.out",
-        "B_siliquastri" : f"{repeats_dir_work}B_siliquastri_masking.ori.out",
-        "C_analis" : f"{repeats_dir_work}C_analis_masking.ori.out",
-        "C_chinensis" : f"{repeats_dir_work}C_chinensis_masking.ori.out",
-        "C_maculatus" : f"{repeats_dir_work}C_maculatus_superscaffolded_masking.ori.out",
-        "C_septempunctata" : f"{repeats_dir_work}C_septempunctata_masking.ori.out",
-        "D_melanogaster" : f"{repeats_dir_work}D_melanogaster_masking.ori.out",
-        "D_ponderosae" : f"{repeats_dir_work}D_ponderosae_masking.ori.out",
-        "I_luminosus" : f"{repeats_dir_work}I_luminosus_masking.ori.out",
-        "P_pyralis" : f"{repeats_dir_work}P_pyralis_masking.ori.out",
-        "R_ferrugineus" : f"{repeats_dir_work}R_ferrugineus_masking.ori.out",
-        "T_castaneum" : f"{repeats_dir_work}T_castaneum_masking.ori.out",
-        "T_molitor" : f"{repeats_dir_work}T_molitor_masking.ori.out",
-        "Z_morio" : f"{repeats_dir_work}Z_morio_masking.ori.out",
-    }
-
-    orthoDB_annot_dir = "/Users/milena/work/orthoDB_annotations/"
-    orthoDB_annotations = {
-        "A_obtectus" : f"{orthoDB_annot_dir}A_obtectus_orthoDB_filtered.gff",
-        "A_verrucosus" : f"{orthoDB_annot_dir}A_verrucosus_orthoDB_filtered.gff",
-        "B_siliquastri" : f"{orthoDB_annot_dir}B_siliquastri_orthoDB_filtered.gff",
-        "C_analis" : f"{orthoDB_annot_dir}C_analis_orthoDB_filtered.gff",
-        "C_chinensis" : f"{orthoDB_annot_dir}C_chinensis_orthoDB_filtered.gff",
-        "C_maculatus" : f"{orthoDB_annot_dir}C_maculatus_orthoDB_filtered.gff",
-        "C_septempunctata" : f"{orthoDB_annot_dir}C_septempunctata_s_orthoDB_filtered.gff",
-        "D_melanogaster" : f"{orthoDB_annot_dir}D_melanogaster_orthoDB_filtered.gff",
-        "D_ponderosae" : f"{orthoDB_annot_dir}D_ponderosae_orthoDB_filtered.gff",
-        "I_luminosus" : f"{orthoDB_annot_dir}I_luminosus_orthoDB_filtered.gff",
-        "P_pyralis" : f"{orthoDB_annot_dir}P_pyralis_orthoDB_filtered.gff",
-        "R_ferrugineus" : f"{orthoDB_annot_dir}R_ferrugineus_orthoDB_filtered.gff",
-        "T_castaneum_s" : f"{orthoDB_annot_dir}T_castaneum_s_orthoDB_filtered.gff",
-        "T_molitor" : f"{orthoDB_annot_dir}T_molitor_orthoDB_filtered.gff",
-        "Z_morio" : f"{orthoDB_annot_dir}Z_morio_orthoDB_filtered.gff",
-    }
-
-    orthoDB_annot_dir_work = "/Users/miltr339/work/orthoDB_annotations/"
-    orthoDB_annotations_work = {
-        "A_obtectus" : f"{orthoDB_annot_dir_work}A_obtectus_braker_isoform_filtered.gff",
-        "A_verrucosus" : f"{orthoDB_annot_dir_work}A_verrucosus_braker_isoform_filtered.gff",
-        "B_siliquastri" : f"{orthoDB_annot_dir_work}B_siliquastri_braker_isoform_filtered.gff",
-        "C_analis" : f"{orthoDB_annot_dir_work}C_analis_braker_isoform_filtered.gff",
-        "C_chinensis" : f"{orthoDB_annot_dir_work}C_chinensis_braker_isoform_filtered.gff",
-        "C_maculatus" : f"{orthoDB_annot_dir_work}C_maculatus_superscaffolded_annotation_isoform_filtered.gff",
-        "C_septempunctata" : f"{orthoDB_annot_dir_work}C_septempunctata_braker_isoform_filtered.gff",
-        "D_melanogaster" : f"{orthoDB_annot_dir_work}D_melanogaster_braker_isoform_filtered.gff",
-        "D_ponderosae" : f"{orthoDB_annot_dir_work}D_ponderosae_braker_isoform_filtered.gff",
-        "I_luminosus" : f"{orthoDB_annot_dir_work}I_luminosus_braker_isoform_filtered.gff",
-        "P_pyralis" : f"{orthoDB_annot_dir_work}P_pyralis_braker_isoform_filtered.gff",
-        "R_ferrugineus" : f"{orthoDB_annot_dir_work}R_ferrugineus_braker_isoform_filtered.gff",
-        "T_castaneum" : f"{orthoDB_annot_dir_work}T_castaneum_braker_isoform_filtered.gff",
-        "T_molitor" : f"{orthoDB_annot_dir_work}T_molitor_braker_isoform_filtered.gff",
-        "Z_morio" : f"{orthoDB_annot_dir_work}Z_morio_braker_isoform_filtered.gff",
-    }
-
-    orthogroups_native = "/Users/miltr339/work/orthofinder/native_orthogroups/N0.tsv"
-    orthogroups_orthoDB = "/Users/miltr339/work/orthofinder/orthoDB_uniform_masking_orthogroups/N0.tsv"
-    # orthogroups_native = "/Users/milena/work/orthofinder/native_orthogroups/N0.tsv"
-    # orthogroups_orthoDB = "/Users/milena/work/orthofinder/orthoDB_uniform_masking_orthogroups/N0.tsv"
-    sig_native = "/Users/miltr339/Box Sync/code/CAFE/native_from_N0_Base_family_results.txt"
-    sig_orthoDB = "/Users/miltr339/Box Sync/code/CAFE/orthoDB_TE_filtered_Base_family_results.txt"
-
-    return repeats_out, repeats_out_work, orthoDB_annotations, orthoDB_annotations_work, orthogroups_native, orthogroups_orthoDB, sig_native, sig_orthoDB
-
-
-
-def tables_filepaths():
-    work_out_dir = "/Users/miltr339/work/PhD_code/"
-    sig_before_transcript = {
-        "A_obtectus" : f"{work_out_dir}A_obtectus_cumulative_repeats_before_sig_transcripts.txt",
-        "A_verrucosus" : f"{work_out_dir}A_verrucosus_cumulative_repeats_before_sig_transcripts.txt",
-        "B_siliquastri" : f"{work_out_dir}B_siliquastri_cumulative_repeats_before_sig_transcripts.txt",
-        "C_analis" : f"{work_out_dir}C_analis_cumulative_repeats_before_sig_transcripts.txt",
-        "C_chinensis" : f"{work_out_dir}C_chinensis_cumulative_repeats_before_sig_transcripts.txt",
-        "C_maculatus" : f"{work_out_dir}C_maculatus_cumulative_repeats_before_sig_transcripts.txt",
-        "C_septempunctata" : f"{work_out_dir}C_septempunctata_cumulative_repeats_before_sig_transcripts.txt",
-        "D_melanogaster" : f"{work_out_dir}D_melanogaster_cumulative_repeats_before_sig_transcripts.txt",
-        "D_ponderosae" : f"{work_out_dir}D_ponderosae_cumulative_repeats_before_sig_transcripts.txt",
-        "I_luminosus" : f"{work_out_dir}I_luminosus_cumulative_repeats_before_sig_transcripts.txt",
-        "P_pyralis" : f"{work_out_dir}P_pyralis_cumulative_repeats_before_sig_transcripts.txt",
-        "R_ferrugineus" : f"{work_out_dir}R_ferrugineus_cumulative_repeats_before_sig_transcripts.txt",
-        "T_castaneum" : f"{work_out_dir}T_castaneum_cumulative_repeats_before_sig_transcripts.txt",
-        "T_molitor" : f"{work_out_dir}T_molitor_cumulative_repeats_before_sig_transcripts.txt",
-        "Z_morio" : f"{work_out_dir}Z_morio_cumulative_repeats_before_sig_transcripts.txt",
-    }
-    sig_after_transcript = {
-        "A_obtectus" : f"{work_out_dir}A_obtectus_cumulative_repeats_after_sig_transcripts.txt",
-        "A_verrucosus" : f"{work_out_dir}A_verrucosus_cumulative_repeats_after_sig_transcripts.txt",
-        "B_siliquastri" : f"{work_out_dir}B_siliquastri_cumulative_repeats_after_sig_transcripts.txt",
-        "C_analis" : f"{work_out_dir}C_analis_cumulative_repeats_after_sig_transcripts.txt",
-        "C_chinensis" : f"{work_out_dir}C_chinensis_cumulative_repeats_after_sig_transcripts.txt",
-        "C_maculatus" : f"{work_out_dir}C_maculatus_cumulative_repeats_after_sig_transcripts.txt",
-        "C_septempunctata" : f"{work_out_dir}C_septempunctata_cumulative_repeats_after_sig_transcripts.txt",
-        "D_melanogaster" : f"{work_out_dir}D_melanogaster_cumulative_repeats_after_sig_transcripts.txt",
-        "D_ponderosae" : f"{work_out_dir}D_ponderosae_cumulative_repeats_after_sig_transcripts.txt",
-        "I_luminosus" : f"{work_out_dir}I_luminosus_cumulative_repeats_after_sig_transcripts.txt",
-        "P_pyralis" : f"{work_out_dir}P_pyralis_cumulative_repeats_after_sig_transcripts.txt",
-        "R_ferrugineus" : f"{work_out_dir}R_ferrugineus_cumulative_repeats_after_sig_transcripts.txt",
-        "T_castaneum" : f"{work_out_dir}T_castaneum_cumulative_repeats_after_sig_transcripts.txt",
-        "T_molitor" : f"{work_out_dir}T_molitor_cumulative_repeats_after_sig_transcripts.txt",
-        "Z_morio" : f"{work_out_dir}Z_morio_cumulative_repeats_after_sig_transcripts.txt",
-    }
-    
-    all_before_transcript = {
-        "A_obtectus" : f"{work_out_dir}A_obtectus_cumulative_repeats_before_all_transcripts.txt",
-        "A_verrucosus" : f"{work_out_dir}A_verrucosus_cumulative_repeats_before_all_transcripts.txt",
-        "B_siliquastri" : f"{work_out_dir}B_siliquastri_cumulative_repeats_before_all_transcripts.txt",
-        "C_analis" : f"{work_out_dir}C_analis_cumulative_repeats_before_all_transcripts.txt",
-        "C_chinensis" : f"{work_out_dir}C_chinensis_cumulative_repeats_before_all_transcripts.txt",
-        "C_maculatus" : f"{work_out_dir}C_maculatus_cumulative_repeats_before_all_transcripts.txt",
-        "C_septempunctata" : f"{work_out_dir}C_septempunctata_cumulative_repeats_before_all_transcripts.txt",
-        "D_melanogaster" : f"{work_out_dir}D_melanogaster_cumulative_repeats_before_all_transcripts.txt",
-        "D_ponderosae" : f"{work_out_dir}D_ponderosae_cumulative_repeats_before_all_transcripts.txt",
-        "I_luminosus" : f"{work_out_dir}I_luminosus_cumulative_repeats_before_all_transcripts.txt",
-        "P_pyralis" : f"{work_out_dir}P_pyralis_cumulative_repeats_before_all_transcripts.txt",
-        "R_ferrugineus" : f"{work_out_dir}R_ferrugineus_cumulative_repeats_before_all_transcripts.txt",
-        "T_castaneum" : f"{work_out_dir}T_castaneum_cumulative_repeats_before_all_transcripts.txt",
-        "T_molitor" : f"{work_out_dir}T_molitor_cumulative_repeats_before_all_transcripts.txt",
-        "Z_morio" : f"{work_out_dir}Z_morio_cumulative_repeats_before_all_transcripts.txt",
-    }
-    all_after_transcript = {
-        "A_obtectus" : f"{work_out_dir}A_obtectus_cumulative_repeats_after_all_transcripts.txt",
-        "A_verrucosus" :f"{work_out_dir}A_verrucosus_cumulative_repeats_after_all_transcripts.txt",
-        "B_siliquastri" :f"{work_out_dir}B_siliquastri_cumulative_repeats_after_all_transcripts.txt",
-        "C_analis" :f"{work_out_dir}C_analis_cumulative_repeats_after_all_transcripts.txt",
-        "C_chinensis" :f"{work_out_dir}C_chinensis_cumulative_repeats_after_all_transcripts.txt",
-        "C_maculatus" :f"{work_out_dir}C_maculatus_cumulative_repeats_after_all_transcripts.txt",
-        "C_septempunctata" :f"{work_out_dir}C_septempunctata_cumulative_repeats_after_all_transcripts.txt",
-        "D_melanogaster" :f"{work_out_dir}D_melanogaster_cumulative_repeats_after_all_transcripts.txt",
-        "D_ponderosae" :f"{work_out_dir}D_ponderosae_cumulative_repeats_after_all_transcripts.txt",
-        "I_luminosus" :f"{work_out_dir}I_luminosus_cumulative_repeats_after_all_transcripts.txt",
-        "P_pyralis" :f"{work_out_dir}P_pyralis_cumulative_repeats_after_all_transcripts.txt",
-        "R_ferrugineus" :f"{work_out_dir}R_ferrugineus_cumulative_repeats_after_all_transcripts.txt",
-        "T_castaneum" :f"{work_out_dir}T_castaneum_cumulative_repeats_after_all_transcripts.txt",
-        "T_molitor" :f"{work_out_dir}T_molitor_cumulative_repeats_after_all_transcripts.txt",
-        "Z_morio" :f"{work_out_dir}Z_morio_cumulative_repeats_after_all_transcripts.txt",
-    }
-
-    repeats_tables ="/Users/miltr339/work/PhD_code/PhD_chapter1/data/repeats_tables/"
-    threshold_before_transcript = {
-        'A_obtectus' : f'{repeats_tables}A_obtectus_cumulative_repeats_before_sig_transcripts_90th_GF_size_percentile.txt',
-        'A_verrucosus' : f'{repeats_tables}A_verrucosus_cumulative_repeats_before_sig_transcripts_90th_GF_size_percentile.txt',
-        'B_siliquastri' : f'{repeats_tables}B_siliquastri_cumulative_repeats_before_sig_transcripts_90th_GF_size_percentile.txt',
-        'C_analis' : f'{repeats_tables}C_analis_cumulative_repeats_before_sig_transcripts_90th_GF_size_percentile.txt',
-        'C_chinensis' : f'{repeats_tables}C_chinensis_cumulative_repeats_before_sig_transcripts_90th_GF_size_percentile.txt',
-        'C_maculatus' : f'{repeats_tables}C_maculatus_cumulative_repeats_before_sig_transcripts_90th_GF_size_percentile.txt',
-        'C_septempunctata' : f'{repeats_tables}C_septempunctata_cumulative_repeats_before_sig_transcripts_90th_GF_size_percentile.txt',
-        'D_melanogaster' : f'{repeats_tables}D_melanogaster_cumulative_repeats_before_sig_transcripts_90th_GF_size_percentile.txt',
-        'D_ponderosae' : f'{repeats_tables}D_ponderosae_cumulative_repeats_before_sig_transcripts_90th_GF_size_percentile.txt',
-        'I_luminosus' : f'{repeats_tables}I_luminosus_cumulative_repeats_before_sig_transcripts_90th_GF_size_percentile.txt',
-        'P_pyralis' : f'{repeats_tables}P_pyralis_cumulative_repeats_before_sig_transcripts_90th_GF_size_percentile.txt',
-        'R_ferrugineus' : f'{repeats_tables}R_ferrugineus_cumulative_repeats_before_sig_transcripts_90th_GF_size_percentile.txt',
-        'T_castaneum' : f'{repeats_tables}T_castaneum_cumulative_repeats_before_sig_transcripts_90th_GF_size_percentile.txt',
-        'T_molitor' : f'{repeats_tables}T_molitor_cumulative_repeats_before_sig_transcripts_90th_GF_size_percentile.txt',
-        'Z_morio' : f'{repeats_tables}Z_morio_cumulative_repeats_before_sig_transcripts_90th_GF_size_percentile.txt',
-    }
-    threshold_after_transcript = {
-        'A_obtectus' : f'{repeats_tables}A_obtectus_cumulative_repeats_after_sig_transcripts_90th_GF_size_percentile.txt',
-        'A_verrucosus' : f'{repeats_tables}A_verrucosus_cumulative_repeats_after_sig_transcripts_90th_GF_size_percentile.txt',
-        'B_siliquastri' : f'{repeats_tables}B_siliquastri_cumulative_repeats_after_sig_transcripts_90th_GF_size_percentile.txt',
-        'C_analis' : f'{repeats_tables}C_analis_cumulative_repeats_after_sig_transcripts_90th_GF_size_percentile.txt',
-        'C_chinensis' : f'{repeats_tables}C_chinensis_cumulative_repeats_after_sig_transcripts_90th_GF_size_percentile.txt',
-        'C_maculatus' : f'{repeats_tables}C_maculatus_cumulative_repeats_after_sig_transcripts_90th_GF_size_percentile.txt',
-        'C_septempunctata' : f'{repeats_tables}C_septempunctata_cumulative_repeats_after_sig_transcripts_90th_GF_size_percentile.txt',
-        'D_melanogaster' : f'{repeats_tables}D_melanogaster_cumulative_repeats_after_sig_transcripts_90th_GF_size_percentile.txt',
-        'D_ponderosae' : f'{repeats_tables}D_ponderosae_cumulative_repeats_after_sig_transcripts_90th_GF_size_percentile.txt',
-        'I_luminosus' : f'{repeats_tables}I_luminosus_cumulative_repeats_after_sig_transcripts_90th_GF_size_percentile.txt',
-        'P_pyralis' : f'{repeats_tables}P_pyralis_cumulative_repeats_after_sig_transcripts_90th_GF_size_percentile.txt',
-        'R_ferrugineus' : f'{repeats_tables}R_ferrugineus_cumulative_repeats_after_sig_transcripts_90th_GF_size_percentile.txt',
-        'T_castaneum' : f'{repeats_tables}T_castaneum_cumulative_repeats_after_sig_transcripts_90th_GF_size_percentile.txt',
-        'T_molitor' : f'{repeats_tables}T_molitor_cumulative_repeats_after_sig_transcripts_90th_GF_size_percentile.txt',
-        'Z_morio' : f'{repeats_tables}Z_morio_cumulative_repeats_after_sig_transcripts_90th_GF_size_percentile.txt',
-    }
-
-    return sig_before_transcript, sig_after_transcript, all_before_transcript, all_after_transcript, threshold_before_transcript, threshold_after_transcript
-
 
 if __name__ == "__main__":
 
@@ -458,45 +268,57 @@ if __name__ == "__main__":
     species = args.species_name
     verbose = args.verbose
 
-    num_bp = args.pb
+    num_bp = args.bp
 
     ##########################################################
     ######### make TE abundance tables for plotting ##########
     ##########################################################
-
-    if args.compute_tables:
     
     ########
     ## tables for significant transcripts.
     ########
-    ## in many species, only plot orthogroups where the GF size is not in the bottom 10 percent of that species (essentially excl. GF size 0 and 1)
-    ## so that the comparison really only shows gene families that are expanding.
-        
+
+    if args.compute_tables_from_list:    
         if verbose:
-            print(f"making foreground tables for {species}: ")
-        
+            print(f"  * making foreground tables from input list for {species}: ")
+        all_orthogroups_list = args.all_list
+        sig_list = args.sig_list
+        before_transcript, after_transcript = tr_surrounds.make_cumulative_TE_table(sig_list, n=num_bp, species=species, repeats_annot_path=repeats_out, genome_annot_path=orthoDB_annotation, sig_orthogroups=sig_list, verbose = verbose)
+
+    if args.compute_tables:
+        if verbose:
+            print(f"  * making foreground tables from orthofinder/CAFE output for {species}: ")
         sig_orthoDB_list, all_orthogroups_list = OGs.get_sig_orthogroups(sig_orthoDB)
         orthoDB_orthogroups = OGs.parse_orthogroups_dict(orthogroups_orthoDB, sig_orthoDB_list, species=species)
         sig_OGs_size_filtered = filter_sig_OGs_by_size(orthoDB_orthogroups=orthoDB_orthogroups, species=species, q=size_percentile_threshold)
+        before_transcript, after_transcript = tr_surrounds.make_cumulative_TE_table(orthogroups_orthoDB, n=num_bp, species=species, repeats_annot_path=repeats_out, genome_annot_path=orthoDB_annotation, sig_orthogroups=sig_OGs_size_filtered, verbose = verbose)
+    
+    if not args.plot:
+        sig_table_before = gff.write_dict_to_file(before_transcript, f"{args.out_dir}{species}_cumulative_repeats_before_sig_transcripts_{size_percentile_threshold}th_GF_size_percentile.txt")
+        sig_table_after = gff.write_dict_to_file(after_transcript, f"{args.out_dir}{species}_cumulative_repeats_after_sig_transcripts_{size_percentile_threshold}th_GF_size_percentile.txt")
         
-        before_transcript, after_transcript = tr_surrounds.make_cumulative_TE_table(orthogroups_orthoDB, n=num_bp, species=species, repeats_annot_path=repeats_out, genome_annot_path=orthoDB_annotation, sig_orthogroups=sig_OGs_size_filtered)
-        sig_table_before = gff.write_dict_to_file(before_transcript, f"{species}_cumulative_repeats_before_sig_transcripts_{size_percentile_threshold}th_GF_size_percentile.txt")
-        sig_table_after = gff.write_dict_to_file(after_transcript, f"{species}_cumulative_repeats_after_sig_transcripts_{size_percentile_threshold}th_GF_size_percentile.txt")
-        
-
 
     #########
     ## tables for all background transcripts
     #########
-        if verbose:
-            print(f"making background tables for {species}: ")
-        ## uv run python3 for quicker runtimes
-        sig_orthoDB_list, all_orthogroups_list = OGs.get_sig_orthogroups(sig_orthoDB)
-        # before_transcript, after_transcript = make_cumulative_TE_table(orthogroups_orthoDB, n=50, species=species, repeats_annot_path=repeats_out[species], genome_annot_path=orthoDB_annotations[species], sig_orthogroups=sig_orthoDB_list)
-        before_transcript, after_transcript = tr_surrounds.make_cumulative_TE_table(orthogroups_orthoDB, n=num_bp, species=species, repeats_annot_path=repeats_out, genome_annot_path=orthoDB_annotation)
-        all_table_before = gff.write_dict_to_file(before_transcript, f"{species}_cumulative_repeats_before_all_transcripts.txt")
-        all_table_after = gff.write_dict_to_file(after_transcript, f"{species}_cumulative_repeats_after_all_transcripts.txt")
+        if args.compute_tables_from_list:    
+            if verbose:
+                print(f"  * making background tables from input list for {species}: ")
+            all_transcripts_list = args.all_list
+            sig_list = args.sig_list
+            before_transcript, after_transcript = tr_surrounds.make_cumulative_TE_table(all_transcripts_list, n=num_bp, species=species, repeats_annot_path=repeats_out, genome_annot_path=orthoDB_annotation, sig_orthogroups=sig_OGs_size_filtered, verbose = verbose)
+
+        if args.compute_tables:
+            if verbose:
+                print(f"  * making background tables from orthofinder/CAFE output for {species}: ")
+            sig_orthoDB_list, all_orthogroups_list = OGs.get_sig_orthogroups(sig_orthoDB)
+            before_transcript, after_transcript = tr_surrounds.make_cumulative_TE_table(orthogroups_orthoDB, n=num_bp, species=species, repeats_annot_path=repeats_out, genome_annot_path=orthoDB_annotation)
+        
+        if not args.plot:
+            all_table_before = gff.write_dict_to_file(before_transcript, f"{args.out_dir}{species}_cumulative_repeats_before_all_transcripts.txt")
+            all_table_after = gff.write_dict_to_file(after_transcript, f"{args.out_dir}{species}_cumulative_repeats_after_all_transcripts.txt")
     
+    ## TODO elif args.compute_tables_from_list:
 
     elif args.plot:
         ## if only plotting is specified, use the given table filepaths
@@ -511,48 +333,44 @@ if __name__ == "__main__":
     ######################################################
     
     ## TODO continue here
+    raise RuntimeError("done with tables")
 
     sig_before_transcript, sig_after_transcript, all_before_transcript, all_after_transcript, threshold_before_transcript, threshold_after_transcript = tables_filepaths()
 
+    if verbose:
+        print(f"\n  * plot {species}")
+    # get total number of transcripts that are part of significantly rapidly evolving orthogroups in this species
+    sig_orthoDB_list, all_orthogroups_list = OGs.get_sig_orthogroups(sig_orthoDB)
+
+    orthoDB_orthogroups = OGs.parse_orthogroups_dict(orthogroups_orthoDB, sig_orthoDB_list, species=species)
+    sig_OGs_size_filtered = filter_sig_OGs_by_size(orthoDB_orthogroups=orthoDB_orthogroups, species=species, q=size_percentile_threshold)
     
-    repeats_plots = "/Users/miltr339/work/PhD_code/PhD_chapter1/data/repeats_cumulative_around_transcripts/"
-    all_species = list(repeats_out.keys())
-    failed_species = []
-    for species in all_species:
-        # species = "B_siliquastri"
-        print(f"\n\n ------------------------------------------------------------- \nplot {species}")
-        # get total number of transcripts that are part of significantly rapidly evolving orthogroups in this species
-        sig_orthoDB_list, all_orthogroups_list = OGs.get_sig_orthogroups(sig_orthoDB)
+    all_transcript_IDs = tr_surrounds.get_sig_transcripts(orthoDB_orthogroups)
+    num_sig_transcripts_ = len(all_transcript_IDs)
+    # print(f"\t{num_sig_transcripts_} significant transcripts according to reading the CAFE and orthoDB output")
+    
+    all_transcript_IDs = tr_surrounds.make_cumulative_TE_table(orthogroups_orthoDB, n=10000, species=species, repeats_annot_path=repeats_out_work[species], genome_annot_path=orthoDB_annotations_work[species], sig_orthogroups=sig_OGs_size_filtered, count_transcripts=True)
+    num_sig_transcripts = len(all_transcript_IDs)
+    if num_sig_transcripts_ != num_sig_transcripts:
+        print(f"\t!!! {num_sig_transcripts} significant transcrips according to making the table\n\t!!! {num_sig_transcripts_} transcripts according to CAFE and orthoDB output\n")
+        failed_species.append(species)
 
-        orthoDB_orthogroups = OGs.parse_orthogroups_dict(orthogroups_orthoDB, sig_orthoDB_list, species=species)
-        sig_OGs_size_filtered = filter_sig_OGs_by_size(orthoDB_orthogroups=orthoDB_orthogroups, species=species, q=size_percentile_threshold)
+    # plot_TE_abundance(threshold_before_transcript[species], threshold_after_transcript[species], sig_transcripts = num_sig_transcripts, filename=f"{repeats_plots}cumulative_repeat_presence_around_transcripts_sig_only_{species}_{size_percentile_threshold}th_percentile_GF_size.png")
+
+    orthoDB_orthogroups = OGs.parse_orthogroups_dict(orthogroups_orthoDB, all_orthogroups_list, species=species)
+    all_transcript_IDs = tr_surrounds.get_sig_transcripts(orthoDB_orthogroups)
+    num_all_transcripts_ = len(all_transcript_IDs)
+    # print(f"\t{num_all_transcripts_} CAFE transcripts according to reading the CAFE and orthoDB output")
+    # write table to output file
+    all_transcript_IDs = tr_surrounds.make_cumulative_TE_table(orthogroups_orthoDB, n=10000, species=species, repeats_annot_path=repeats_out_work[species], genome_annot_path=orthoDB_annotations_work[species], count_transcripts=True)
+    num_all_transcripts = len(all_transcript_IDs)
+    if num_all_transcripts_ != num_all_transcripts:
+        print(f"\t!!! {num_all_transcripts} significant transcrips according to making the table\n\t!!! {num_all_transcripts_} transcripts according to CAFE and orthoDB output")
         
-        all_transcript_IDs = tr_surrounds.get_sig_transcripts(orthoDB_orthogroups)
-        num_sig_transcripts_ = len(all_transcript_IDs)
-        # print(f"\t{num_sig_transcripts_} significant transcripts according to reading the CAFE and orthoDB output")
-        
-        all_transcript_IDs = tr_surrounds.make_cumulative_TE_table(orthogroups_orthoDB, n=10000, species=species, repeats_annot_path=repeats_out_work[species], genome_annot_path=orthoDB_annotations_work[species], sig_orthogroups=sig_OGs_size_filtered, count_transcripts=True)
-        num_sig_transcripts = len(all_transcript_IDs)
-        if num_sig_transcripts_ != num_sig_transcripts:
-            print(f"\t!!! {num_sig_transcripts} significant transcrips according to making the table\n\t!!! {num_sig_transcripts_} transcripts according to CAFE and orthoDB output\n")
-            failed_species.append(species)
 
-        # plot_TE_abundance(threshold_before_transcript[species], threshold_after_transcript[species], sig_transcripts = num_sig_transcripts, filename=f"{repeats_plots}cumulative_repeat_presence_around_transcripts_sig_only_{species}_{size_percentile_threshold}th_percentile_GF_size.png")
-
-        orthoDB_orthogroups = OGs.parse_orthogroups_dict(orthogroups_orthoDB, all_orthogroups_list, species=species)
-        all_transcript_IDs = tr_surrounds.get_sig_transcripts(orthoDB_orthogroups)
-        num_all_transcripts_ = len(all_transcript_IDs)
-        # print(f"\t{num_all_transcripts_} CAFE transcripts according to reading the CAFE and orthoDB output")
-        # write table to output file
-        all_transcript_IDs = tr_surrounds.make_cumulative_TE_table(orthogroups_orthoDB, n=10000, species=species, repeats_annot_path=repeats_out_work[species], genome_annot_path=orthoDB_annotations_work[species], count_transcripts=True)
-        num_all_transcripts = len(all_transcript_IDs)
-        if num_all_transcripts_ != num_all_transcripts:
-            print(f"\t!!! {num_all_transcripts} CAFE transcrips according to making the table\n\t!!! {num_all_transcripts_} transcripts according to CAFE and orthoDB output")
-            failed_species.append(species)
-
-        plot_TE_abundance(threshold_before_transcript[species], threshold_after_transcript[species], sig_transcripts = num_sig_transcripts, all_before_filepath=all_before_transcript[species], all_after_filepath=all_after_transcript[species], all_transcripts=num_all_transcripts, filename=f"{repeats_plots}cumulative_repeat_presence_around_transcripts_sig_and_all_{species}_{size_percentile_threshold}th_percentile_GF_size.png", legend=False)
-        # break
-        print(f"\n-----------------------------------------------------\nspecies where the transcript numbers don't match: {failed_species}")
+    plot_TE_abundance(threshold_before_transcript[species], threshold_after_transcript[species], sig_transcripts = num_sig_transcripts, all_before_filepath=all_before_transcript[species], all_after_filepath=all_after_transcript[species], all_transcripts=num_all_transcripts, filename=f"{repeats_plots}cumulative_repeat_presence_around_transcripts_sig_and_all_{species}_{size_percentile_threshold}th_percentile_GF_size.png", legend=False)
+    # break
+    print(f"\n-----------------------------------------------------\nspecies where the transcript numbers don't match: {failed_species}")
 
 
 

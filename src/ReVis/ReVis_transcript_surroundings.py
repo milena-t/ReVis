@@ -20,10 +20,14 @@ def parse_args():
     # Create the parser
     program_description = """
 ----------------- Quick start:
+* compute tables
 python3 ReVis_transcript_surroundings.py --compute_tables --out_dir ../../example_data --masker_outfile ../../example_data/bruchidius_siliquastri_repeats.fna.out --annotation_gff ../../example_data/bruchidius_siliquastri.gff --orthogroups ../../example_data/N0.tsv --CAFE5_results ../../example_data/CAFE5_Base_family_results.txt --species_name B_siliquastri --bp 500 --GF_size_percentile 90 --verbose
+* read tables for plotting
+python3 ReVis_transcript_surroundings.py --plot --out_dir ../../example_data --all_before_table ../../example_data/B_siliquastri_cumulative_repeats_before_all_transcripts.txt --sig_before_table ../../example_data/B_siliquastri_cumulative_repeats_before_sig_transcripts_90th_GF_size_percentile.txt --all_after_table ../../example_data/B_siliquastri_cumulative_repeats_after_all_transcripts.txt --sig_after_table ../../example_data/B_siliquastri_cumulative_repeats_after_sig_transcripts_90th_GF_size_percentile.txt --num_transcripts ../../example_data/B_siliquastri_transcript_numbers.txt --species_name B_siliquastri --verbose
+
 
 Files that need to be included to compute the tables from scratch:
-* repeats_out (takes both .out and .ori.out and then acts accordingly, like base ReVis)
+* repeats_out (takes both .out and .ori.out and then acts accordingly, like base ReVis. not out.gff!)
 * annotations_gff
 * orthogroups_orthofinder
 * CAFE_sig_OGs
@@ -71,6 +75,7 @@ This can be one of two kinds. they are formatted the same, but can be computed o
     parser.add_argument('--all_after_table', type=str, help="""when only plotting: table with background repeat abundance after genes ('all' genes)""")
     parser.add_argument('--sig_before_table', type=str, help="""when only plotting: table with foreground repeat abundance before genes ('significant' genes)""")
     parser.add_argument('--sig_after_table', type=str, help="""when only plotting: table with foreground repeat abundance after genes ('significant' genes)""")
+    parser.add_argument('--num_transcripts', type=str, help="""when only plotting: file containing the number of genes/transcripts used to compute the foreground and background tables (to be able to calculate proportion)""")
     
 
     parser.add_argument('--species_name', type=str, help="""species identifier string, MUST match one species name in the orthofinder output""")
@@ -136,6 +141,20 @@ def filter_sig_OGs_by_size(orthoDB_orthogroups:dict, species:str, q:int, verbose
     return OGs_filtered
 
 
+def read_transcripts_num_file(transcripts_num_filepath:str):
+    num_sig_tr = 0
+    num_all_r = 0
+    with open(transcripts_num_filepath, "r") as num_file:
+        for line_ in num_file.readlines():
+            line = line_.strip()
+            desc,num = line.split(": ")
+            if "number of sig. transcripts: " in line:
+                num_sig_tr = int(num)
+            elif "number of all transcripts: " in line:
+                numm_all_tr = int(num)
+            else:
+                raise RuntimeError(f"wrong formatting in transcript numbers file!\n\t {line_} does not match the expectation")
+    return num_sig_tr, numm_all_tr
 
 
 def plot_TE_abundance(before_filepath:str, after_filepath:str, sig_transcripts:int, all_before_filepath:str = "", all_after_filepath:str = "", all_transcripts:int = 0, filename = "cumulative_repeat_presence_around_transcripts.png", legend = True):
@@ -278,11 +297,17 @@ if __name__ == "__main__":
     ## tables for significant transcripts.
     ########
 
+    transcript_nums_file = f"{args.out_dir}{species}_transcript_numbers.txt"
+    num_sig_transcripts = 0
+    num_all_transcripts = 0
+
     if args.compute_tables_from_list:    
         if verbose:
             print(f"  * making foreground tables from input list for {species}: ")
         all_orthogroups_list = args.all_list
+        num_all_transcripts = len(all_orthogroups_list)
         sig_list = args.sig_list
+        num_sig_transcripts = len(sig_list)
         before_transcript, after_transcript = tr_surrounds.make_cumulative_TE_table(sig_list, n=num_bp, species=species, repeats_annot_path=repeats_out, genome_annot_path=orthoDB_annotation, sig_orthogroups=sig_list, verbose = verbose)
 
     if args.compute_tables:
@@ -291,12 +316,16 @@ if __name__ == "__main__":
         sig_orthoDB_list, all_orthogroups_list = OGs.get_sig_orthogroups(sig_orthoDB)
         orthoDB_orthogroups = OGs.parse_orthogroups_dict(orthogroups_orthoDB, sig_orthoDB_list, species=species)
         sig_OGs_size_filtered = filter_sig_OGs_by_size(orthoDB_orthogroups=orthoDB_orthogroups, species=species, q=size_percentile_threshold)
+        num_all_transcripts = len([value for key, value in orthoDB_orthogroups.items() if value !=['']])
+        num_sig_transcripts = len(sig_OGs_size_filtered)
         before_transcript, after_transcript = tr_surrounds.make_cumulative_TE_table(orthogroups_orthoDB, n=num_bp, species=species, repeats_annot_path=repeats_out, genome_annot_path=orthoDB_annotation, sig_orthogroups=sig_OGs_size_filtered, verbose = verbose)
     
     if not args.plot:
         sig_table_before = gff.write_dict_to_file(before_transcript, f"{args.out_dir}{species}_cumulative_repeats_before_sig_transcripts_{size_percentile_threshold}th_GF_size_percentile.txt")
         sig_table_after = gff.write_dict_to_file(after_transcript, f"{args.out_dir}{species}_cumulative_repeats_after_sig_transcripts_{size_percentile_threshold}th_GF_size_percentile.txt")
-        
+        with open(transcript_nums_file, "w") as tr_num_file:
+            tr_num_file.write(f"number of sig. transcripts: {num_sig_transcripts}\n")
+            tr_num_file.write(f"number of all transcripts: {num_all_transcripts}")
 
     #########
     ## tables for all background transcripts
@@ -318,15 +347,16 @@ if __name__ == "__main__":
             all_table_before = gff.write_dict_to_file(before_transcript, f"{args.out_dir}{species}_cumulative_repeats_before_all_transcripts.txt")
             all_table_after = gff.write_dict_to_file(after_transcript, f"{args.out_dir}{species}_cumulative_repeats_after_all_transcripts.txt")
     
-    ## TODO elif args.compute_tables_from_list:
 
     elif args.plot:
-        ## if only plotting is specified, use the given table filepaths
+        ## if only plotting is specified, use the given table filepaths to get all tables and values required
         sig_table_before = args.all_before_table
         sig_table_after = args.all_after_table
         all_table_before = args.sig_before_table
         all_table_after = args.sig_after_table
 
+        transcript_nums_file = args.num_transcripts
+        num_sig_transcripts, num_all_transcripts = read_transcripts_num_file(transcript_nums_file)
 
     ######################################################
     ############ plot above computed tables ##############

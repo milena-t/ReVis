@@ -83,6 +83,7 @@ This can be one of two kinds. they are formatted the same, but can be computed o
     parser.add_argument('--GF_size_percentile', type=int, help="""only gene families in the upper nth percentile of gene family size areincluded in the significant gene families. This helps ensure that only gene families that are really expandingin species_name specifically are included, and not the ones that are significant because they are expanding in other species.The default is 90 percent, which includes almost all gene families except the ones with only 1 or 0 members in most cases""")
 
     parser.add_argument('--plot_white_background', action="store_true", help="the plot does NOT have a transparent background, but white instead")
+    parser.add_argument('--plot_no_legend', action="store_true", help="the plot does NOT include a legend with the colors for all the repeat categories")
     parser.add_argument('--verbose', action="store_true", help="print progress in the command line (recommended, on by default)")
 
 
@@ -168,6 +169,12 @@ def plot_TE_abundance(before_filepath:str, after_filepath:str, sig_transcripts:i
     
     before_dict = gff.read_dict_from_file(before_filepath)
     before_dict = { key : [int(v)/sig_transcripts*100 for v in value] for key, value in before_dict.items()}
+    for key, value in before_dict.items():
+        for v in value:
+            v_ = int(v)
+            perc = v_/sig_transcripts*100
+            if perc>150:
+                print(f"{key} : \t {v_}/{sig_transcripts} * 100 = {perc:.2f}%")
     after_dict = gff.read_dict_from_file(after_filepath)
     after_dict = { key : [int(v)/sig_transcripts*100 for v in value] for key, value in after_dict.items()}
 
@@ -267,7 +274,8 @@ def plot_TE_abundance(before_filepath:str, after_filepath:str, sig_transcripts:i
     plt.xlabel(f"basepairs upstream and downstream from transcript", fontsize = fs)
 
     plt.ylabel(f"percent of transcripts in which this base is a repeat", fontsize = fs)
-    ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 and x<1 else f'{int(x)}%'))
+    # ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 and x<1 else f'{int(x)}%'))
+    
 
     plt.tight_layout()
     plt.savefig(filename, dpi = 300, transparent = plot_transparent_bg)
@@ -324,8 +332,9 @@ if __name__ == "__main__":
         before_transcript, after_transcript = tr_surrounds.make_cumulative_TE_table(orthogroups_orthoDB, n=num_bp, species=species, repeats_annot_path=repeats_out, genome_annot_path=orthoDB_annotation, sig_orthogroups=sig_OGs_size_filtered, verbose = verbose)
     
     if not args.plot:
-        sig_table_before = gff.write_dict_to_file(before_transcript, f"{args.out_dir}{species}_cumulative_repeats_before_sig_transcripts_{size_percentile_threshold}th_GF_size_percentile.txt")
-        sig_table_after = gff.write_dict_to_file(after_transcript, f"{args.out_dir}{species}_cumulative_repeats_after_sig_transcripts_{size_percentile_threshold}th_GF_size_percentile.txt")
+        ## return values are filepaths
+        sig_before_transcript = gff.write_dict_to_file(before_transcript, f"{args.out_dir}{species}_cumulative_repeats_before_sig_transcripts_{size_percentile_threshold}th_GF_size_percentile.txt")
+        sig_after_transcript = gff.write_dict_to_file(after_transcript, f"{args.out_dir}{species}_cumulative_repeats_after_sig_transcripts_{size_percentile_threshold}th_GF_size_percentile.txt")
         with open(transcript_nums_file, "w") as tr_num_file:
             tr_num_file.write(f"number of sig. transcripts: {num_sig_transcripts}\n")
             tr_num_file.write(f"number of all transcripts: {num_all_transcripts}")
@@ -347,16 +356,16 @@ if __name__ == "__main__":
             before_transcript, after_transcript = tr_surrounds.make_cumulative_TE_table(orthogroups_orthoDB, n=num_bp, species=species, repeats_annot_path=repeats_out, genome_annot_path=orthoDB_annotation)
         
         if not args.plot:
-            all_table_before = gff.write_dict_to_file(before_transcript, f"{args.out_dir}{species}_cumulative_repeats_before_all_transcripts.txt")
-            all_table_after = gff.write_dict_to_file(after_transcript, f"{args.out_dir}{species}_cumulative_repeats_after_all_transcripts.txt")
+            all_before_transcript = gff.write_dict_to_file(before_transcript, f"{args.out_dir}{species}_cumulative_repeats_before_all_transcripts.txt")
+            all_after_transcript = gff.write_dict_to_file(after_transcript, f"{args.out_dir}{species}_cumulative_repeats_after_all_transcripts.txt")
     
 
     elif args.plot:
         ## if only plotting is specified, use the given table filepaths to get all tables and values required
-        sig_before_transcript = args.all_before_table
-        sig_after_transcript = args.all_after_table
-        all_before_transcript = args.sig_before_table
-        all_after_transcript = args.sig_after_table
+        all_before_transcript = args.all_before_table
+        all_after_transcript = args.all_after_table
+        sig_before_transcript = args.sig_before_table
+        sig_after_transcript = args.sig_after_table
 
         transcript_nums_file = args.num_transcripts
         num_sig_transcripts, num_all_transcripts = read_transcripts_num_file(transcript_nums_file)
@@ -369,9 +378,15 @@ if __name__ == "__main__":
 
     if verbose:
         print(f"\n  * plot {species}")
+        print(f"all transcripts: {num_all_transcripts}, sig transcripts: {num_sig_transcripts}")
     # plot_TE_abundance(threshold_before_transcript[species], threshold_after_transcript[species], sig_transcripts = num_sig_transcripts, filename=f"{repeats_plots}cumulative_repeat_presence_around_transcripts_sig_only_{species}_{size_percentile_threshold}th_percentile_GF_size.png")
+    plot_legend = True
+    if args.plot_no_legend:
+        plot_legend=False
+
     
-    plot_TE_abundance(sig_before_transcript, sig_after_transcript, sig_transcripts = num_sig_transcripts, all_before_filepath=all_before_transcript, all_after_filepath=all_after_transcript, all_transcripts=num_all_transcripts, filename=f"{args.out_dir}{species}cumulative_repeat_presence_around_transcripts.png", legend=False, plot_white_bg=args.plot_white_background)
+    plot_TE_abundance(before_filepath = sig_before_transcript, after_filepath=sig_after_transcript, sig_transcripts = num_sig_transcripts, all_before_filepath=all_before_transcript, all_after_filepath=all_after_transcript, all_transcripts=num_all_transcripts, filename=f"{args.out_dir}{species}_cumulative_repeat_presence_around_transcripts.png", legend=plot_legend, plot_white_bg=args.plot_white_background)
+    print(f"{sig_before_transcript}")
     # break
 
 

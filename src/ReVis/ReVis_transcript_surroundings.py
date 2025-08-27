@@ -79,7 +79,7 @@ This can be one of two kinds. they are formatted the same, but can be computed o
     
 
     parser.add_argument('--species_name', type=str, help="""species identifier string, MUST match one species name in the orthofinder output""")
-    parser.add_argument('--bp', type=int, required = True, help="how many bp up and downstream of the transcript borders should be included. Default is 500 for testing purposes, but to see patterns you should use at least 5kbp")
+    parser.add_argument('--bp', type=int, help="how many bp up and downstream of the transcript borders should be included. Default is 500 for testing purposes, but to see patterns you should use at least 5kbp")
     parser.add_argument('--GF_size_percentile', type=int, help="""only gene families in the upper nth percentile of gene family size areincluded in the significant gene families. This helps ensure that only gene families that are really expandingin species_name specifically are included, and not the ones that are significant because they are expanding in other species.The default is 90 percent, which includes almost all gene families except the ones with only 1 or 0 members in most cases""")
 
     parser.add_argument('--plot_white_background', action="store_true", help="the plot does NOT have a transparent background, but white instead")
@@ -99,11 +99,11 @@ This can be one of two kinds. they are formatted the same, but can be computed o
     
     ## enforce plotting or tables computation
     if args.compute_tables:
-        for required in ["masker_outfile", "annotation_gff", "orthogroups", "CAFE5_results", "species_name"]:
+        for required in ["masker_outfile", "annotation_gff", "orthogroups", "CAFE5_results", "species_name", "bp"]:
             if getattr(args, required) is None:
                 parser.error(f"--{required} is required when using --compute_tables")
     elif args.compute_tables_from_list:
-        for required in ["masker_outfile", "annotation_gff", "all_list", "sig_list"]:
+        for required in ["masker_outfile", "annotation_gff", "all_list", "sig_list", "bp"]:
             if getattr(args, required) is None:
                 parser.error(f"--{required} is required when using --compute_tables_from_list")
     elif args.plot:
@@ -157,11 +157,14 @@ def read_transcripts_num_file(transcripts_num_filepath:str):
     return num_sig_tr, numm_all_tr
 
 
-def plot_TE_abundance(before_filepath:str, after_filepath:str, sig_transcripts:int, all_before_filepath:str = "", all_after_filepath:str = "", all_transcripts:int = 0, filename = "cumulative_repeat_presence_around_transcripts.png", legend = True):
+def plot_TE_abundance(before_filepath:str, after_filepath:str, sig_transcripts:int, all_before_filepath:str = "", all_after_filepath:str = "", all_transcripts:int = 0, filename = "cumulative_repeat_presence_around_transcripts.png", legend = True, plot_white_bg = False):
     """
     plot the cumulative repeat presence per base before and after a transcript (before and after infile paths)
     infiles generated from make_cumulative_TE_table and saved to text file
     """
+    plot_transparent_bg = True
+    if plot_white_bg:
+        plot_transparent_bg = False
     
     before_dict = gff.read_dict_from_file(before_filepath)
     before_dict = { key : [int(v)/sig_transcripts*100 for v in value] for key, value in before_dict.items()}
@@ -267,7 +270,7 @@ def plot_TE_abundance(before_filepath:str, after_filepath:str, sig_transcripts:i
     ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 and x<1 else f'{int(x)}%'))
 
     plt.tight_layout()
-    plt.savefig(filename, dpi = 300, transparent = True)
+    plt.savefig(filename, dpi = 300, transparent = plot_transparent_bg)
     print("Figure saved in the current working directory directory as: "+filename)
 
 
@@ -350,10 +353,10 @@ if __name__ == "__main__":
 
     elif args.plot:
         ## if only plotting is specified, use the given table filepaths to get all tables and values required
-        sig_table_before = args.all_before_table
-        sig_table_after = args.all_after_table
-        all_table_before = args.sig_before_table
-        all_table_after = args.sig_after_table
+        sig_before_transcript = args.all_before_table
+        sig_after_transcript = args.all_after_table
+        all_before_transcript = args.sig_before_table
+        all_after_transcript = args.sig_after_table
 
         transcript_nums_file = args.num_transcripts
         num_sig_transcripts, num_all_transcripts = read_transcripts_num_file(transcript_nums_file)
@@ -362,45 +365,14 @@ if __name__ == "__main__":
     ############ plot above computed tables ##############
     ######################################################
     
-    ## TODO continue here
-    raise RuntimeError("done with tables")
-
-    sig_before_transcript, sig_after_transcript, all_before_transcript, all_after_transcript, threshold_before_transcript, threshold_after_transcript = tables_filepaths()
+    ## TODO continue here, plotting doesn't work yet
 
     if verbose:
         print(f"\n  * plot {species}")
-    # get total number of transcripts that are part of significantly rapidly evolving orthogroups in this species
-    sig_orthoDB_list, all_orthogroups_list = OGs.get_sig_orthogroups(sig_orthoDB)
-
-    orthoDB_orthogroups = OGs.parse_orthogroups_dict(orthogroups_orthoDB, sig_orthoDB_list, species=species)
-    sig_OGs_size_filtered = filter_sig_OGs_by_size(orthoDB_orthogroups=orthoDB_orthogroups, species=species, q=size_percentile_threshold)
-    
-    all_transcript_IDs = tr_surrounds.get_sig_transcripts(orthoDB_orthogroups)
-    num_sig_transcripts_ = len(all_transcript_IDs)
-    # print(f"\t{num_sig_transcripts_} significant transcripts according to reading the CAFE and orthoDB output")
-    
-    all_transcript_IDs = tr_surrounds.make_cumulative_TE_table(orthogroups_orthoDB, n=10000, species=species, repeats_annot_path=repeats_out_work[species], genome_annot_path=orthoDB_annotations_work[species], sig_orthogroups=sig_OGs_size_filtered, count_transcripts=True)
-    num_sig_transcripts = len(all_transcript_IDs)
-    if num_sig_transcripts_ != num_sig_transcripts:
-        print(f"\t!!! {num_sig_transcripts} significant transcrips according to making the table\n\t!!! {num_sig_transcripts_} transcripts according to CAFE and orthoDB output\n")
-        failed_species.append(species)
-
     # plot_TE_abundance(threshold_before_transcript[species], threshold_after_transcript[species], sig_transcripts = num_sig_transcripts, filename=f"{repeats_plots}cumulative_repeat_presence_around_transcripts_sig_only_{species}_{size_percentile_threshold}th_percentile_GF_size.png")
-
-    orthoDB_orthogroups = OGs.parse_orthogroups_dict(orthogroups_orthoDB, all_orthogroups_list, species=species)
-    all_transcript_IDs = tr_surrounds.get_sig_transcripts(orthoDB_orthogroups)
-    num_all_transcripts_ = len(all_transcript_IDs)
-    # print(f"\t{num_all_transcripts_} CAFE transcripts according to reading the CAFE and orthoDB output")
-    # write table to output file
-    all_transcript_IDs = tr_surrounds.make_cumulative_TE_table(orthogroups_orthoDB, n=10000, species=species, repeats_annot_path=repeats_out_work[species], genome_annot_path=orthoDB_annotations_work[species], count_transcripts=True)
-    num_all_transcripts = len(all_transcript_IDs)
-    if num_all_transcripts_ != num_all_transcripts:
-        print(f"\t!!! {num_all_transcripts} significant transcrips according to making the table\n\t!!! {num_all_transcripts_} transcripts according to CAFE and orthoDB output")
-        
-
-    plot_TE_abundance(threshold_before_transcript[species], threshold_after_transcript[species], sig_transcripts = num_sig_transcripts, all_before_filepath=all_before_transcript[species], all_after_filepath=all_after_transcript[species], all_transcripts=num_all_transcripts, filename=f"{repeats_plots}cumulative_repeat_presence_around_transcripts_sig_and_all_{species}_{size_percentile_threshold}th_percentile_GF_size.png", legend=False)
+    
+    plot_TE_abundance(sig_before_transcript, sig_after_transcript, sig_transcripts = num_sig_transcripts, all_before_filepath=all_before_transcript, all_after_filepath=all_after_transcript, all_transcripts=num_all_transcripts, filename=f"{args.out_dir}{species}cumulative_repeat_presence_around_transcripts.png", legend=False, plot_white_bg=args.plot_white_background)
     # break
-    print(f"\n-----------------------------------------------------\nspecies where the transcript numbers don't match: {failed_species}")
 
 
 

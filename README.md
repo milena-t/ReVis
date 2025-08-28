@@ -150,8 +150,92 @@ Good luck!
 
 # ReVis transcript surroundings
 
-There is also the option to look at the repeat proportion of the sequences up and downstream of a list of genes. This requires a list of all genes you want to use as "background", and then a different list (potentially a subset of the first one) that you want to contrast with that. Here, I do *not* use windows, this is looking at the repeat abundance at individual bp positions up and downstream of gene borders.
-I wrote this code to use on the results of a CAFE5 analysis based on orthofinder, so this is the kind of file format it expects, but it's probably not too difficult to modify. 
+## Quick start
 
-The script works like this: 
-* make a table for the surrounding n bases upstream and downstream of each gene where each base is a row and each column is the sum of how often this base is annotated as the TE-category across all transcripts
+Generate the tables
+```
+python3 ReVis_transcript_surroundings.py \
+  --compute_tables \
+  --out_dir ../../example_data \
+  --masker_outfile ../../example_data/bruchidius_siliquastri_repeats.fna.out \
+  --annotation_gff ../../example_data/bruchidius_siliquastri.gff \
+  --orthogroups ../../example_data/N0.tsv \
+  --CAFE5_results ../../example_data/CAFE5_Base_family_results.txt \
+  --species_name B_siliquastri \
+  --bp 500 --GF_size_percentile 90 --verbose
+```
+
+Plot already existing tables
+```
+python3 ReVis_transcript_surroundings.py \
+  --plot \
+  --out_dir ../../example_data \
+  --all_before_table ../../example_data/B_siliquastri_cumulative_repeats_before_all_transcripts.txt \
+  --sig_before_table ../../example_data/B_siliquastri_cumulative_repeats_before_sig_transcripts_90th_GF_size_percentile.txt \
+  --all_after_table ../../example_data/B_siliquastri_cumulative_repeats_after_all_transcripts.txt \
+  --sig_after_table ../../example_data/B_siliquastri_cumulative_repeats_after_sig_transcripts_90th_GF_size_percentile.txt \
+  --num_transcripts ../../example_data/B_siliquastri_transcript_numbers.txt \
+  --species_name B_siliquastri --verbose
+```
+
+## Summary
+
+Each table has a row for each repeat category, and each column is one base. The number in the cell is how often this base position is annotated with a repeat of one category in all the transcripts considered. It also generates a file where it saves the number of transcripts considered for foreground and background respectively, so that the repeat counts from the tables can be normalized into a percentage for comparability.
+
+Since I get the foreground and background transcripts from orthofinder and CAFE analysis of a set of species, these are the data structures that I have tested this code with the most. This is also why they are mostly refered to as "sig" (significant) for the foreground transcripts and "all" for the background transcripts. I did try to implement an option where you can pass lists of transcript IDs (corresponding to your annotation) in the command line directly for the foreground and background transcripts, if you are not using orthofinder/cafe, but I didn't exactly test it rigorously so it may not work.
+
+You can specify how many bp up and downstream from a transcript border you want to check (default 500). This is not a fast program, so I have found that 10k bp is a nice compromise of seeing interesting dynamics and it not taking too long. The test plot with B. siliquastri took less than 10 mins for 10k bp, but more repeat rich genomes will take longer, as will longer foreground and background lists.
+
+ReVis_transcript_surroundings.py comptues four tables:
+* foreground transcripts sequences:
+    * before transcript start
+    * after transcript start
+* background transcripts sequences:
+    * before transcript start
+    * after transcript start
+and one file that contains the number of transcripts used to calculate the foreground and background tables, to use for calculating the percentages when plotting
+
+You can pass these parameters
+* `bp` (how many bp up- and downstream of a transcript to compute and plot)
+* `gene family size percentile` (recommended! for the sig. table, only genes that are part of actually expanding gene families (whose size is in the upper nth size percentile, not just all sig. evolving orthogroups, are included)
+If you
+* If you are doing orthofinder/CAFE: `species name` (matching one in the orthofinder output!!!)
+
+```
+options:
+  -h, --help            show this help message and exit
+  --compute_tables      it will compute all the tables required for plotting and then also make the plot
+  --plot                it will ONLY plot and you have to pass the table filepaths as input (if you go more than 1kb up/downstream, computing the tables will take a long time)
+  --compute_tables_from_list
+                        it will compute all the tables from two lists of transcript IDs, a foreground and a background list (or a 'significant' and 'all' list respectively)
+  --out_dir OUT_DIR     path to output directory. If not given all files will be saved in current working directory
+  --masker_outfile MASKER_OUTFILE
+                        repeatmasker output file ending in .out (.ori.out, is recommended, but both work, the other one is just slower)
+  --annotation_gff ANNOTATION_GFF
+                        genome annotation based on the same assembly as the repeatmasker output
+  --orthogroups ORTHOGROUPS
+                        hierarchical orthogroups file computed by orthofinder (N0.tsv) matching the results from CAFE5
+  --CAFE5_results CAFE5_RESULTS
+                        family_results.txt file from CAFE5 with orthogroup names matching the orthofinder output
+  --all_list ALL_LIST   path to csv file containing a list of gene or transcript IDs from annotation_gff to be used in the all table (background table).
+  --sig_list SIG_LIST   path to csv file containing a list of gene or transcript IDs from annotation_gff to be used in the sig table (foreground table).
+  --all_before_table ALL_BEFORE_TABLE
+                        when only plotting: table with background repeat abundance before genes ('all' genes)
+  --all_after_table ALL_AFTER_TABLE
+                        when only plotting: table with background repeat abundance after genes ('all' genes)
+  --sig_before_table SIG_BEFORE_TABLE
+                        when only plotting: table with foreground repeat abundance before genes ('significant' genes)
+  --sig_after_table SIG_AFTER_TABLE
+                        when only plotting: table with foreground repeat abundance after genes ('significant' genes)
+  --num_transcripts NUM_TRANSCRIPTS
+                        when only plotting: file containing the number of genes/transcripts used to compute the foreground and background tables (to be able to calculate proportion)
+  --species_name SPECIES_NAME
+                        species identifier string, MUST match one species name in the orthofinder output
+  --bp BP               how many bp up and downstream of the transcript borders should be included. Default is 500 for testing purposes, but to see patterns you should use at least 5kbp
+  --GF_size_percentile GF_SIZE_PERCENTILE
+                        only gene families in the upper nth percentile of gene family size areincluded in the significant gene families. This helps ensure that only gene families that are really expandingin species_name specifically are included, and not the ones that are significant because they are expanding in other species.The default is 90 percent, which includes almost all gene families except the ones with only 1 or 0 members in most cases
+  --plot_white_background
+                        the plot does NOT have a transparent background, but white instead
+  --plot_no_legend      the plot does NOT include a legend with the colors for all the repeat categories
+  --verbose             print progress in the command line (recommended, on by default)
+  ```

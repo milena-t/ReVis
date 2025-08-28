@@ -25,9 +25,18 @@ python3 ReVis_transcript_surroundings.py --compute_tables --out_dir ../../exampl
 * read tables for plotting
 python3 ReVis_transcript_surroundings.py --plot --out_dir ../../example_data --all_before_table ../../example_data/B_siliquastri_cumulative_repeats_before_all_transcripts.txt --sig_before_table ../../example_data/B_siliquastri_cumulative_repeats_before_sig_transcripts_90th_GF_size_percentile.txt --all_after_table ../../example_data/B_siliquastri_cumulative_repeats_after_all_transcripts.txt --sig_after_table ../../example_data/B_siliquastri_cumulative_repeats_after_sig_transcripts_90th_GF_size_percentile.txt --num_transcripts ../../example_data/B_siliquastri_transcript_numbers.txt --species_name B_siliquastri --verbose --plot_white_background
 
+----------------- Summary:
+
+ReVis_transcript_surroundings.py comptues four tables:
+* foreground transcripts sequences:
+    * before transcript start
+    * after transcript start
+* background transcripts sequences:
+    * before transcript start
+    * after transcript start
 
 Files that need to be included to compute the tables from scratch:
-* repeats_out (takes both .out and .ori.out and then acts accordingly, like base ReVis. not out.gff!)
+* repeats_out (takes both .out and .ori.out and then acts accordingly, like base ReVis. Not out.gff!)
 * annotations_gff
 * orthogroups_orthofinder
 * CAFE_sig_OGs
@@ -36,9 +45,6 @@ Other flags to include:
 * bp (how many bp up- and downstream of a transcript to compute and plot)
 * gene family size percentile (recommended! for the sig. table, only genes that are part of actually expanding gene families (not just all sig. evolving orthogroups) are included)
 * species name (matching one in the orthofinder output!!!)
-
-## TODO:
-* implement options for gene/transcript ID list input as well, in case someone doesn't use orthofinder or CAFE
 
 tables that need to be included if they were previously computed and should only be plotted:
 * "background" repeat abundance

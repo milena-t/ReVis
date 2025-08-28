@@ -1,9 +1,18 @@
 # ReVis
 
-Visualize the repeat content across a genome in a stacked histogram of the different repeat categories. The repeat content is shown in non-overlapping windows, and optionally a line of the gene numbers (mean over multiple windows) can be included.
+Visualize output of repeatmasker. 
+
+## Genome wide
+
+You can show the repeat content across a genome in a stacked histogram of the different repeat categories. The windows are non-overlapping, and optionally a line of the gene numbers (mean over a specified multiple windows) can be included.
+
 ![B. siliquastri repeat landscape](example_data/repeat_abundance_with_gene_numbers_in_b_siliquastri.png) 
 
-It is also possible to look at the surroundings of specific genes, and assess the repeat content in the upstream and downstream regions of a list of genes compared to a wider set to assess differences. This is not as user-friendly as the histograms right now but I am working on it. See detailed information below.
+## Gene surroundings
+
+It is also possible to look at the repeat landscape in the up and downstream sequence of specific genes. The repeat abundance is calculated for individual bases (not windows), the repeat content in the upstream and downstream regions of a list of "foreground" genes compared to a wider set of "background" to assess differences. 
+
+![B. siliquastri transcript surroundings repeat landscape](example_data/B_siliquastri_cumulative_repeat_presence_around_transcripts.png) 
 
 # ReVis Histograms
 

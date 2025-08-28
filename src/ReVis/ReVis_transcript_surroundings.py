@@ -118,7 +118,7 @@ This can be one of two kinds. they are formatted the same, but can be computed o
 
 def filter_sig_OGs_by_size(orthoDB_orthogroups:dict, species:str, q:int, verbose=False):
     """
-    return a list of orthogroup IDs, where the GF size in the species is above the q'th percentile
+    return a list dict orthogroups, where the GF size in the species is above the q'th percentile
     """
     GF_sizes_species = {}
     sizes = []
@@ -127,7 +127,7 @@ def filter_sig_OGs_by_size(orthoDB_orthogroups:dict, species:str, q:int, verbose
         sizes.append(len(transcripts_list))
 
     ## calculate size threshold
-    OGs_filtered = []
+    OGs_filtered = {}
     sizes = np.array(sizes)
     percentile_size = np.percentile(sizes, q = q)
     if verbose:
@@ -135,7 +135,7 @@ def filter_sig_OGs_by_size(orthoDB_orthogroups:dict, species:str, q:int, verbose
 
     for OG_id, size in GF_sizes_species.items():
         if size > percentile_size:
-            OGs_filtered.append(OG_id)
+            OGs_filtered[OG_id]= orthoDB_orthogroups[OG_id]
     if verbose:
         print(f"before filtering: {len(orthoDB_orthogroups)} --> after filtering: {len(OGs_filtered)}")
 
@@ -158,6 +158,17 @@ def read_transcripts_num_file(transcripts_num_filepath:str):
     return num_sig_tr, numm_all_tr
 
 
+def num_transcripts_from_OG_dict(OG_dict:dict):
+    """ 
+    get the number of transcripts in a dictionary of orthogroups like { OG_id : [transcripts,list] }
+    """
+    num_transcripts = 0
+    for OG_id, transcripts_list in OG_dict.items():
+        if transcripts_list == ['']:
+            continue
+        num_transcripts+= len(transcripts_list)
+    return num_transcripts
+
 def plot_TE_abundance(before_filepath:str, after_filepath:str, sig_transcripts:int, all_before_filepath:str = "", all_after_filepath:str = "", all_transcripts:int = 0, filename = "cumulative_repeat_presence_around_transcripts.png", legend = True, plot_white_bg = False):
     """
     plot the cumulative repeat presence per base before and after a transcript (before and after infile paths)
@@ -169,12 +180,14 @@ def plot_TE_abundance(before_filepath:str, after_filepath:str, sig_transcripts:i
     
     before_dict = gff.read_dict_from_file(before_filepath)
     before_dict = { key : [int(v)/sig_transcripts*100 for v in value] for key, value in before_dict.items()}
+    # show percentages of they are too high
     for key, value in before_dict.items():
         for v in value:
             v_ = int(v)
             perc = v_/sig_transcripts*100
             if perc>150:
                 print(f"{key} : \t {v_}/{sig_transcripts} * 100 = {perc:.2f}%")
+
     after_dict = gff.read_dict_from_file(after_filepath)
     after_dict = { key : [int(v)/sig_transcripts*100 for v in value] for key, value in after_dict.items()}
 
@@ -325,40 +338,50 @@ if __name__ == "__main__":
         if verbose:
             print(f"  * making foreground tables from orthofinder/CAFE output for {species}: ")
         sig_orthoDB_list, all_orthogroups_list = OGs.get_sig_orthogroups(sig_orthoDB)
-        orthoDB_orthogroups = OGs.parse_orthogroups_dict(orthogroups_orthoDB, sig_orthoDB_list, species=species)
-        sig_OGs_size_filtered = filter_sig_OGs_by_size(orthoDB_orthogroups=orthoDB_orthogroups, species=species, q=size_percentile_threshold)
-        num_all_transcripts = len([value for key, value in orthoDB_orthogroups.items() if value !=['']])
-        num_sig_transcripts = len(sig_OGs_size_filtered)
+        orthoDB_orthogroups_dict = OGs.parse_orthogroups_dict(orthogroups_orthoDB, sig_orthoDB_list, species=species)
+        
+        sig_OGs_size_filtered_dict = filter_sig_OGs_by_size(orthoDB_orthogroups=orthoDB_orthogroups_dict, species=species, q=size_percentile_threshold)
+        sig_OGs_size_filtered = list(sig_OGs_size_filtered_dict.keys())
+        list_sig_transcripts = tr_surrounds.get_sig_transcripts(sig_OGs_size_filtered_dict)
+        num_sig_transcripts = len(list_sig_transcripts)
+
+        ### compute table
         before_transcript, after_transcript = tr_surrounds.make_cumulative_TE_table(orthogroups_orthoDB, n=num_bp, species=species, repeats_annot_path=repeats_out, genome_annot_path=orthoDB_annotation, sig_orthogroups=sig_OGs_size_filtered, verbose = verbose)
     
     if not args.plot:
         ## return values are filepaths
         sig_before_transcript = gff.write_dict_to_file(before_transcript, f"{args.out_dir}{species}_cumulative_repeats_before_sig_transcripts_{size_percentile_threshold}th_GF_size_percentile.txt")
         sig_after_transcript = gff.write_dict_to_file(after_transcript, f"{args.out_dir}{species}_cumulative_repeats_after_sig_transcripts_{size_percentile_threshold}th_GF_size_percentile.txt")
-        with open(transcript_nums_file, "w") as tr_num_file:
-            tr_num_file.write(f"number of sig. transcripts: {num_sig_transcripts}\n")
-            tr_num_file.write(f"number of all transcripts: {num_all_transcripts}")
 
     #########
     ## tables for all background transcripts
     #########
-        if args.compute_tables_from_list:    
-            if verbose:
-                print(f"  * making background tables from input list for {species}: ")
-            all_transcripts_list = args.all_list
-            sig_list = args.sig_list
-            before_transcript, after_transcript = tr_surrounds.make_cumulative_TE_table(all_transcripts_list, n=num_bp, species=species, repeats_annot_path=repeats_out, genome_annot_path=orthoDB_annotation, sig_orthogroups=sig_OGs_size_filtered, verbose = verbose)
+    if args.compute_tables_from_list:    
+        if verbose:
+            print(f"  * making background tables from input list for {species}: ")
+        all_transcripts_list = args.all_list
+        sig_list = args.sig_list
+        before_transcript, after_transcript = tr_surrounds.make_cumulative_TE_table(all_transcripts_list, n=num_bp, species=species, repeats_annot_path=repeats_out, genome_annot_path=orthoDB_annotation, sig_orthogroups=sig_OGs_size_filtered, verbose = verbose)
 
-        if args.compute_tables:
-            if verbose:
-                print(f"  * making background tables from orthofinder/CAFE output for {species}: ")
-            sig_orthoDB_list, all_orthogroups_list = OGs.get_sig_orthogroups(sig_orthoDB)
-            before_transcript, after_transcript = tr_surrounds.make_cumulative_TE_table(orthogroups_orthoDB, n=num_bp, species=species, repeats_annot_path=repeats_out, genome_annot_path=orthoDB_annotation)
-        
-        if not args.plot:
-            all_before_transcript = gff.write_dict_to_file(before_transcript, f"{args.out_dir}{species}_cumulative_repeats_before_all_transcripts.txt")
-            all_after_transcript = gff.write_dict_to_file(after_transcript, f"{args.out_dir}{species}_cumulative_repeats_after_all_transcripts.txt")
+    if args.compute_tables:
+        if verbose:
+            print(f"  * making background tables from orthofinder/CAFE output for {species}: ")
+        sig_orthoDB_list, all_orthogroups_list = OGs.get_sig_orthogroups(sig_orthoDB)
+        # get number of transcripts to compute percentiles for "background"
+        orthoDB_orthogroups_dict = OGs.parse_orthogroups_dict(orthogroups_orthoDB, species=species)
+        list_all_transcripts = tr_surrounds.get_sig_transcripts(orthoDB_orthogroups_dict)
+        num_all_transcripts = len(list_all_transcripts)
+
+        ## compute table
+        before_transcript, after_transcript = tr_surrounds.make_cumulative_TE_table(orthogroups_orthoDB, n=num_bp, species=species, repeats_annot_path=repeats_out, genome_annot_path=orthoDB_annotation)
     
+    if not args.plot:
+        all_before_transcript = gff.write_dict_to_file(before_transcript, f"{args.out_dir}{species}_cumulative_repeats_before_all_transcripts.txt")
+        all_after_transcript = gff.write_dict_to_file(after_transcript, f"{args.out_dir}{species}_cumulative_repeats_after_all_transcripts.txt")
+        with open(transcript_nums_file, "w") as tr_num_file:
+            tr_num_file.write(f"number of sig. transcripts: {num_sig_transcripts}\n")
+            tr_num_file.write(f"number of all transcripts: {num_all_transcripts}")
+
 
     elif args.plot:
         ## if only plotting is specified, use the given table filepaths to get all tables and values required
@@ -386,7 +409,7 @@ if __name__ == "__main__":
 
     
     plot_TE_abundance(before_filepath = sig_before_transcript, after_filepath=sig_after_transcript, sig_transcripts = num_sig_transcripts, all_before_filepath=all_before_transcript, all_after_filepath=all_after_transcript, all_transcripts=num_all_transcripts, filename=f"{args.out_dir}{species}_cumulative_repeat_presence_around_transcripts.png", legend=plot_legend, plot_white_bg=args.plot_white_background)
-    print(f"{sig_before_transcript}")
+    # print(f"{sig_before_transcript}")
     # break
 
 

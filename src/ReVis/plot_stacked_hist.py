@@ -265,6 +265,7 @@ def plot_repeat_abundance(species_abundances, species_categories, gff_filepath, 
             ax3.tick_params(axis ='y', labelcolor = genes_line_color, labelsize = fs)  
             
             gene_nos_plot, = ax3.plot(gene_positions, gene_numbers_in_window, color = genes_line_color, label = "native")
+            ax3.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x == 0 else int(x)))
             # gene_nos_plot, = ax3.plot(gene_positions, gene_numbers_in_window, color = genes_line_color2, label = "orthoDB", linestyle = ":")
 
             if include_genes_line2:
@@ -279,7 +280,6 @@ def plot_repeat_abundance(species_abundances, species_categories, gff_filepath, 
     # convert x axis to Mb
     # Set the primary x-axis formatter to convert bp to Mb
     ax.xaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x < 0 else f'{x / 1e6:.0f} Mb'))
-    ax3.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x == 0 else int(x)))
 
     # add contig names
     # Set the secondary x-axis ticks and labels
@@ -323,11 +323,11 @@ def plot_repeat_abundance(species_abundances, species_categories, gff_filepath, 
         # make legends for repeat lines (hard coded labes in plot command above!)
         # repeat_lines = [gene_nos_plot, gene_nos_plot2]
         repeat_lines = ax3.get_lines()
-        legend_lines = plt.legend(repeat_lines, ["native", "uniform"], loc = "upper left", fontsize = fs*0.75, title = "annotation", title_fontsize = fs*0.85)
+        legend_lines = plt.legend(repeat_lines, ["1", "2"], loc = "upper left", fontsize = fs*0.75, title = "genome annotation", title_fontsize = fs*0.85)
         plt.gca().add_artist(legend_lines)
     elif include_genes_line and not include_genes_line2:
         repeat_lines = ax3.get_lines()
-        legend_lines = plt.legend(repeat_lines, ["native"], loc = "upper left", fontsize = fs*0.75, title = "annotation", title_fontsize = fs*0.85)
+        legend_lines = plt.legend(repeat_lines, ["genome annotation"], loc = "upper left", fontsize = fs*0.75, title_fontsize = fs*0.85)
         # legend_lines = plt.legend(repeat_lines, ["orthoDB"], loc = "upper left", fontsize = fs, title = "annotation", title_fontsize = fs)
         plt.gca().add_artist(legend_lines)
 

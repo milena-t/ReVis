@@ -224,9 +224,10 @@ def plot_TE_abundance(before_filepath:str, after_filepath:str, sig_transcripts:i
 
     fs = 25 # set font size
     if legend:
-        fig, ax = plt.subplots(1, 1, figsize=(20, 10))
+        fig, ax = plt.subplots(1, 1, figsize=(23, 10))
     else:
-        fig, ax = plt.subplots(1, 1, figsize=(20, 12))
+        fig, ax = plt.subplots(1, 1, figsize=(21, 12))
+
     rep_classes = list(before_dict.keys())
     num_bp = len(before_dict[rep_classes[0]])
     x_before = range(-num_bp, 0)
@@ -242,8 +243,9 @@ def plot_TE_abundance(before_filepath:str, after_filepath:str, sig_transcripts:i
         if max_after>max_percentage:
             max_percentage=max_after
 
-        ax.plot(x_before, before_dict[rep_class], label = rep_class, color = colors[rep_class])
-        ax.plot(x_after, after_dict[rep_class], color = colors[rep_class])
+        rep_label = rep_class.replace("_", " ")
+        ax.plot(x_before, before_dict[rep_class], label = rep_label, color = colors[rep_class], linewidth=2)
+        ax.plot(x_after, after_dict[rep_class], color = colors[rep_class], linewidth=2)
         
         if all_before_dict !={} and all_after_dict !={} and all_transcripts!=0:
             max_before = max(all_before_dict[rep_class])
@@ -256,11 +258,11 @@ def plot_TE_abundance(before_filepath:str, after_filepath:str, sig_transcripts:i
             ax.plot(x_before, all_before_dict[rep_class], color = colors[rep_class], linestyle = (0, (1, 10)))                    
             ax.plot(x_after, all_after_dict[rep_class], color = colors[rep_class], linestyle = (0, (1, 10)))                
     
-    max_percentage=int(max_percentage*1.4)
+    max_percentage=int(max_percentage*1.3)
     if max_percentage == 0 or max_percentage>100:
         max_percentage= 100
 
-    plt.vlines(x= 0, ymin=0, ymax=max_percentage, colors="#000000", linestyles="dashed", label="transcript border")
+    plt.vlines(x= 0, ymin=0, ymax=max_percentage, colors="#000000", linestyles="dashed", label="transcript border", linewidth=3)
     plt.xticks(range(-num_bp, num_bp+1, int(num_bp/5)), fontsize = fs)
     plt.yticks(range(0, max_percentage+1, 10), fontsize = fs)
 
@@ -268,28 +270,27 @@ def plot_TE_abundance(before_filepath:str, after_filepath:str, sig_transcripts:i
     species = species.replace("_", ". ")
 
     if legend:
-        ax.set_xlim([-num_bp, num_bp*1.35])
-        plt.legend(loc = "upper right", fontsize = fs)
-        plt.title(f"{species} transcript surroundings {num_bp} bp up and downstream \n({num_sig_transcripts} significant transcripts of {all_transcripts} in CAFE analysis)", fontsize = fs*1.25)
-    else:
+        # plot color legend
+        ax.set_xlim([-num_bp, num_bp*1.55])
+        legend_colors = ax.legend(loc = "center right", fontsize = fs)
+        plt.gca().add_artist(legend_colors)
+        # plt.title(f"{species} transcript surroundings {num_bp} bp up and downstream \n({num_sig_transcripts} significant transcripts of {all_transcripts} in CAFE analysis)", fontsize = fs*1.25)
         
-        solid = Line2D([0], [0], color='black', linestyle='-', linewidth=2)
-        dotted = Line2D([0], [0], color='black', linestyle=':', linewidth=2)
-        handles = [solid, dotted]
-        labels = []
-        # handles.append(mpatches.Patch(fill=False, linestyle=None))
-        # handles.append(mpatches.Patch(fill=False, linestyle=None))
-        labels.append(f"significant transcripts ({num_sig_transcripts})")
-        labels.append(f"all CAFE transcripts ({all_transcripts})")
-        plt.legend(handles, labels, loc = "upper center", fontsize = fs)
-        plt.title(f"{species} transcript surroundings {num_bp} bp up and downstream", fontsize = fs*1.25)
-    
+    # plot dotted/bold legend
+    solid = Line2D([0], [0], color='black', linestyle='-', linewidth=2)
+    dotted = Line2D([0], [0], color='black', linestyle=':', linewidth=2)
+    handles = [solid, dotted]
+    labels = []
+    labels.append(f"significant transcripts ({num_sig_transcripts})")
+    labels.append(f"all CAFE transcripts ({all_transcripts})")
+    plt.legend(handles, labels, loc = "upper left", fontsize = fs)
+
+    plt.title(f"{species} transcript surroundings {num_bp} bp up and downstream", fontsize = fs*1.25)
     plt.xlabel(f"basepairs upstream and downstream from transcript", fontsize = fs)
 
     plt.ylabel(f"percent of transcripts in which this base is a repeat", fontsize = fs)
-    # ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 and x<1 else f'{int(x)}%'))
+    ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 or x<1 else f'{int(x)}%'))
     
-
     plt.tight_layout()
     plt.savefig(filename, dpi = 300, transparent = plot_transparent_bg)
     print("Figure saved in the current working directory directory as: "+filename)

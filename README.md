@@ -2,7 +2,11 @@
 
 Visualize output of repeatmasker. 
 
-## Genome wide
+## Installation
+
+Download the latest release, and run the python script as described in quickstart below. You might have to install a few external dependencies manually (see `requirements.txt`) but they are all easy to install with `pip`.
+
+## Genome wide mode
 
 You can show the repeat content across a genome in a stacked histogram of the different repeat categories. The windows are non-overlapping, and optionally a line of the gene numbers (mean over a specified multiple windows) can be included.
 
@@ -148,7 +152,7 @@ Good luck!
                             Prints repeat information (and gene numbers if applicable) for each contig, mostly for debugging purposes
 ```
 
-# ReVis transcript surroundings
+# Transcript Surroundings mode
 
 ## Quick start
 

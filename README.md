@@ -41,6 +41,7 @@ It is also possible to look at the repeat landscape in the up and downstream seq
 python3 ReVis.py \
     --masker_outfile your_assembly.fna.ori.out \
     --masker_out_gff your_assembly.fna.out.gff \
+    --out_dir ./ \
     --species_name Y_species \
     --window_length 1e6 \
     --plot_overlap_filtered \

@@ -126,11 +126,13 @@ which also increases the runtime. In any case, the longest runtime i managed to 
         args.gene_density = False
     if not args.merge_gene_windows:
         args.merge_gene_windows = 5
+
     if args.out_dir:
         if args.out_dir[-1] != "/":
             args.out_dir = f"{args.out_dir}/"
-    elif not args.out_dir:
-        args.outdir = ""
+    else:
+        args.outdir = "./"
+
     if not args.plot_overlap_filtered:
         args.out_dir = f"{args.out_dir}no_overlap_filtered_"
 
@@ -231,7 +233,7 @@ if __name__ == "__main__":
     start_time_complete = time.perf_counter()
 
     args = parse_args()
-
+    
     include_annotation = False
     if args.annotation_gff:
         include_annotation = True
@@ -296,7 +298,8 @@ if __name__ == "__main__":
         else:
             plot_windows.plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, transparent_bg = plot_transparent_backrgound, species_name=args.species_name, output_dir = args.out_dir, plot_overlap_filtered = args.plot_overlap_filtered)
             pass
-
+        
+        print(f"output dir given: -->'{args.out_dir}'")
 
     elif args.table:
 
@@ -331,7 +334,7 @@ if __name__ == "__main__":
         # print(output_df)
 
         ## save to tsv
-  
+
         outfile_name = f"{args.out_dir}repeat_statistics_{species_name}_table.tsv"
         
         output_df.to_csv(outfile_name, sep="\t", header=True, index=False)

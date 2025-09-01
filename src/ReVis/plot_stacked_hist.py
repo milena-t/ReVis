@@ -19,12 +19,14 @@ def random_hex_color():
 def plot_repeat_abundance(species_abundances, species_categories, gff_filepath, window_length, transparent_bg, gene_numbers = {}, gene_numbers2 = {}, species_name = "", y_label = "repeat abundance", output_dir  = "", plot_overlap_filtered = True):
 
     print("\n* start plotting...")
-    
+
     if len(species_name)==0:
         species_name = gff.split_at_second_occurrence(gff_filepath.split("/")[-1])
         #species_name = species_name.replace("_", ". ")
-
-    filename = f"{output_dir}repeat_abundance_in_{species_name}.png"
+    if output_dir == "./":
+        filename = f"repeat_abundance_in_{species_name}.png"
+    else:    
+        filename = f"{output_dir}repeat_abundance_in_{species_name}.png"
     if len(gene_numbers)>0:
         filename = f"{output_dir}repeat_abundance_with_gene_numbers_in_{species_name}.png"
 

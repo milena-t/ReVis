@@ -126,8 +126,11 @@ which also increases the runtime. In any case, the longest runtime i managed to 
         args.gene_density = False
     if not args.merge_gene_windows:
         args.merge_gene_windows = 5
-    if args.out_dir[-1] != "/":
-        args.out_dir = f"{args.out_dir}/"
+    if args.out_dir:
+        if args.out_dir[-1] != "/":
+            args.out_dir = f"{args.out_dir}/"
+    elif not args.out_dir:
+        args.outdir = ""
     if not args.plot_overlap_filtered:
         args.out_dir = f"{args.out_dir}no_overlap_filtered_"
 

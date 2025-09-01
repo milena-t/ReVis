@@ -14,6 +14,7 @@ Download the latest release and unzip it. You can just run the python script as 
     - tqdm, random, time
     - dataclasses, enum, pandas, tempfile, SeqIO
     - matplotlib
+
 (they can all be installed through pip. Sorry if I forgot any, I'm sure the compiler will tell you)
 
 # Run modes

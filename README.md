@@ -4,7 +4,7 @@ Visualize output of repeatmasker.
 
 ## Installation
 
-Download the latest release, and run the python script as described in quickstart below. You might have to install a few external dependencies manually (see `requirements.txt`) but they are all easy to install with `pip`.
+Download the latest release and unzip it. You can just run the python script as described in quickstart below. You might have to install a few external dependencies manually (see `requirements.txt`) but they are all easy to install with `pip`.
 
 ## Genome wide mode
 

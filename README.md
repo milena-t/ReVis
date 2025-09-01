@@ -162,7 +162,7 @@ Good luck!
 
 ## Quick start
 
-Generate the tables
+Generate the tables from scratch and plot (existing tables of the same name from previous runs will be overwritten)
 ```
 python3 ReVis_transcript_surroundings.py \
   --compute_tables \

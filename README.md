@@ -6,7 +6,21 @@ Visualize output of repeatmasker.
 
 Download the latest release and unzip it. You can just run the python script as described in quickstart below. You might have to install a few external dependencies manually (see `requirements.txt`) but they are all easy to install with `pip`.
 
-## Genome wide mode
+### Dependencies
+
+ *  On uppmax, load biopython/1.80-py3.10.8 to use argparse (base python doesn't include it).
+ *  Libraries imported in this script and in parse_repeats.py and parse_gff.py:
+    - sys, re, os, subprocess, argparse
+    - tqdm, random, time
+    - dataclasses, enum, pandas, tempfile, SeqIO
+    - matplotlib
+    (they can all be installed through pip. Sorry if I forgot any, I'm sure the compiler will tell you)
+
+# Run modes
+
+You can make two different kinds of plots with ReVis:
+
+## Genome wide
 
 You can show the repeat content across a genome in a stacked histogram of the different repeat categories. The windows are non-overlapping, and optionally a line of the gene numbers (mean over a specified multiple windows) can be included.
 
@@ -18,7 +32,7 @@ It is also possible to look at the repeat landscape in the up and downstream seq
 
 ![B. siliquastri transcript surroundings repeat landscape](example_data/B_siliquastri_cumulative_repeat_presence_around_transcripts.png) 
 
-# ReVis Histograms
+# ReVis Histograms (genome wide mode)
 
 ## Quick start
 
@@ -71,16 +85,6 @@ filtered repeats that do not overlap any more
 
 (completely inserted repeats vanish this way, but the overall bases covered by repeats stays similar. Repeats completely inserted into other repeats that span a wider region are filtered out completely)
 
-
-## Dependencies
-
- *  On uppmax, load biopython/1.80-py3.10.8 to use argparse (base python doesn't include it).
- *  Libraries imported in this script and in parse_repeats.py and parse_gff.py:
-    - sys, re, os, subprocess, argparse
-    - tqdm, random, time
-    - dataclasses, enum, pandas, tempfile, SeqIO
-    - matplotlib
-    (they can all be installed through pip. Sorry if I forgot any, I'm sure the compiler will tell you)
 
 ## Detailed description
 

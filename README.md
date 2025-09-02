@@ -49,11 +49,8 @@ python3 ReVis.py \
     --plot
 ```
 
-<<<<<<< HEAD
 
-=======
 (TODO: fix default for no given output directory! --> explicitly use `--out_dir ./` for now)
->>>>>>> 2df8a8b7d52b4f48adc1970f8922fae111b522ab
 
 ## Input options
 

@@ -49,6 +49,8 @@ python3 ReVis.py \
     --plot
 ```
 
+(TODO: fix default for no given output directory! --> explicitly use `--out_dir ./` for now)
+
 ## Input options
 
 These are quickstart options, see all possible options with the `-h` flag or at the end of this documentation.

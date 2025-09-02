@@ -54,7 +54,7 @@ python3 ReVis.py \
 
 ## Input options
 
-Above are quickstart options, see all possible options with the `-h` flag or at the end of this documentation. Contigs be sorted by size decreasing in the plot.
+Above are quickstart options, see all possible options with the `-h` flag or at the end of this documentation. Contigs are sorted by size decreasing in the plot.
 
 ### Files
 

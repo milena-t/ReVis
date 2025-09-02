@@ -95,6 +95,11 @@ def plot_repeat_abundance(species_abundances, species_categories, gff_filepath, 
     assembly_length = sum([lengths[1] for lengths in contig_lengths_all.values()])
 
     contig_lengths = {contig : length for contig, length in contig_lengths_all.items() if length[1]>window_length}
+    contig_lengths_keys = {length[1] : contig for contig, length in contig_lengths_all.items() if length[1]>window_length}
+    lengths = [lengths[1] for lengths in contig_lengths.values()]
+    lengths.sort(reverse=True)
+    contig_names_sorted_by_length = [contig_lengths_keys[length] for length in lengths]
+
     incl_contigs = len(contig_lengths)
     incl_length = sum([lengths[1] for lengths in contig_lengths.values()])
 
@@ -171,8 +176,8 @@ def plot_repeat_abundance(species_abundances, species_categories, gff_filepath, 
             if y_max_genes<y_max_genes2:
                 ax3.set_ylim(bottom=0, top=y_max_genes2)
 
-
-    for contig in contig_lengths.keys():
+    for contig in contig_names_sorted_by_length:
+#    for contig in contig_lengths.keys():
         window_intervals = gen_windows.get_window_intervals(contig_lengths[contig], window_length)
         window_centers = [window[0]+ 0.5*window_length for window in window_intervals]
         window_abundances = species_abundances[contig]

@@ -49,9 +49,12 @@ python3 ReVis.py \
     --plot
 ```
 
+
+
 ## Input options
 
-These are quickstart options, see all possible options with the `-h` flag or at the end of this documentation.
+Above are quickstart options, see all possible options with the `-h` flag or at the end of this documentation. Contigs be sorted by size decreasing in the plot.
+
 ### Files
 
 * Repeatmasker outfiles (do not change file extensions!!):

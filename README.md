@@ -4,18 +4,18 @@ Visualize the output of repeatmasker.
 
 ## Installation
 
-Download the latest release and unzip it. You can just run the python script as described in quickstart below. You might have to install a few external dependencies manually (see `requirements.txt`) but they are all easy to install with `pip`.
+Download the latest release and unzip it. You can just run the python script as described in quickstart below. You might have to install a few external dependencies manually (see `requirements.txt`) but they are all commonly used libraries easy to install with `pip`.
 
 ### Dependencies
 
  *  On uppmax, load biopython/1.80-py3.10.8 to use argparse (base python doesn't include it).
- *  Libraries imported in this script and in parse_repeats.py and parse_gff.py:
+ *  Libraries imported by any script:
     - sys, re, os, subprocess, argparse
     - tqdm, random, time
     - dataclasses, enum, pandas, tempfile, SeqIO
     - matplotlib
 
-(they can all be installed through pip. Sorry if I forgot any, I'm sure the compiler will tell you)
+(Sorry if I forgot any, I'm sure the compiler will tell you if you miss something)
 
 # Run modes
 

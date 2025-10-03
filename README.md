@@ -199,8 +199,6 @@ Each table has a row for each repeat category, and each column is one base. The 
 
 Since I get the foreground and background transcripts from orthofinder and CAFE analysis of a set of species, these are the data structures that I have tested this code with the most. This is also why they are mostly refered to as "sig" (significant) for the foreground transcripts and "all" for the background transcripts. I did try to implement an option where you can pass lists of transcript IDs (corresponding to your annotation) in the command line directly for the foreground and background transcripts, if you are not using orthofinder/cafe, but I didn't exactly test it rigorously so it may not work.
 
-You can specify how many bp up and downstream from a transcript border you want to check (default 500). This is not a fast program, so I have found that 10k bp is a nice compromise of seeing interesting dynamics and it not taking too long. The test plot with B. siliquastri took less than 10 mins for 10k bp, but more repeat rich genomes will take longer, as will longer foreground and background lists.
-
 ReVis_transcript_surroundings.py comptues four tables:
 * foreground transcripts sequences:
     * before transcript start
@@ -210,6 +208,8 @@ ReVis_transcript_surroundings.py comptues four tables:
     * after transcript start
 
 and one file that contains the number of transcripts used to calculate the foreground and background tables, to use for calculating the percentages when plotting
+
+You can specify how many bp up and downstream from a transcript border you want to check (default 500). This is not a fast program, so I have found that 10k bp is a nice compromise of seeing interesting dynamics and it not taking too long. The test plot with *B. siliquastri* took less than 10 mins for 10k bp, but more repeat rich genomes will take longer, as will longer foreground and background lists. When I run it with a different species that has a 1 Gb genome, 70% repeats and I set 10 kb up and downstream it takes almost two hours.
 
 You can pass these parameters
 * `bp` (how many bp up- and downstream of a transcript to compute and plot)

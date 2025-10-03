@@ -82,7 +82,7 @@ def make_cumulative_TE_table(orthogroups_path, n:int, species:str, repeats_annot
         except:
             raise RuntimeError(f"{transcript_id} can not be found in {genome_annot_path}. Are you using the correct annotation?")
             missing_in_annot_transcripts.append(transcript_id)
-            print(f"\ttranscript: {transcript_id}")
+            # print(f"\ttranscript: {transcript_id}")
             continue
         # start and end of the interval surrounding this transcript
         int_start = transcript.start - n

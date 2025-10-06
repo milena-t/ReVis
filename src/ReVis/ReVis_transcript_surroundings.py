@@ -73,6 +73,7 @@ This can be one of two kinds. they are formatted the same, but can be computed o
     parser.add_argument('--annotation_gff', type=str, help="""genome annotation based on the same assembly as the repeatmasker output""")
     parser.add_argument('--orthogroups', type=str, help="""hierarchical orthogroups file computed by orthofinder (N0.tsv) matching the results from CAFE5""")
     parser.add_argument('--CAFE5_results', type=str, help="""family_results.txt file from CAFE5 with orthogroup names matching the orthofinder output""")
+    
     parser.add_argument('--all_list', type=str, help="""path to csv file containing a list of gene or transcript IDs from annotation_gff to be used in the all table (background table).""")
     parser.add_argument('--sig_list', type=str, help="""path to csv file containing a list of gene or transcript IDs from annotation_gff to be used in the sig table (foreground table).""")
 
@@ -175,7 +176,7 @@ def num_transcripts_from_OG_dict(OG_dict:dict):
         num_transcripts+= len(transcripts_list)
     return num_transcripts
 
-def plot_TE_abundance(before_filepath:str, after_filepath:str, sig_transcripts:int, all_before_filepath:str = "", all_after_filepath:str = "", all_transcripts:int = 0, filename = "cumulative_repeat_presence_around_transcripts.png", legend = True, plot_white_bg = False):
+def plot_TE_abundance(before_filepath:str, after_filepath:str, sig_transcripts:int, general_legend_names = False, all_before_filepath:str = "", all_after_filepath:str = "", all_transcripts:int = 0, filename = "cumulative_repeat_presence_around_transcripts.png", legend = True, plot_white_bg = False):
     """
     plot the cumulative repeat presence per base before and after a transcript (before and after infile paths)
     infiles generated from make_cumulative_TE_table and saved to text file
@@ -287,8 +288,12 @@ def plot_TE_abundance(before_filepath:str, after_filepath:str, sig_transcripts:i
     dotted = Line2D([0], [0], color='black', linestyle=':', linewidth=2)
     handles = [solid, dotted]
     labels = []
-    labels.append(f"significant transcripts ({num_sig_transcripts})")
-    labels.append(f"all CAFE transcripts ({all_transcripts})")
+    if general_legend_names:
+        labels.append(f"foreground transcripts ({num_sig_transcripts})")
+        labels.append(f"background transcripts ({all_transcripts})")
+    else:
+        labels.append(f"significant transcripts ({num_sig_transcripts})")
+        labels.append(f"all CAFE transcripts ({all_transcripts})")
     plt.legend(handles, labels, loc = "upper left", fontsize = fs)
 
     plt.title(f"{species} transcript surroundings {num_bp} bp up and downstream", fontsize = fs*1.25)
@@ -301,7 +306,17 @@ def plot_TE_abundance(before_filepath:str, after_filepath:str, sig_transcripts:i
     plt.savefig(filename, dpi = 300, transparent = plot_transparent_bg)
     print("Figure saved in the current working directory directory as: "+filename)
 
-
+def read_transcript_IDs_csv(filepath:str)->list:
+    """ 
+    read the csv path with transcript ID lists into an actual list
+    """
+    tr_list = []
+    with open(filepath, "r") as file:
+        lines = file.readlines()
+        assert len(lines) == 1
+        line = lines.strip()
+        tr_list = line.split(",")
+    return tr_list
 
 
 if __name__ == "__main__":
@@ -335,9 +350,9 @@ if __name__ == "__main__":
     if args.compute_tables_from_list:    
         if verbose:
             print(f"  * making foreground tables from input list for {species}: ")
-        all_orthogroups_list = args.all_list
+        all_orthogroups_list = read_transcript_IDs_csv(args.all_list)
         num_all_transcripts = len(all_orthogroups_list)
-        sig_list = args.sig_list
+        sig_list = read_transcript_IDs_csv(args.sig_list)
         num_sig_transcripts = len(sig_list)
         before_transcript, after_transcript = tr_surrounds.make_cumulative_TE_table(sig_list, n=num_bp, species=species, repeats_annot_path=repeats_out, genome_annot_path=orthoDB_annotation, sig_orthogroups=sig_list, verbose = verbose)
 
@@ -403,8 +418,7 @@ if __name__ == "__main__":
     ######################################################
     ############ plot above computed tables ##############
     ######################################################
-    
-    ## TODO continue here, plotting doesn't work yet
+
 
     if verbose:
         print(f"\n  * plot {species}")
@@ -415,7 +429,7 @@ if __name__ == "__main__":
         plot_legend=False
 
     
-    plot_TE_abundance(before_filepath = sig_before_transcript, after_filepath=sig_after_transcript, sig_transcripts = num_sig_transcripts, all_before_filepath=all_before_transcript, all_after_filepath=all_after_transcript, all_transcripts=num_all_transcripts, filename=f"{args.out_dir}{species}_cumulative_repeat_presence_around_transcripts.png", legend=plot_legend, plot_white_bg=args.plot_white_background)
+    plot_TE_abundance(before_filepath = sig_before_transcript, after_filepath=sig_after_transcript, sig_transcripts = num_sig_transcripts, general_legend_names=args.compute_tables_from_list, all_before_filepath=all_before_transcript, all_after_filepath=all_after_transcript, all_transcripts=num_all_transcripts, filename=f"{args.out_dir}{species}_cumulative_repeat_presence_around_transcripts.png", legend=plot_legend, plot_white_bg=args.plot_white_background)
     # print(f"{sig_before_transcript}")
     # break
 

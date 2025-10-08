@@ -170,6 +170,8 @@ Good luck!
 
 # Transcript Surroundings mode
 
+Creates count tables of repeat presence per base in the transcript surroundings and then plots them.
+
 ## Quick start
 
 Generate the tables from scratch and plot (existing tables of the same name from previous runs will be overwritten)
@@ -200,7 +202,7 @@ python3 ReVis_transcript_surroundings.py \
 
 ## Summary
 
-Each table has a row for each repeat category, and each column is one base. The number in the cell is how often this base position is annotated with a repeat of one category in all the transcripts considered. It also generates a file where it saves the number of transcripts considered for foreground and background respectively, so that the repeat counts from the tables can be normalized into a percentage for comparability.
+The data is generated and saved into four tables prior to plotting. Each table has a row for each repeat category, and each column is one base. The number in the cell is how often this base position is annotated with a repeat of one category in all the transcripts considered. It also generates a file where it saves the number of transcripts considered for foreground and background respectively, so that the repeat counts from the tables can be normalized into a percentage for comparability.
 
 Since I get the foreground and background transcripts from orthofinder and CAFE analysis of a set of species, these are the data structures that I have tested this code with the most. This is also why they are mostly refered to as "sig" (significant) for the foreground transcripts and "all" for the background transcripts. I did try to implement an option where you can pass lists of transcript IDs (corresponding to your annotation) in the command line directly for the foreground and background transcripts, if you are not using orthofinder/cafe, but I didn't exactly test it rigorously so it may not work.
 

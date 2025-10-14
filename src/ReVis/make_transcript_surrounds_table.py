@@ -80,7 +80,7 @@ def make_cumulative_TE_table(orthogroups_path, n:int, species:str, repeats_annot
                 all_transcripts_list.append(transcript_id)
                 continue
         except:
-            raise RuntimeError(f"{transcript_id} can not be found in {genome_annot_path}. Are you using the correct annotation?")
+            raise RuntimeError(f"{transcript_id} can not be found in {genome_annot_path}. Are you using the correct annotation?\n\t(if you want to just skip these transcripts and continue as normal, \n\tcomment out the RuntimeError line mentioned in the error message in make_transcripts_surrounds_table.py")
             missing_in_annot_transcripts.append(transcript_id)
             # print(f"\ttranscript: {transcript_id}")
             continue

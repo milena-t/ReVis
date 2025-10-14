@@ -170,14 +170,15 @@ Good luck!
 
 # Transcript Surroundings mode
 
-Creates count tables of repeat presence per base in the transcript surroundings and then plots them.
+Creates count tables of repeat presence per base in the transcript surroundings and then plots them. The tables can be generated based on orthofinder and CAFE output directly (`--compute_tables_from_OG`) or from lists of transcript IDs (`--compute_tables_from_list`)
 
 ## Quick start
+!! existing tables of the same name from previous runs will be overwritten
 
-Generate the tables from scratch and plot (existing tables of the same name from previous runs will be overwritten)
+Generate the tables from orthofinder and CAFE5
 ```
 python3 ReVis_transcript_surroundings.py \
-  --compute_tables \
+  --compute_tables_from_OG \
   --out_dir ../../example_data \
   --masker_outfile ../../example_data/bruchidius_siliquastri_repeats.fna.out \
   --annotation_gff ../../example_data/bruchidius_siliquastri.gff \
@@ -185,6 +186,19 @@ python3 ReVis_transcript_surroundings.py \
   --CAFE5_results ../../example_data/CAFE5_Base_family_results.txt \
   --species_name B_siliquastri \
   --bp 500 --GF_size_percentile 90 --verbose
+```
+```
+python3 ReVis_transcript_surroundings.py \
+    --compute_tables_from_list \
+    --out_dir ../../example_data \
+    --masker_outfile ../../example_data/bruchidius_siliquastri_repeats.fna.out \
+    --annotation_gff ../../example_data/bruchidius_siliquastri.gff \
+    --all_list ../../example_data/overlap_all_transcripts_B_siliquastri.txt \
+    --sig_list ../../example_data/overlap_sig_transcripts_B_siliquastri.txt \
+    --species_name B_siliquastri \
+    --bp 10000 \
+    --GF_size_percentile 90 \
+    --verbose
 ```
 
 Plot already existing tables
@@ -226,7 +240,8 @@ You can pass these parameters
 ```
 options:
   -h, --help            show this help message and exit
-  --compute_tables      it will compute all the tables required for plotting and then also make the plot
+  --compute_tables_from_OG
+                        it will compute all the tables required for plotting and then also make the plot
   --plot                it will ONLY plot and you have to pass the table filepaths as input (if you go more than 1kb up/downstream, computing the tables will take a long time)
   --compute_tables_from_list
                         it will compute all the tables from two lists of transcript IDs, a foreground and a background list (or a 'significant' and 'all' list respectively)

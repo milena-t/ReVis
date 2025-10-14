@@ -52,6 +52,8 @@ def parse_repeats_repeatmasker_outfile(filepath_out, verbose = True, filter_over
     this function does not filter overlaps, because many levels of repeats can overlap through insertions into insertions into an original repeat.
     Overlaps can be filtered after parsing
     """
+    if not os.path.isfile(filepath_out):
+        raise RuntimeError(f"file not found: {filepath_out}")
 
     base_outfile = False
     # check if the file is .out or .ori.out

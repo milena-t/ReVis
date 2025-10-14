@@ -62,7 +62,7 @@ This can be one of two kinds. they are formatted the same, but can be computed o
     
     # make tables or only plot
     output = parser.add_mutually_exclusive_group(required=True)
-    output.add_argument("--compute_tables", action="store_true", help = """it will compute all the tables required for plotting and then also make the plot""")
+    output.add_argument("--compute_tables_from_OG", action="store_true", help = """it will compute all the tables required for plotting and then also make the plot""")
     output.add_argument("--plot", action="store_true", help = """it will ONLY plot and you have to pass the table filepaths as input (if you go more than 1kb up/downstream, computing the tables will take a long time)""")
     output.add_argument("--compute_tables_from_list", action="store_true", help = """it will compute all the tables from two lists of transcript IDs, a foreground and a background list (or a 'significant' and 'all' list respectively)""")
     
@@ -71,11 +71,14 @@ This can be one of two kinds. they are formatted the same, but can be computed o
     # arguments for computing the tables
     parser.add_argument('--masker_outfile', type=str, help="""repeatmasker output file ending in .out (.ori.out, is recommended, but both work, the other one is just slower)""")
     parser.add_argument('--annotation_gff', type=str, help="""genome annotation based on the same assembly as the repeatmasker output""")
-    parser.add_argument('--orthogroups', type=str, help="""hierarchical orthogroups file computed by orthofinder (N0.tsv) matching the results from CAFE5""")
-    parser.add_argument('--CAFE5_results', type=str, help="""family_results.txt file from CAFE5 with orthogroup names matching the orthofinder output""")
     
-    parser.add_argument('--all_list', type=str, help="""path to csv file containing a list of gene or transcript IDs from annotation_gff to be used in the all table (background table).""")
-    parser.add_argument('--sig_list', type=str, help="""path to csv file containing a list of gene or transcript IDs from annotation_gff to be used in the sig table (foreground table).""")
+    input_bg = parser.add_mutually_exclusive_group(required=False)
+    input_fg = parser.add_mutually_exclusive_group(required=False)
+    input_bg.add_argument('--orthogroups', type=str, help="""hierarchical orthogroups file computed by orthofinder (N0.tsv) matching the results from CAFE5""")
+    input_fg.add_argument('--CAFE5_results', type=str, help="""family_results.txt file from CAFE5 with orthogroup names matching the orthofinder output""")
+    
+    input_bg.add_argument('--all_list', type=str, help="""path to csv file containing a list of gene or transcript IDs from annotation_gff to be used in the all table (background table).""")
+    input_fg.add_argument('--sig_list', type=str, help="""path to csv file containing a list of gene or transcript IDs from annotation_gff to be used in the sig table (foreground table).""")
 
     # arguments for given tables, only do the plotting
     parser.add_argument('--all_before_table', type=str, help="""when only plotting: table with background repeat abundance before genes ('all' genes)""")
@@ -105,11 +108,12 @@ This can be one of two kinds. they are formatted the same, but can be computed o
     if args.out_dir[-1] != "/":
         args.out_dir = f"{args.out_dir}/"
     
-    ## enforce plotting or tables computation
-    if args.compute_tables:
+    ## enforce one type of input files for plotting or tables computation
+    if args.compute_tables_from_OG:
         for required in ["masker_outfile", "annotation_gff", "orthogroups", "CAFE5_results", "species_name", "bp"]:
             if getattr(args, required) is None:
-                parser.error(f"--{required} is required when using --compute_tables")
+                parser.error(f"--{required} is required when using --compute_tables_from_OG")
+
     elif args.compute_tables_from_list:
         for required in ["masker_outfile", "annotation_gff", "all_list", "sig_list", "bp"]:
             if getattr(args, required) is None:
@@ -314,8 +318,9 @@ def read_transcript_IDs_csv(filepath:str)->list:
     with open(filepath, "r") as file:
         lines = file.readlines()
         assert len(lines) == 1
-        line = lines.strip()
+        line = lines[0].strip()
         tr_list = line.split(",")
+    tr_list = list(set(tr_list))## get rid of duplicates
     return tr_list
 
 
@@ -350,13 +355,13 @@ if __name__ == "__main__":
     if args.compute_tables_from_list:    
         if verbose:
             print(f"  * making foreground tables from input list for {species}: ")
-        all_orthogroups_list = read_transcript_IDs_csv(args.all_list)
-        num_all_transcripts = len(all_orthogroups_list)
+        all_transcripts_list = read_transcript_IDs_csv(args.all_list)
+        num_all_transcripts = len(all_transcripts_list)
         sig_list = read_transcript_IDs_csv(args.sig_list)
         num_sig_transcripts = len(sig_list)
         before_transcript, after_transcript = tr_surrounds.make_cumulative_TE_table(sig_list, n=num_bp, species=species, repeats_annot_path=repeats_out, genome_annot_path=orthoDB_annotation, sig_orthogroups=sig_list, verbose = verbose)
 
-    if args.compute_tables:
+    if args.compute_tables_from_OG:
         if verbose:
             print(f"  * making foreground tables from orthofinder/CAFE output for {species}: ")
         sig_orthoDB_list, all_orthogroups_list = OGs.get_sig_orthogroups(sig_orthoDB)
@@ -380,12 +385,14 @@ if __name__ == "__main__":
     #########
     if args.compute_tables_from_list:    
         if verbose:
-            print(f"  * making background tables from input list for {species}: ")
-        all_transcripts_list = args.all_list
-        sig_list = args.sig_list
-        before_transcript, after_transcript = tr_surrounds.make_cumulative_TE_table(all_transcripts_list, n=num_bp, species=species, repeats_annot_path=repeats_out, genome_annot_path=orthoDB_annotation, sig_orthogroups=sig_OGs_size_filtered, verbose = verbose)
+            print(f"  * making foreground tables from input list for {species}: ")
+        all_transcripts_list = read_transcript_IDs_csv(args.all_list)
+        num_all_transcripts = len(all_transcripts_list)
+        sig_list = read_transcript_IDs_csv(args.sig_list)
+        num_sig_transcripts = len(sig_list)
+        before_transcript, after_transcript = tr_surrounds.make_cumulative_TE_table(all_transcripts_list, n=num_bp, species=species, repeats_annot_path=repeats_out, genome_annot_path=orthoDB_annotation, verbose = verbose)
 
-    if args.compute_tables:
+    if args.compute_tables_from_OG:
         if verbose:
             print(f"  * making background tables from orthofinder/CAFE output for {species}: ")
         sig_orthoDB_list, all_orthogroups_list = OGs.get_sig_orthogroups(sig_orthoDB)

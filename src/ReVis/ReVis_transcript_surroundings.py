@@ -272,8 +272,8 @@ def plot_TE_abundance(before_filepath:str, after_filepath:str, sig_transcripts:i
             if max_after>max_percentage:
                 max_percentage=max_after
 
-            ax.plot(x_before, all_before_dict[rep_class], color = colors[rep_class], linestyle = (0, (1, 10)))                    
-            ax.plot(x_after, all_after_dict[rep_class], color = colors[rep_class], linestyle = (0, (1, 10)))                
+            ax.plot(x_before, all_before_dict[rep_class], color = colors[rep_class], linestyle = (0, (1, 10)), linewidth = 2)                    
+            ax.plot(x_after, all_after_dict[rep_class], color = colors[rep_class], linestyle = (0, (1, 10)), linewidth = 2)                
     
     max_percentage=int(max_percentage*1.3)
     if max_percentage == 0 or max_percentage>100:

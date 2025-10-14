@@ -101,8 +101,6 @@ This can be one of two kinds. they are formatted the same, but can be computed o
     args = parser.parse_args()
 
     ## make defaults
-    if not args.GF_size_percentile:
-        args.GF_size_percentile = 90
     if not args.bp:
         args.bp = 500
     if args.out_dir[-1] != "/":
@@ -113,6 +111,14 @@ This can be one of two kinds. they are formatted the same, but can be computed o
         for required in ["masker_outfile", "annotation_gff", "orthogroups", "CAFE5_results", "species_name", "bp"]:
             if getattr(args, required) is None:
                 parser.error(f"--{required} is required when using --compute_tables_from_OG")
+        for excluded in ["GF_size_percentile"]:
+            if getattr(args, excluded) is not None:
+                parser.error(f"--{excluded} is not applicable when using --compute_tables_from_OG")
+        
+
+    ## make defaults
+    if not args.GF_size_percentile:
+        args.GF_size_percentile = 90
 
     elif args.compute_tables_from_list:
         for required in ["masker_outfile", "annotation_gff", "all_list", "sig_list", "bp"]:

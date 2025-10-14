@@ -90,7 +90,7 @@ This can be one of two kinds. they are formatted the same, but can be computed o
 
     parser.add_argument('--species_name', type=str, help="""species identifier string, MUST match one species name in the orthofinder output""")
     parser.add_argument('--bp', type=int, help="how many bp up and downstream of the transcript borders should be included. Default is 500 for testing purposes, but to see patterns you should use at least 5kbp")
-    parser.add_argument('--GF_size_percentile', type=int, help="""only gene families in the upper nth percentile of gene family size areincluded in the significant gene families. This helps ensure that only gene families that are really expandingin species_name specifically are included, and not the ones that are significant because they are expanding in other species.The default is 90 percent, which includes almost all gene families except the ones with only 1 or 0 members in most cases""")
+    parser.add_argument('--GF_size_percentile', type=int, help="""only gene families in the upper nth percentile of gene family size areincluded in the significant gene families. DOES NOT APPLY TO COMPUTE_TABLES_FROM_LIST! This helps ensure that only gene families that are really expandingin species_name specifically are included, and not the ones that are significant because they are expanding in other species.The default is 90 percent, which includes almost all gene families except the ones with only 1 or 0 members in most cases""")
 
     parser.add_argument('--plot_white_background', action="store_true", help="the plot does NOT have a transparent background, but white instead")
     parser.add_argument('--plot_no_legend', action="store_true", help="the plot does NOT include a legend with the colors for all the repeat categories")
@@ -129,7 +129,7 @@ This can be one of two kinds. they are formatted the same, but can be computed o
 
 def filter_sig_OGs_by_size(orthoDB_orthogroups:dict, species:str, q:int, verbose=False):
     """
-    return a list dict orthogroups, where the GF size in the species is above the q'th percentile
+    return a dict orthogroups, where the GF size in the species is above the q'th percentile
     """
     GF_sizes_species = {}
     sizes = []

@@ -118,18 +118,18 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
         all_after_ypred = all_after_model.predict(p_after) 
 
         ## calculate predicted confidence interval
-        _, upper_before_model,lower_before_model = wls_prediction_std(before_model)
-        _, upper_all_before_model,lower_all_before_model = wls_prediction_std(all_before_model)
-        _, upper_after_model,lower_after_model = wls_prediction_std(after_model)
-        _, upper_all_after_model,lower_all_after_model = wls_prediction_std(all_after_model)
+        _, upper_before_model,lower_before_model = wls_prediction_std(before_model, alpha=0.05)
+        _, upper_all_before_model,lower_all_before_model = wls_prediction_std(all_before_model, alpha=0.05)
+        _, upper_after_model,lower_after_model = wls_prediction_std(after_model, alpha=0.05)
+        _, upper_all_after_model,lower_all_after_model = wls_prediction_std(all_after_model, alpha=0.05)
 
         rep_label = rep_class.replace("_", " ")
         ax.plot(x_before_reshape, before_dict[rep_class], color = colors[rep_class], linewidth=2)
         ax.plot(x_after_reshape, after_dict[rep_class], color = colors[rep_class], linewidth=2)
         ax.plot(x_before_reshape, before_ypred, label = f"{rep_label} pol. reg.\nforeground", color = colors[rep_class], linewidth = 3, linestyle = (0, (5, 2)))
         ax.plot(x_after_reshape, after_ypred, color = colors[rep_class], linewidth=3, linestyle = (0, (5, 2)))
-        ax.fill_between(x_before, upper_before_model,lower_before_model, color=colors[rep_class], alpha = 0.25)
-        ax.fill_between(x_after, upper_after_model,lower_after_model, color=colors[rep_class], alpha = 0.25)
+        ax.fill_between(x_before, upper_before_model,lower_before_model, color=colors[rep_class], alpha = 0.3)
+        ax.fill_between(x_after, upper_after_model,lower_after_model, color=colors[rep_class], alpha = 0.3)
         
         if all_before_dict !={} and all_after_dict !={} and all_transcripts!=0:
             max_before = max(all_before_dict[rep_class])
@@ -143,8 +143,8 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
             ax.plot(x_after, all_after_dict[rep_class], color = colors[rep_class], linestyle = (0, (1, 10)), linewidth = 2)   
             ax.plot(x_before, all_before_ypred, color = colors[rep_class],label = f"{rep_label} pol. reg.\nbackground", linewidth=1, linestyle = (0, (5, 2)))
             ax.plot(x_after, all_after_ypred, color = colors[rep_class], linewidth=1, linestyle = (0, (5, 2)))
-            ax.fill_between(x_before, upper_all_before_model,lower_all_before_model, color=colors[rep_class], alpha = 0.25)
-            ax.fill_between(x_after, upper_all_after_model,lower_all_after_model, color=colors[rep_class], alpha = 0.25, label = "confidence\ninterval")           
+            ax.fill_between(x_before, upper_all_before_model,lower_all_before_model, color=colors[rep_class], alpha = 0.2)
+            ax.fill_between(x_after, upper_all_after_model,lower_all_after_model, color=colors[rep_class], alpha = 0.2, label = "confidence\ninterval")           
 
         if True: ## print model output
             o = sys.stdout

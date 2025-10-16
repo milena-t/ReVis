@@ -3,7 +3,7 @@
 
 U_NAME=milena
 REP_TABLES=/Users/${U_NAME}/work/PhD_code/PhD_chapter1/data/repeats_tables
-SPECIES=A_obtectus
+SPECIES=B_siliquastri
 
 python3 /Users/${U_NAME}/work/PhD_code/ReVis/src/ReVis/ReVis_transcript_surroundings.py \
     --plot \

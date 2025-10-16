@@ -426,10 +426,10 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, sig_trans
         p_after = polynomial_features.fit_transform(x_after_reshape)
 
         # model polynomial regression
-        before_model = sm.OLS(before_dict[rep_class], p_before).fit()
-        all_before_model = sm.OLS(all_before_dict[rep_class], p_before).fit()
-        after_model = sm.OLS(after_dict[rep_class], p_after).fit()
-        all_after_model = sm.OLS(all_after_dict[rep_class], p_after).fit()
+        before_model = sm.WLS(before_dict[rep_class], p_before, weights=np.full_like(before_dict[rep_class], num_sig_transcripts)).fit()
+        all_before_model = sm.WLS(all_before_dict[rep_class], p_before, weights=np.full_like(all_before_dict[rep_class], num_all_transcripts)).fit()
+        after_model = sm.WLS(after_dict[rep_class], p_after, weights=np.full_like(after_dict[rep_class], num_sig_transcripts)).fit()
+        all_after_model = sm.WLS(all_after_dict[rep_class], p_after, weights=np.full_like(all_after_dict[rep_class], num_all_transcripts)).fit()
 
         ## calculate predicted polynomial
         before_ypred = before_model.predict(p_before) 

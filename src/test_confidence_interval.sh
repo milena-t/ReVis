@@ -1,7 +1,7 @@
 ## do the plotting based on existing tables
 
 
-U_NAME=miltr339
+U_NAME=milena
 REP_TABLES=/Users/${U_NAME}/work/PhD_code/PhD_chapter1/data/repeats_tables
 SPECIES=A_obtectus
 

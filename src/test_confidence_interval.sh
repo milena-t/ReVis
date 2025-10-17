@@ -1,7 +1,7 @@
 ## do the plotting based on existing tables
 
 
-U_NAME=milena
+U_NAME=miltr339
 REP_TABLES=/Users/${U_NAME}/work/PhD_code/PhD_chapter1/data/repeats_tables
 SPECIES=B_siliquastri
 
@@ -13,6 +13,8 @@ python3 /Users/${U_NAME}/work/PhD_code/ReVis/src/ReVis/ReVis_transcript_surround
     --all_after_table ${REP_TABLES}/${SPECIES}_cumulative_repeats_after_all_transcripts.txt \
     --sig_after_table ${REP_TABLES}/${SPECIES}_cumulative_repeats_after_sig_transcripts_90th_GF_size_percentile.txt \
     --num_transcripts ${REP_TABLES}/${SPECIES}_transcript_numbers.txt \
+    --nonoverlapping_windows \
+    --polreg_win_smooth 300 \
     --species_name $SPECIES \
     --verbose
 ##

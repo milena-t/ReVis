@@ -170,7 +170,7 @@ Good luck!
 
 # Transcript Surroundings mode
 
-Creates count tables of repeat presence per base in the transcript surroundings and then plots them. The tables can be generated based on orthofinder and CAFE output directly (`--compute_tables_from_OG`) or from lists of transcript IDs (`--compute_tables_from_list`)
+Creates count tables of repeat presence per base in the transcript surroundings and then plots them. The tables can be generated based on orthofinder and CAFE output directly (`--compute_tables_from_OG`) or from lists of transcript IDs (`--compute_tables_from_list`). Also plots individual polynomial regressions for each repeat class with 95% confidence interval, data here can be smoothed with `--polreg_win_smooth` in either overlapping or nonoverlapping windows.
 
 ## Quick start
 !! existing tables of the same name from previous runs will be overwritten
@@ -185,6 +185,7 @@ python3 ReVis_transcript_surroundings.py \
   --orthogroups ../../example_data/N0.tsv \
   --CAFE5_results ../../example_data/CAFE5_Base_family_results.txt \
   --species_name B_siliquastri \
+  --overlapping_windows \
   --bp 500 --GF_size_percentile 90 --verbose
 ```
 ```
@@ -196,6 +197,7 @@ python3 ReVis_transcript_surroundings.py \
     --all_list ../../example_data/overlap_all_transcripts_B_siliquastri.txt \
     --sig_list ../../example_data/overlap_sig_transcripts_B_siliquastri.txt \
     --species_name B_siliquastri \
+    --overlapping_windows \
     --bp 10000 \
     --GF_size_percentile 90 \
     --verbose
@@ -211,7 +213,9 @@ python3 ReVis_transcript_surroundings.py \
   --all_after_table ../../example_data/B_siliquastri_cumulative_repeats_after_all_transcripts.txt \
   --sig_after_table ../../example_data/B_siliquastri_cumulative_repeats_after_sig_transcripts_90th_GF_size_percentile.txt \
   --num_transcripts ../../example_data/B_siliquastri_transcript_numbers.txt \
-  --species_name B_siliquastri --verbose
+  --species_name B_siliquastri \ 
+  --overlapping_windows \
+  --verbose
 ```
 
 ## Summary

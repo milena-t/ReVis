@@ -94,6 +94,11 @@ This can be one of two kinds. they are formatted the same, but can be computed o
     parser.add_argument('--species_name', type=str, help="""species identifier string, MUST match one species name in the orthofinder output""")
     parser.add_argument('--bp', type=int, help="how many bp up and downstream of the transcript borders should be included. Default is 500 for testing purposes, but to see patterns you should use at least 5kbp")
     parser.add_argument('--GF_size_percentile', type=int, help="""only gene families in the upper nth percentile of gene family size areincluded in the significant gene families. DOES NOT APPLY TO COMPUTE_TABLES_FROM_LIST! This helps ensure that only gene families that are really expandingin species_name specifically are included, and not the ones that are significant because they are expanding in other species.The default is 90 percent, which includes almost all gene families except the ones with only 1 or 0 members in most cases""")
+    
+    windows = parser.add_mutually_exclusive_group(required=True)
+    windows.add_argument('--nonoverlapping_windows', action="store_true", help="nonoverlapping windows in the plots that calculate a ploynomial regression with confidence interval for the repeat classes")
+    windows.add_argument('--overlapping_windows', action="store_true", help="overlapping windows in the plots that calculate a ploynomial regression with confidence interval for the repeat classes")
+    parser.add_argument('--polreg_win_smooth', type=int, required=False, help="for the polynomial regression, how long should the windows for the smoothing be", default=100)
 
     parser.add_argument('--plot_white_background', action="store_true", help="the plot does NOT have a transparent background, but white instead")
     parser.add_argument('--plot_no_legend', action="store_true", help="the plot does NOT include a legend with the colors for all the repeat categories")
@@ -450,13 +455,17 @@ if __name__ == "__main__":
         plot_legend=False
 
     
+    plot_overlapping_windows = False
+    if args.overlapping_windows==True and args.nonoverlapping_windows==False:
+        plot_overlapping_windows=True
+
     plot_TE_abundance(before_filepath = sig_before_transcript, after_filepath=sig_after_transcript, sig_transcripts = num_sig_transcripts, general_legend_names=args.compute_tables_from_list, all_before_filepath=all_before_transcript, all_after_filepath=all_after_transcript, all_transcripts=num_all_transcripts, filename=f"{args.out_dir}{species}_cumulative_repeat_presence_around_transcripts.png", legend=plot_legend, plot_white_bg=args.plot_white_background)
     # print(f"{sig_before_transcript}")
     # break
     if verbose:
         # print(f"\n  * plot confidence intervals for {species}")
         print(f"\n  * plot polynomial regression for all categories individually...")
-    CI.plot_confidence_intervals(before_filepath = sig_before_transcript, after_filepath=sig_after_transcript, num_sig_transcripts = num_sig_transcripts, num_all_transcripts = num_all_transcripts, general_legend_names=args.compute_tables_from_list, all_before_filepath=all_before_transcript, all_after_filepath=all_after_transcript, all_transcripts=num_all_transcripts, filename=f"{args.out_dir}{species}_cumulative_repeat_presence_around_transcripts_95percent_confidence_interval", modelstats_filename =f"{args.out_dir}{species}_polynomial_regression_summary", legend=plot_legend, plot_white_bg=args.plot_white_background)
+    CI.plot_confidence_intervals(before_filepath = sig_before_transcript, after_filepath=sig_after_transcript, num_sig_transcripts = num_sig_transcripts, num_all_transcripts = num_all_transcripts, win_len = args.polreg_win_smooth, overlapping_windows=plot_overlapping_windows, all_before_filepath=all_before_transcript, all_after_filepath=all_after_transcript, all_transcripts=num_all_transcripts, filename=f"{args.out_dir}{species}_cumulative_repeat_presence_around_transcripts_95percent_confidence_interval", modelstats_filename =f"{args.out_dir}{species}_polynomial_regression_summary", legend=plot_legend, plot_white_bg=args.plot_white_background)
 
 
 

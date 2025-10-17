@@ -6,6 +6,7 @@ calculate and plot the confidence intervals of the individual TE categories in t
 import parse_gff as gff
 
 import numpy as np
+import pandas as pd
 import sys
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
@@ -16,7 +17,7 @@ import statsmodels.api as sm
 from statsmodels.sandbox.regression.predstd import wls_prediction_std
 
 
-def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_transcripts:int, num_all_transcripts:int, general_legend_names = False, all_before_filepath:str = "", all_after_filepath:str = "", all_transcripts:int = 0, filename = "cumulative_repeat_presence_around_transcripts_95_perc_CI", modelstats_filename = "pol_reg_sum.txt", legend = True, plot_white_bg = False):
+def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_transcripts:int, num_all_transcripts:int, win_len = 200, overlapping_windows = True, all_before_filepath:str = "", all_after_filepath:str = "", all_transcripts:int = 0, filename = "cumulative_repeat_presence_around_transcripts_95_perc_CI", modelstats_filename = "pol_reg_sum.txt", legend = True, plot_white_bg = False):
     """
     make a separate plot for each TE category with the foreground/background and before/after lines in it 
     do the polynomial regressions and see the 95% confidence intervals
@@ -73,10 +74,8 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
     fs = 25 # set font size
 
     rep_classes = list(before_dict.keys())
-    num_bp = len(before_dict[rep_classes[0]])
-    x_before = range(-num_bp, 0)
-    x_after = range(num_bp)
-
+    num_bp = len(before_dict[rep_classes[0]]) 
+      
     for rep_class in rep_classes:
         if legend:
             fig, ax = plt.subplots(1, 1, figsize=(23, 10))
@@ -95,6 +94,45 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
         if max_after>max_percentage:
             max_percentage=max_after
 
+        ## use only every 10th bp for better independence
+        # before_dict[rep_class] = before_dict[rep_class][::win_len]
+        # all_before_dict[rep_class] = all_before_dict[rep_class][::win_len]
+        # after_dict[rep_class] = after_dict[rep_class][::win_len]
+        # all_after_dict[rep_class] = all_after_dict[rep_class][::win_len]
+        
+        ## calculate nonoverlapping window means
+        before_df = pd.DataFrame(before_dict[rep_class])
+        all_before_df = pd.DataFrame(all_before_dict[rep_class])
+        after_df = pd.DataFrame(after_dict[rep_class])
+        all_after_df = pd.DataFrame(all_after_dict[rep_class])
+        
+        if overlapping_windows:
+            ## overlapping windows
+            legend_title = f"{win_len} bp overlapping windows"
+            x_before = range(-num_bp, 0)
+            x_after = range(0, num_bp)
+
+            before_df_win = before_df.rolling(window=win_len, min_periods=1).median()
+            all_before_df_win = all_before_df.rolling(window=win_len, min_periods=1).median()
+            after_df_win = after_df.rolling(window=win_len, min_periods=1).median()
+            all_after_df_win = all_after_df.rolling(window=win_len, min_periods=1).median()
+        else:
+            ## nonoverlapping windows
+            legend_title = f"{win_len} bp nonoverlapping windows"
+            x_before = range(-num_bp, 0, win_len)
+            x_after = range(0, num_bp, win_len)
+
+            before_df_win = before_df.groupby(before_df.index // win_len).median()
+            all_before_df_win = all_before_df.groupby(all_before_df.index // win_len).median()
+            after_df_win = after_df.groupby(after_df.index // win_len).median()
+            all_after_df_win = all_after_df.groupby(all_after_df.index // win_len).median()
+
+        # make to list again
+        before_dict[rep_class] = list(before_df_win[0])
+        all_before_dict[rep_class] = list(all_before_df_win[0])
+        after_dict[rep_class] = list(after_df_win[0])
+        all_after_dict[rep_class] = list(all_after_df_win[0])
+        
         # make polynomial features
         polynomial_features= PolynomialFeatures(degree = 4)
         ## I tried a few degrees but 4 looks the most reasonable
@@ -139,8 +177,8 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
             if max_after>max_percentage:
                 max_percentage=max_after
 
-            ax.plot(x_before, all_before_dict[rep_class], color = colors[rep_class], linestyle = (0, (1, 10)), linewidth = 2)                    
-            ax.plot(x_after, all_after_dict[rep_class], color = colors[rep_class], linestyle = (0, (1, 10)), linewidth = 2)   
+            ax.plot(x_before, all_before_dict[rep_class], color = colors[rep_class], linestyle = (0, (1, 2)), linewidth = 2)                    
+            ax.plot(x_after, all_after_dict[rep_class], color = colors[rep_class], linestyle = (0, (1, 2)), linewidth = 2)   
             ax.plot(x_before, all_before_ypred, color = colors[rep_class],label = f"{rep_label} pol. reg.\nbackground", linewidth=1, linestyle = (0, (5, 2)))
             ax.plot(x_after, all_after_ypred, color = colors[rep_class], linewidth=1, linestyle = (0, (5, 2)))
             ax.fill_between(x_before, upper_all_before_model,lower_all_before_model, color=colors[rep_class], alpha = 0.2)
@@ -181,13 +219,14 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
         dotted = Line2D([0], [0], color='black', linestyle=':', linewidth=2)
         handles = [solid, dotted]
         labels = []
-        if general_legend_names:
+        
+        if True:
             labels.append(f"foreground transcripts ({num_sig_transcripts})")
             labels.append(f"background transcripts ({all_transcripts})")
         else:
             labels.append(f"significant transcripts ({num_sig_transcripts})")
             labels.append(f"all CAFE transcripts ({all_transcripts})")
-        plt.legend(handles, labels, loc = "upper left", fontsize = fs)
+        plt.legend(handles, labels, loc = "upper left", fontsize = fs, title=legend_title, title_fontsize=fs)
 
         plt.title(f"{species} transcript surroundings {num_bp} bp up and downstream\nrepeat category: {rep_label} with polynomial regression and 95% confidence interval", fontsize = fs*1.25)
         plt.xlabel(f"basepairs upstream and downstream from transcript", fontsize = fs)
@@ -196,9 +235,9 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
         ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 or x<1 else f'{int(x)}%'))
         
         plt.tight_layout()
-        filename = f"{filename}_{rep_class}.png"
-        plt.savefig(filename, dpi = 300, transparent = plot_transparent_bg)
+        filename_class = f"{filename}_{rep_class}.png"
+        plt.savefig(filename_class, dpi = 300, transparent = plot_transparent_bg)
         plt.close(fig)
-        print(f"\t * repeat category {rep_label} \t--> Figure saved as: {filename}")
+        print(f"\t * repeat category {rep_label}    \t--> Figure saved as: {filename_class}")
 
 

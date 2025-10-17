@@ -106,7 +106,7 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
         after_df = pd.DataFrame(after_dict[rep_class])
         all_after_df = pd.DataFrame(all_after_dict[rep_class])
         
-        if overlapping_windows:
+        if overlapping_windows and win_len != 1:
             ## overlapping windows
             legend_title = f"{win_len} bp overlapping windows"
             x_before = range(-num_bp, 0)
@@ -116,7 +116,14 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
             all_before_df_win = all_before_df.rolling(window=win_len, min_periods=1).median()
             after_df_win = after_df.rolling(window=win_len, min_periods=1).median()
             all_after_df_win = all_after_df.rolling(window=win_len, min_periods=1).median()
-        else:
+
+            # make to list again
+            before_dict[rep_class] = list(before_df_win[0])
+            all_before_dict[rep_class] = list(all_before_df_win[0])
+            after_dict[rep_class] = list(after_df_win[0])
+            all_after_dict[rep_class] = list(all_after_df_win[0])
+
+        elif win_len !=1:
             ## nonoverlapping windows
             legend_title = f"{win_len} bp nonoverlapping windows"
             x_before = range(-num_bp, 0, win_len)
@@ -127,11 +134,16 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
             after_df_win = after_df.groupby(after_df.index // win_len).median()
             all_after_df_win = all_after_df.groupby(all_after_df.index // win_len).median()
 
-        # make to list again
-        before_dict[rep_class] = list(before_df_win[0])
-        all_before_dict[rep_class] = list(all_before_df_win[0])
-        after_dict[rep_class] = list(after_df_win[0])
-        all_after_dict[rep_class] = list(all_after_df_win[0])
+            # make to list again
+            before_dict[rep_class] = list(before_df_win[0])
+            all_before_dict[rep_class] = list(all_before_df_win[0])
+            after_dict[rep_class] = list(after_df_win[0])
+            all_after_dict[rep_class] = list(all_after_df_win[0])
+        
+        elif win_len == 1:
+            legend_title = f""
+            x_before = range(-num_bp, 0)
+            x_after = range(0, num_bp)
         
         # make polynomial features
         polynomial_features= PolynomialFeatures(degree = 4)

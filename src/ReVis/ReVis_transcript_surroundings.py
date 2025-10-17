@@ -466,7 +466,6 @@ if __name__ == "__main__":
     wilcoxon_stats_path = CI.statistical_enrichment(before_filepath = sig_before_transcript, after_filepath=sig_after_transcript, num_sig_transcripts = num_sig_transcripts, num_all_transcripts = num_all_transcripts, all_before_filepath=all_before_transcript, all_after_filepath=all_after_transcript, filename=f"{args.out_dir}{species}_wilcoxon_test_plot.png", modelstats_filename =f"{args.out_dir}{species}_wilcoxon_test.txt", legend=plot_legend, plot_white_bg=args.plot_white_background)
     CI.plot_modelstats(wilcoxon_stats_path, plot_white_bg=args.plot_white_background)
 
-    raise RuntimeError("exit")
     if verbose:
         # print(f"\n  * plot confidence intervals for {species}")
         print(f"\n  * plot polynomial regression for all categories individually...")

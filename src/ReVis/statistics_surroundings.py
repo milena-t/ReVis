@@ -11,6 +11,7 @@ import sys
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 from matplotlib.lines import Line2D
+from matplotlib.markers import MarkerStyle
 
 from sklearn.preprocessing import PolynomialFeatures
 import statsmodels.api as sm
@@ -64,7 +65,11 @@ def statistical_enrichment(before_filepath:str, after_filepath:str, num_sig_tran
     rep_classes = list(before_dict.keys())
     num_bp = len(before_dict[rep_classes[0]]) 
     
-    win_len = num_bp//40 
+    ##################
+    # make the window interval so that you measure every 100th base --> more independent than all bases, they are not directly ajacent
+    win_len = num_bp//100 
+    ##################
+
     if win_len<2:
         win_len =1
 
@@ -132,6 +137,7 @@ def plot_modelstats(modelstats_filepath:str, plot_white_bg = True):
     """
     plot modelstats file with the wilcoxon results
     """
+    outdir = "/".join(modelstats_filepath.split("/")[:-1])
     species = gff.split_at_second_occurrence(modelstats_filepath.split("/")[-1])
     modelstats_dict = read_modelstats(modelstats_filepath)
     plot_transparent_bg = True
@@ -161,8 +167,52 @@ def plot_modelstats(modelstats_filepath:str, plot_white_bg = True):
     }
 
     fs = 25 # set font size
+    fig, ax = plt.subplots(1, 1, figsize=(15, 12))
 
+    pbefore = []
+    pafter = []
+    repeat_class_list = []
+    colors_list = []
+    for repeat_class in modelstats_dict.keys():
+        rep_label = repeat_class.replace("_", " ")
+        repeat_class_list.append(rep_label)
+
+        pvalue_before,test_statistic_before,pvalue_after,test_statistic_after = modelstats_dict[repeat_class]
+        pbefore.append(float(pvalue_before))
+        pafter.append(float(pvalue_after))
+        colors_list.append(colors[repeat_class])
+
+    pointsize = 500
+    ax.scatter(repeat_class_list, pbefore, color = colors_list, s=pointsize)
+    ax.scatter(repeat_class_list, pafter, color = colors_list, s=pointsize, marker="v")
+
+    ax.scatter([-1], [-1], color='black', label = "before transcript", s=pointsize)
+    ax.scatter([-1], [-1], color='black', label = "after transcript", s=pointsize, marker="v")
+    plt.hlines(y=0.05, xmin=-0.5, xmax = len(repeat_class_list), linestyle="dashed", color="black", label="p = 0.05")
+
+    plt.legend(loc = "upper left", fontsize = fs)
+
+    plt.title(f"{species} transcript surroundings repeat enrichment\np-value from wilcoxon test", fontsize = fs*1.25)
+    plt.ylabel(f"p-value", fontsize = fs)
+    ax.tick_params(axis ='x', labelsize = fs) 
+    ax.tick_params(axis ='y', labelsize = fs) 
+    ax.set_yscale("log")
+    ax.grid(True)
+    ax.yaxis.grid(False)
+    plt.xticks(rotation=45, ha="right")
+
+    xmin, xmax = plt.xlim()
+    plt.xlim(-0.5, xmax)
+    ymin, ymax = plt.ylim()
+    plt.ylim(0, ymax)
     
+    plt.tight_layout()
+    filename_class = f"{outdir}/{species}_wilcoxon_summary.png"
+    plt.savefig(filename_class, dpi = 300, transparent = False)
+    plt.close(fig)
+    print(f"\t * repeat category {rep_label}    \t--> Figure saved as: {filename_class}")
+
+
 
 
 

@@ -191,8 +191,8 @@ def plot_modelstats(modelstats_filepath:str, plot_white_bg = True):
     plt.hlines(y=0.05, xmin=-0.5, xmax = len(repeat_class_list), linestyle="dashed", color="black", label="p = 0.05")
 
     plt.legend(loc = "upper left", fontsize = fs)
-
-    plt.title(f"{species} transcript surroundings repeat enrichment\np-value from wilcoxon test", fontsize = fs*1.25)
+    species_title = species.replace("_", ". ")
+    plt.title(f"{species_title} transcript surroundings repeat enrichment\np-value from wilcoxon test", fontsize = fs*1.25)
     plt.ylabel(f"p-value", fontsize = fs)
     ax.tick_params(axis ='x', labelsize = fs) 
     ax.tick_params(axis ='y', labelsize = fs) 

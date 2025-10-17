@@ -66,8 +66,8 @@ def statistical_enrichment(before_filepath:str, after_filepath:str, num_sig_tran
     num_bp = len(before_dict[rep_classes[0]]) 
     
     ##################
-    # make the window interval so that you measure every 100th base --> more independent than all bases, they are not directly ajacent
-    win_len = num_bp//100 
+    # make the window interval so that you measure 20 windows --> every 500 bp is more independent than all bases, they are not directly ajacent
+    win_len = num_bp//20 
     ##################
 
     if win_len<2:
@@ -126,11 +126,13 @@ def read_modelstats(modelstats_filepath:str):
     modelstats_dict = {}
     with open(modelstats_filepath, "r") as modelstats_file:
         lines = modelstats_file.readlines()
+        line_winlen = lines[1] # pairwise differences within repeat category, downsampled to every 500 bases
+        winlen = line_winlen.strip().split(" ")[-2]
         lines = [line for line in lines if line[0]!="#"]
         for line in lines[1:]:
             repeat_class,pvalue_before,test_statistic_before,pvalue_after,test_statistic_after = line.strip().split("\t")
             modelstats_dict[repeat_class] = [pvalue_before,test_statistic_before,pvalue_after,test_statistic_after]
-    return modelstats_dict   
+    return modelstats_dict, winlen
 
 
 def plot_modelstats(modelstats_filepath:str, plot_white_bg = True):
@@ -139,7 +141,7 @@ def plot_modelstats(modelstats_filepath:str, plot_white_bg = True):
     """
     outdir = "/".join(modelstats_filepath.split("/")[:-1])
     species = gff.split_at_second_occurrence(modelstats_filepath.split("/")[-1])
-    modelstats_dict = read_modelstats(modelstats_filepath)
+    modelstats_dict, window_length = read_modelstats(modelstats_filepath)
     plot_transparent_bg = True
     if plot_white_bg:
         plot_transparent_bg = False
@@ -192,7 +194,7 @@ def plot_modelstats(modelstats_filepath:str, plot_white_bg = True):
 
     plt.legend(loc = "upper left", fontsize = fs)
     species_title = species.replace("_", ". ")
-    plt.title(f"{species_title} transcript surroundings repeat enrichment\np-value from wilcoxon test", fontsize = fs*1.25)
+    plt.title(f"{species_title} transcript surroundings repeat enrichment\np-value from wilcoxon test (every {window_length} bases)", fontsize = fs*1.25)
     plt.ylabel(f"p-value", fontsize = fs)
     ax.tick_params(axis ='x', labelsize = fs) 
     ax.tick_params(axis ='y', labelsize = fs) 
@@ -208,7 +210,7 @@ def plot_modelstats(modelstats_filepath:str, plot_white_bg = True):
     
     plt.tight_layout()
     filename_class = f"{outdir}/{species}_wilcoxon_summary.png"
-    plt.savefig(filename_class, dpi = 300, transparent = False)
+    plt.savefig(filename_class, dpi = 300, transparent = plot_transparent_bg)
     plt.close(fig)
     print(f"\t * repeat category {rep_label}    \t--> Figure saved as: {filename_class}")
 

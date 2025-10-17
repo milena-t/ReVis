@@ -7,7 +7,7 @@ annotated on that base
 import parse_gff as gff
 import parse_orthogroups as OGs
 import make_transcript_surrounds_table as tr_surrounds
-import confidence_interval_surroundings as CI
+import statistics_surroundings as CI
 
 import numpy as np
 import sys
@@ -462,10 +462,15 @@ if __name__ == "__main__":
     plot_TE_abundance(before_filepath = sig_before_transcript, after_filepath=sig_after_transcript, sig_transcripts = num_sig_transcripts, general_legend_names=args.compute_tables_from_list, all_before_filepath=all_before_transcript, all_after_filepath=all_after_transcript, all_transcripts=num_all_transcripts, filename=f"{args.out_dir}{species}_cumulative_repeat_presence_around_transcripts.png", legend=plot_legend, plot_white_bg=args.plot_white_background)
     # print(f"{sig_before_transcript}")
     # break
+
+    wilcoxon_stats_path = CI.statistical_enrichment(before_filepath = sig_before_transcript, after_filepath=sig_after_transcript, num_sig_transcripts = num_sig_transcripts, num_all_transcripts = num_all_transcripts, all_before_filepath=all_before_transcript, all_after_filepath=all_after_transcript, filename=f"{args.out_dir}{species}_wilcoxon_test_plot.png", modelstats_filename =f"{args.out_dir}{species}_wilcoxon_test.txt", legend=plot_legend, plot_white_bg=args.plot_white_background)
+    CI.plot_modelstats(wilcoxon_stats_path, plot_white_bg=args.plot_white_background)
+
+    raise RuntimeError("exit")
     if verbose:
         # print(f"\n  * plot confidence intervals for {species}")
         print(f"\n  * plot polynomial regression for all categories individually...")
-    CI.plot_confidence_intervals(before_filepath = sig_before_transcript, after_filepath=sig_after_transcript, num_sig_transcripts = num_sig_transcripts, num_all_transcripts = num_all_transcripts, win_len = args.polreg_win_smooth, overlapping_windows=plot_overlapping_windows, all_before_filepath=all_before_transcript, all_after_filepath=all_after_transcript, all_transcripts=num_all_transcripts, filename=f"{args.out_dir}{species}_cumulative_repeat_presence_around_transcripts_95percent_confidence_interval", modelstats_filename =f"{args.out_dir}{species}_polynomial_regression_summary", legend=plot_legend, plot_white_bg=args.plot_white_background)
+    CI.plot_confidence_intervals(before_filepath = sig_before_transcript, after_filepath=sig_after_transcript, num_sig_transcripts = num_sig_transcripts, num_all_transcripts = num_all_transcripts, win_len = args.polreg_win_smooth, overlapping_windows=plot_overlapping_windows, all_before_filepath=all_before_transcript, all_after_filepath=all_after_transcript, filename=f"{args.out_dir}{species}_cumulative_repeat_presence_around_transcripts_95percent_confidence_interval", modelstats_filename =f"{args.out_dir}{species}_polynomial_regression_summary", legend=plot_legend, plot_white_bg=args.plot_white_background)
 
 
 

@@ -15,9 +15,158 @@ from matplotlib.lines import Line2D
 from sklearn.preprocessing import PolynomialFeatures
 import statsmodels.api as sm
 from statsmodels.sandbox.regression.predstd import wls_prediction_std
+from scipy.stats import wilcoxon
 
 
-def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_transcripts:int, num_all_transcripts:int, win_len = 200, overlapping_windows = True, all_before_filepath:str = "", all_after_filepath:str = "", all_transcripts:int = 0, filename = "cumulative_repeat_presence_around_transcripts_95_perc_CI", modelstats_filename = "pol_reg_sum.txt", legend = True, plot_white_bg = False):
+def statistical_enrichment(before_filepath:str, after_filepath:str, num_sig_transcripts:int, num_all_transcripts:int, all_before_filepath:str = "", all_after_filepath:str = "", filename = "cumulative_repeat_presence_around_transcripts_95_perc_CI", modelstats_filename = "pol_reg_sum.txt", legend = True, plot_white_bg = False):
+    """
+    do the wilcoxon test for all repeat classes
+    """
+    
+    before_dict = gff.read_dict_from_file(before_filepath)
+    before_dict = { key : [int(v)/num_sig_transcripts*100 for v in value] for key, value in before_dict.items()}
+    after_dict = gff.read_dict_from_file(after_filepath)
+    after_dict = { key : [int(v)/num_sig_transcripts*100 for v in value] for key, value in after_dict.items()}
+
+    all_before_dict = {}
+    all_after_dict = {}
+    if all_before_filepath !="" and all_after_filepath !="" :
+        
+        all_before_dict = gff.read_dict_from_file(all_before_filepath)
+        all_before_dict = { key : [int(v)/num_all_transcripts*100 for v in value] for key, value in all_before_dict.items()}
+        all_after_dict = gff.read_dict_from_file(all_after_filepath)
+        all_after_dict = { key : [int(v)/num_all_transcripts*100 for v in value] for key, value in all_after_dict.items()}
+        
+    colors = {
+        'Unknown' : "#C1C1C1" , # light grey
+        # orange
+        'DNA' : "#FF9000" , # Princeton orange
+        # green
+        'LTR' : "#6E8448" , # reseda green
+        'RC' : "#8EA861" , # asparagus 
+        # red
+        'tRNA' : "#C14953" , # bittersweet shimmer
+        'rRNA' : "#D0767E" , # old rose
+        'snRNA' : "#7A2A30" , # wine
+        # blue 
+        'LINE' : "#3476AD" , # UCLA blue
+        'SINE': "#72A8D5" , # ruddy blue
+        'SINE?': "#72A8D5" , # ruddy blue
+        # '' : "#2A618D" , #lapis lazuli
+        # dark red-brown
+        'Low_complexity' : "#3A3335" , # Jet 
+        'Satellite' : "#564D4F" , #Wenge 
+        'Simple_repeat' : "#827376" , #Taupe gray
+    }
+
+    fs = 25 # set font size
+
+    rep_classes = list(before_dict.keys())
+    num_bp = len(before_dict[rep_classes[0]]) 
+    
+    win_len = num_bp//40 
+    if win_len<2:
+        win_len =1
+
+    rep_classes_stats = {}
+      
+    for rep_class in rep_classes:
+        if legend:
+            fig, ax = plt.subplots(1, 1, figsize=(23, 10))
+        else:
+            fig, ax = plt.subplots(1, 1, figsize=(21, 12))
+
+        species = gff.split_at_second_occurrence(before_filepath.split("/")[-1])
+        species = species.replace("_", ". ")
+
+        max_before = max([max(before_dict[rep_class]), max(all_before_dict[rep_class])])
+        max_after = max([max(after_dict[rep_class]), max(all_after_dict[rep_class])])
+        max_percentage = max([max_before, max_after])
+        max_percentage=int(max_percentage*1.3)
+        if max_percentage == 0 or max_percentage>100:
+            max_percentage= 100
+
+        diff_before = [before_dict[rep_class][i] - all_before_dict[rep_class][i] for i in range(0, num_bp, win_len)]
+        diff_after = [after_dict[rep_class][i] - all_after_dict[rep_class][i] for i in range(0, num_bp, win_len)]
+
+        res_before = wilcoxon(diff_before, alternative="greater") #alternative greater because we only consider TE enrichment and not TE depletion
+        res_after = wilcoxon(diff_after, alternative="greater") #alternative greater because we only consider TE enrichment and not TE depletion
+
+        rep_classes_stats[rep_class] = [str(res_before.pvalue), str(res_before.statistic), str(res_after.pvalue), str(res_after.statistic)]
+
+    with open(modelstats_filename, "w") as modelstats_file:
+        comment = f"# one-sided wilcoxon test for all repeat categories\n# pairwise differences within repeat category, downsampled to every {win_len} bases\n"
+        header = f"rep_class\tpvalue_before\ttest_statistic_before\tpvalue_after\ttest_statistic_after\n"
+        modelstats_file.write(comment)
+        modelstats_file.write(header)
+        for rep_class in rep_classes:
+            values = "\t".join(rep_classes_stats[rep_class])
+            line = f"{rep_class}\t{values}\n"
+            modelstats_file.write(line)
+    
+    print(f"\tWilcoxon test statistics written to: \t-->{modelstats_filename}")
+    return modelstats_filename
+
+
+def read_modelstats(modelstats_filepath:str):
+    """
+    read modelstats into dict:
+    rep_classes_stats = {rep_class : [
+                            res_before.pvalue, 
+                            res_before.statistic, 
+                            res_after.pvalue, 
+                            res_after.statistic],
+                        }
+    """
+    modelstats_dict = {}
+    with open(modelstats_filepath, "r") as modelstats_file:
+        lines = modelstats_file.readlines()
+        lines = [line for line in lines if line[0]!="#"]
+        for line in lines[1:]:
+            repeat_class,pvalue_before,test_statistic_before,pvalue_after,test_statistic_after = line.strip().split("\t")
+            modelstats_dict[repeat_class] = [pvalue_before,test_statistic_before,pvalue_after,test_statistic_after]
+    return modelstats_dict   
+
+
+def plot_modelstats(modelstats_filepath:str, plot_white_bg = True):
+    """
+    plot modelstats file with the wilcoxon results
+    """
+    species = gff.split_at_second_occurrence(modelstats_filepath.split("/")[-1])
+    modelstats_dict = read_modelstats(modelstats_filepath)
+    plot_transparent_bg = True
+    if plot_white_bg:
+        plot_transparent_bg = False
+
+    colors = {
+        'Unknown' : "#C1C1C1" , # light grey
+        # orange
+        'DNA' : "#FF9000" , # Princeton orange
+        # green
+        'LTR' : "#6E8448" , # reseda green
+        'RC' : "#8EA861" , # asparagus 
+        # red
+        'tRNA' : "#C14953" , # bittersweet shimmer
+        'rRNA' : "#D0767E" , # old rose
+        'snRNA' : "#7A2A30" , # wine
+        # blue 
+        'LINE' : "#3476AD" , # UCLA blue
+        'SINE': "#72A8D5" , # ruddy blue
+        'SINE?': "#72A8D5" , # ruddy blue
+        # '' : "#2A618D" , #lapis lazuli
+        # dark red-brown
+        'Low_complexity' : "#3A3335" , # Jet 
+        'Satellite' : "#564D4F" , #Wenge 
+        'Simple_repeat' : "#827376" , #Taupe gray
+    }
+
+    fs = 25 # set font size
+
+    
+
+
+
+def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_transcripts:int, num_all_transcripts:int, win_len = 200, overlapping_windows = True, all_before_filepath:str = "", all_after_filepath:str = "", filename = "cumulative_repeat_presence_around_transcripts_95_perc_CI", modelstats_filename = "pol_reg_sum.txt", legend = True, plot_white_bg = False):
     """
     make a separate plot for each TE category with the foreground/background and before/after lines in it 
     do the polynomial regressions and see the 95% confidence intervals
@@ -45,9 +194,9 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
     if all_before_filepath !="" and all_after_filepath !="" :
         
         all_before_dict = gff.read_dict_from_file(all_before_filepath)
-        all_before_dict = { key : [int(v)/all_transcripts*100 for v in value] for key, value in all_before_dict.items()}
+        all_before_dict = { key : [int(v)/num_all_transcripts*100 for v in value] for key, value in all_before_dict.items()}
         all_after_dict = gff.read_dict_from_file(all_after_filepath)
-        all_after_dict = { key : [int(v)/all_transcripts*100 for v in value] for key, value in all_after_dict.items()}
+        all_after_dict = { key : [int(v)/num_all_transcripts*100 for v in value] for key, value in all_after_dict.items()}
         
     colors = {
         'Unknown' : "#C1C1C1" , # light grey
@@ -181,7 +330,7 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
         ax.fill_between(x_before, upper_before_model,lower_before_model, color=colors[rep_class], alpha = 0.3)
         ax.fill_between(x_after, upper_after_model,lower_after_model, color=colors[rep_class], alpha = 0.3)
         
-        if all_before_dict !={} and all_after_dict !={} and all_transcripts!=0:
+        if all_before_dict !={} and all_after_dict !={} and num_all_transcripts!=0:
             max_before = max(all_before_dict[rep_class])
             max_after = max(all_after_dict[rep_class])
             if max_before>max_percentage:
@@ -189,10 +338,10 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
             if max_after>max_percentage:
                 max_percentage=max_after
 
-            ax.plot(x_before, all_before_dict[rep_class], color = colors[rep_class], linestyle = (0, (1, 2)), linewidth = 2)                    
-            ax.plot(x_after, all_after_dict[rep_class], color = colors[rep_class], linestyle = (0, (1, 2)), linewidth = 2)   
-            ax.plot(x_before, all_before_ypred, color = colors[rep_class],label = f"{rep_label} pol. reg.\nbackground", linewidth=1, linestyle = (0, (5, 2)))
-            ax.plot(x_after, all_after_ypred, color = colors[rep_class], linewidth=1, linestyle = (0, (5, 2)))
+            ax.plot(x_before_reshape, all_before_dict[rep_class], color = colors[rep_class], linestyle = (0, (1, 2)), linewidth = 2)                    
+            ax.plot(x_after_reshape, all_after_dict[rep_class], color = colors[rep_class], linestyle = (0, (1, 2)), linewidth = 2)   
+            ax.plot(x_before_reshape, all_before_ypred, color = colors[rep_class],label = f"{rep_label} pol. reg.\nbackground", linewidth=1, linestyle = (0, (5, 2)))
+            ax.plot(x_after_reshape, all_after_ypred, color = colors[rep_class], linewidth=1, linestyle = (0, (5, 2)))
             ax.fill_between(x_before, upper_all_before_model,lower_all_before_model, color=colors[rep_class], alpha = 0.2)
             ax.fill_between(x_after, upper_all_after_model,lower_all_after_model, color=colors[rep_class], alpha = 0.2, label = "confidence\ninterval")           
 
@@ -234,10 +383,10 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
         
         if True:
             labels.append(f"foreground transcripts ({num_sig_transcripts})")
-            labels.append(f"background transcripts ({all_transcripts})")
+            labels.append(f"background transcripts ({num_all_transcripts})")
         else:
             labels.append(f"significant transcripts ({num_sig_transcripts})")
-            labels.append(f"all CAFE transcripts ({all_transcripts})")
+            labels.append(f"all CAFE transcripts ({num_all_transcripts})")
         plt.legend(handles, labels, loc = "upper left", fontsize = fs, title=legend_title, title_fontsize=fs)
 
         plt.title(f"{species} transcript surroundings {num_bp} bp up and downstream\nrepeat category: {rep_label} with polynomial regression and 95% confidence interval", fontsize = fs*1.25)

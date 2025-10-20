@@ -192,7 +192,7 @@ def plot_modelstats(modelstats_filepath:str, plot_white_bg = True):
     ax.scatter([-1], [-1], color='black', label = "after transcript", s=pointsize, marker="v")
     plt.hlines(y=0.05, xmin=-0.5, xmax = len(repeat_class_list), linestyle="dashed", color="black", label="p = 0.05")
 
-    plt.legend(loc = "upper left", fontsize = fs)
+    plt.legend(loc = "lower right", fontsize = fs)
     species_title = species.replace("_", ". ")
     plt.title(f"{species_title} transcript surroundings repeat enrichment\np-value from wilcoxon test (every {window_length} bases)", fontsize = fs*1.25)
     plt.ylabel(f"p-value", fontsize = fs)
@@ -418,7 +418,15 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
 
         plt.vlines(x= 0, ymin=0, ymax=max_percentage, colors="#000000", linestyles="dashed", label="transcript border", linewidth=3)
         plt.xticks(range(-num_bp, num_bp+1, int(num_bp/5)), fontsize = fs)
-        plt.yticks(range(0, max_percentage+1, 10), fontsize = fs)
+        if max_percentage>20:
+            plt.yticks(range(0, max_percentage+1, 10), fontsize = fs)
+        elif max_percentage >10:
+            plt.yticks(range(0, max_percentage+1, 5), fontsize = fs)
+        elif max_percentage > 5:
+            plt.yticks(range(0, max_percentage+1, 2), fontsize = fs)
+        else:
+            plt.yticks(range(0, max_percentage+1, 1), fontsize = fs)
+
 
         if legend:
             # plot color legend

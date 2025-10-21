@@ -413,20 +413,27 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
             sys.stdout = o
 
         max_percentage=int(max_percentage*1.3)
-        if max_percentage == 0 or max_percentage>100:
-            max_percentage= 100
 
         plt.vlines(x= 0, ymin=0, ymax=max_percentage, colors="#000000", linestyles="dashed", label="transcript border", linewidth=3)
         plt.xticks(range(-num_bp, num_bp+1, int(num_bp/5)), fontsize = fs)
+        ints_perc = True
         if max_percentage>20:
             plt.yticks(range(0, max_percentage+1, 10), fontsize = fs)
-        elif max_percentage >10:
+        elif max_percentage >14:
             plt.yticks(range(0, max_percentage+1, 5), fontsize = fs)
-        elif max_percentage > 5:
+        elif max_percentage > 6:
             plt.yticks(range(0, max_percentage+1, 2), fontsize = fs)
+        elif max_percentage > 1:
+            plt.yticks(range(0, max_percentage+1, 0.5), fontsize = fs)
+            ints_perc = False
         else:
-            plt.yticks(range(0, max_percentage+1, 1), fontsize = fs)
-
+            plt.yticks(range(0, max_percentage, 0.1), fontsize = fs)
+            ints_perc = False
+        
+        if ints_perc:
+            ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 or x<0 else f'{int(x)}%'))
+        else:
+            ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 or x<0 else f'{x:.1}%'))
 
         if legend:
             # plot color legend
@@ -453,7 +460,6 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
         plt.xlabel(f"basepairs upstream and downstream from transcript", fontsize = fs)
 
         plt.ylabel(f"percent of transcripts in which this base is a repeat", fontsize = fs)
-        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 or x<0 else f'{int(x)}%'))
         
         plt.tight_layout()
         filename_class = f"{filename}_{rep_class}.png"

@@ -453,7 +453,7 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
         plt.xlabel(f"basepairs upstream and downstream from transcript", fontsize = fs)
 
         plt.ylabel(f"percent of transcripts in which this base is a repeat", fontsize = fs)
-        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 or x<1 else f'{int(x)}%'))
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 or x<0 else f'{int(x)}%'))
         
         plt.tight_layout()
         filename_class = f"{filename}_{rep_class}.png"

@@ -112,15 +112,17 @@ covered by each repeat category (NOT overlap filtered, so there can be more bp c
 of masked bp or even the window length) and also the number of bp and ratio covered by coding regions (exons). If the masked
 assembly is given it will also include the number of unmasked bp in each window.
 
-It takes as input two of the repeatmasker output files, `*.out` (but  `*.ori.out` also works), and `*.out.gff`. I have noticed that there
-are some repeat categories that are missing from `*ori.out`, and I am unsure why. In my case it was specifically low complexity regions
-that are in the repeatmasker `.tbl` summary and in `.out` but not in `ori.out`. My script can parse both, but double check which
-one you want to use.
-
 The runtime depends on the overall repeat content and on how fragmented the assembly is. I have tried my best to optimize, 
 but if your assembly is long and fragmented, it takes long to loop through many small contigs, and if there are many repeats, 
 it takes long to sum all of them up per window. Short windows increase the total number of windows computed and plotted, 
 which also increases the runtime. In any case, the longest runtime i managed to achieve with my data was 3:30 min.
+
+### different possible input files
+
+It takes as input two of the repeatmasker output files, `*.out` (but  `*.ori.out` also works), and `*.out.gff`. I have noticed that there
+are some repeat categories that are missing from `*ori.out`, and I am unsure why. In my case it was specifically low complexity regions
+that are in the repeatmasker `.tbl` summary and in `.out` but not in `ori.out`. My script can parse both, but double check which
+one you want to use.
 
 Good luck!
 

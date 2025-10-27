@@ -469,6 +469,7 @@ if __name__ == "__main__":
     if verbose:
         # print(f"\n  * plot confidence intervals for {species}")
         print(f"\n  * plot polynomial regression for all categories individually...")
+    
     CI.plot_confidence_intervals(before_filepath = sig_before_transcript, after_filepath=sig_after_transcript, num_sig_transcripts = num_sig_transcripts, num_all_transcripts = num_all_transcripts, win_len = args.polreg_win_smooth, overlapping_windows=plot_overlapping_windows, all_before_filepath=all_before_transcript, all_after_filepath=all_after_transcript, filename=f"{args.out_dir}{species}_cumulative_repeat_presence_around_transcripts_95percent_confidence_interval", modelstats_filename =f"{args.out_dir}{species}_polynomial_regression_summary", legend=plot_legend, plot_white_bg=args.plot_white_background)
 
 

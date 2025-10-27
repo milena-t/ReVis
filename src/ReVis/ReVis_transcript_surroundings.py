@@ -72,7 +72,7 @@ This can be one of two kinds. they are formatted the same, but can be computed o
     parser.add_argument('--out_dir', type=str, help="path to output directory. If not given all files will be saved in current working directory")
     
     # arguments for computing the tables
-    parser.add_argument('--masker_outfile', type=str, help="""repeatmasker output file ending in .out (.ori.out, is recommended, but both work, the other one is just slower)""")
+    parser.add_argument('--masker_outfile', type=str, help="""repeatmasker output file ending in .out""")
     parser.add_argument('--annotation_gff', type=str, help="""genome annotation based on the same assembly as the repeatmasker output""")
     
     input_bg = parser.add_mutually_exclusive_group(required=False)
@@ -95,10 +95,11 @@ This can be one of two kinds. they are formatted the same, but can be computed o
     parser.add_argument('--bp', type=int, help="how many bp up and downstream of the transcript borders should be included. Default is 500 for testing purposes, but to see patterns you should use at least 5kbp")
     parser.add_argument('--GF_size_percentile', type=int, help="""only gene families in the upper nth percentile of gene family size areincluded in the significant gene families. DOES NOT APPLY TO COMPUTE_TABLES_FROM_LIST! This helps ensure that only gene families that are really expandingin species_name specifically are included, and not the ones that are significant because they are expanding in other species.The default is 90 percent, which includes almost all gene families except the ones with only 1 or 0 members in most cases""")
     
-    windows = parser.add_mutually_exclusive_group(required=True)
+    windows = parser.add_mutually_exclusive_group(required=False)
     windows.add_argument('--nonoverlapping_windows', action="store_true", help="nonoverlapping windows in the plots that calculate a ploynomial regression with confidence interval for the repeat classes")
     windows.add_argument('--overlapping_windows', action="store_true", help="overlapping windows in the plots that calculate a ploynomial regression with confidence interval for the repeat classes")
-    parser.add_argument('--polreg_win_smooth', type=int, required=False, help="for the polynomial regression, how long should the windows for the smoothing be", default=100)
+    
+    parser.add_argument('--polreg_win_smooth', type=int, required=False, help="for the polynomial regression, how long should the windows for the smoothing be. default is 1bp, so no windows", default=1)
 
     parser.add_argument('--plot_white_background', action="store_true", help="the plot does NOT have a transparent background, but white instead")
     parser.add_argument('--plot_no_legend', action="store_true", help="the plot does NOT include a legend with the colors for all the repeat categories")
@@ -137,6 +138,9 @@ This can be one of two kinds. they are formatted the same, but can be computed o
             if getattr(args, required) is None:
                 parser.error(f"--{required} is required when using --plot")
 
+    if args.polreg_win_smooth > 1:
+        if not args.nonoverlapping_windows and not args.overlapping_windows:
+            parser.error(f"either --nonoverlapping_windows or --noverlapping_windows is required when using --polreg_win_smooth")
 
     return args
 

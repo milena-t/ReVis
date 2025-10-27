@@ -212,7 +212,7 @@ def plot_modelstats(modelstats_filepath:str, plot_white_bg = True):
     filename_class = f"{outdir}/{species}_wilcoxon_summary.png"
     plt.savefig(filename_class, dpi = 300, transparent = plot_transparent_bg)
     plt.close(fig)
-    print(f"\t * repeat category {rep_label}    \t--> Figure saved as: {filename_class}")
+    print(f"\t * repeat categories summary    \t--> Figure saved as: {filename_class}")
 
 
 
@@ -424,10 +424,18 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
         elif max_percentage > 6:
             plt.yticks(range(0, max_percentage+1, 2), fontsize = fs)
         elif max_percentage > 1:
-            plt.yticks(range(0, max_percentage+1, 0.5), fontsize = fs)
+            try:
+                plt.yticks(range(0, max_percentage+1, 0.5), fontsize = fs)
+            except:
+                list_ticks = [x / 10.0 for x in range(0, (max_percentage+1)*10, 5)]
+                plt.yticks(list_ticks, fontsize = fs)
             ints_perc = False
         else:
-            plt.yticks(range(0, max_percentage, 0.1), fontsize = fs)
+            try:
+                plt.yticks(range(0, max_percentage, 0.1), fontsize = fs)
+            except:
+                list_ticks = [x / 10.0 for x in range(0, max_percentage*10, 1)]
+                plt.yticks(list_ticks, fontsize = fs)
             ints_perc = False
         
         if ints_perc:

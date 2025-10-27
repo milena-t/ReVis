@@ -39,7 +39,7 @@ It is also possible to look at the repeat landscape in the up and downstream seq
 
 ```bash
 python3 ReVis.py \
-    --masker_outfile your_assembly.fna.ori.out \
+    --masker_outfile your_assembly.fna.out \
     --masker_out_gff your_assembly.fna.out.gff \
     --out_dir ./ \
     --species_name Y_species \
@@ -59,7 +59,7 @@ Above are quickstart options, see all possible options with the `-h` flag or at 
 ### Files
 
 * Repeatmasker outfiles (do not change file extensions!!):
-  * `your_assembly.fna.ori.out`
+  * `your_assembly.fna.out`
   * `your_assembly.fna.out.gff`
 * Optional:
   * genome annotation 1
@@ -112,7 +112,10 @@ covered by each repeat category (NOT overlap filtered, so there can be more bp c
 of masked bp or even the window length) and also the number of bp and ratio covered by coding regions (exons). If the masked
 assembly is given it will also include the number of unmasked bp in each window.
 
-It takes as input two of the repeatmasker output files, *.ori.out (but just *.out also works, only slower), and *.out.gff
+It takes as input two of the repeatmasker output files, `*.out` (but  `*.ori.out` also works), and `*.out.gff`. I have noticed that there
+are some repeat categories that are missing from `*ori.out`, and I am unsure why. In my case it was specifically low complexity regions
+that are in the repeatmasker `.tbl` summary and in `.out` but not in `ori.out`. My script can parse both, but double check which
+one you want to use.
 
 The runtime depends on the overall repeat content and on how fragmented the assembly is. I have tried my best to optimize, 
 but if your assembly is long and fragmented, it takes long to loop through many small contigs, and if there are many repeats, 
@@ -126,7 +129,6 @@ Good luck!
 -h, --help            show this help message and exit
   --masker_outfile MASKER_OUTFILE
                         repeatmasker output file ending in .out 
-                            (I really recommend .ori.out, but both work, the other one is just slower)
   --masker_out_gff MASKER_OUT_GFF
                         repeatmasker output file ending in .out.gff
                             If not given it will be assumed to have the same basename as .out and inferred automatically.

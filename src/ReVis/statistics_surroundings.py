@@ -94,10 +94,25 @@ def statistical_enrichment(before_filepath:str, after_filepath:str, num_sig_tran
         diff_before = [before_dict[rep_class][i] - all_before_dict[rep_class][i] for i in range(0, num_bp, win_len)]
         diff_after = [after_dict[rep_class][i] - all_after_dict[rep_class][i] for i in range(0, num_bp, win_len)]
 
-        res_before = wilcoxon(diff_before, alternative="greater") #alternative greater because we only consider TE enrichment and not TE depletion
-        res_after = wilcoxon(diff_after, alternative="greater") #alternative greater because we only consider TE enrichment and not TE depletion
+        if all(base_diff == 0 for base_diff in diff_before):
+            res_before_pvalue = np.NaN
+            res_before_statistic = np.NaN
+            print(f"before transcript -> Wilcoxon test could not be run for absent repeat class: {rep_class}")# \n\t{diff_before}")
+        else:
+            res_before = wilcoxon(diff_before, alternative="greater") #alternative greater because we only consider TE enrichment and not TE depletion
+            res_before_pvalue = res_before.pvalue
+            res_before_statistic = res_before.statistic            
 
-        rep_classes_stats[rep_class] = [str(res_before.pvalue), str(res_before.statistic), str(res_after.pvalue), str(res_after.statistic)]
+        if all(base_diff == 0 for base_diff in diff_after):
+            res_after_pvalue = np.NaN
+            res_after_statistic = np.NaN
+            print(f"after transcript -> Wilcoxon test could not be run for absent repeat class: {rep_class}")# \n\t{diff_after}")
+        else:
+            res_after = wilcoxon(diff_after, alternative="greater") #alternative greater because we only consider TE enrichment and not TE depletion
+            res_after_pvalue = res_after.pvalue
+            res_after_statistic = res_after.statistic            
+
+        rep_classes_stats[rep_class] = [str(res_before_pvalue), str(res_before_statistic), str(res_after_pvalue), str(res_after_statistic)]
 
     with open(modelstats_filename, "w") as modelstats_file:
         comment = f"# one-sided wilcoxon test for all repeat categories\n# pairwise differences within repeat category, downsampled to every {win_len} bases\n"
@@ -412,36 +427,51 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
                 print(all_after_model.summary())
             sys.stdout = o
 
-        max_percentage=int(max_percentage*1.3)
+        #max_percentage=int(max_percentage*1.3)
+        max_percentage=max_percentage*1.3
 
         plt.vlines(x= 0, ymin=0, ymax=max_percentage, colors="#000000", linestyles="dashed", label="transcript border", linewidth=3)
         plt.xticks(range(-num_bp, num_bp+1, int(num_bp/5)), fontsize = fs)
-        ints_perc = True
+
+        #### MANUALLY SET Y-TICKS
+        func_set = False
         if max_percentage>20:
+            max_percentage=int(max_percentage)
             plt.yticks(range(0, max_percentage+1, 10), fontsize = fs)
         elif max_percentage >14:
+            max_percentage=int(max_percentage)
             plt.yticks(range(0, max_percentage+1, 5), fontsize = fs)
         elif max_percentage > 6:
+            max_percentage=int(max_percentage)
             plt.yticks(range(0, max_percentage+1, 2), fontsize = fs)
         elif max_percentage > 1:
             try:
                 plt.yticks(range(0, max_percentage+1, 0.5), fontsize = fs)
             except:
-                list_ticks = [x / 10.0 for x in range(0, (max_percentage+1)*10, 5)]
+                list_ticks = [x / 10.0 for x in range(0, int(max_percentage*10), 5)]
                 plt.yticks(list_ticks, fontsize = fs)
-            ints_perc = False
-        else:
+            ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 else ( f"{int(x)}%" if x == 0 else f'{x:.1f}%') ))
+            func_set = True
+        elif max_percentage>0.5:
             try:
                 plt.yticks(range(0, max_percentage, 0.1), fontsize = fs)
             except:
-                list_ticks = [x / 10.0 for x in range(0, max_percentage*10, 1)]
+                list_ticks = [x / 100.0 for x in range(0, int(max_percentage*100), 1)]
                 plt.yticks(list_ticks, fontsize = fs)
-            ints_perc = False
-        
-        if ints_perc:
-            ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 or x<0 else f'{int(x)}%'))
+            ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 else ( f"{int(x)}%" if x == 0 else f'{x:.2f}%') ))
+            func_set = True
         else:
-            ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 or x<0 else f'{x:.1}%'))
+            print(f"\t\t\t max percentage: {max_percentage}")
+            try:
+                plt.yticks(range(0, max_percentage, 0.05), fontsize = fs)
+            except:
+                list_ticks = [x / 100.0 for x in range(0, int(max_percentage*100), 5)]
+                plt.yticks(list_ticks, fontsize = fs)
+            ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 else ( f"{int(x)}%" if x == 0 else f'{x:.3f}%') ))
+            func_set = True
+        
+        if not func_set:
+            ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 or x<0 else f'{int(x)}%'))
 
         if legend:
             # plot color legend

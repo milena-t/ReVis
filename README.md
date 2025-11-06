@@ -39,7 +39,7 @@ It is also possible to look at the repeat landscape in the up and downstream seq
 
 ```bash
 python3 ReVis.py \
-    --masker_outfile your_assembly.fna.ori.out \
+    --masker_outfile your_assembly.fna.out \
     --masker_out_gff your_assembly.fna.out.gff \
     --out_dir ./ \
     --species_name Y_species \
@@ -59,7 +59,7 @@ Above are quickstart options, see all possible options with the `-h` flag or at 
 ### Files
 
 * Repeatmasker outfiles (do not change file extensions!!):
-  * `your_assembly.fna.ori.out`
+  * `your_assembly.fna.out`
   * `your_assembly.fna.out.gff`
 * Optional:
   * genome annotation 1
@@ -112,12 +112,17 @@ covered by each repeat category (NOT overlap filtered, so there can be more bp c
 of masked bp or even the window length) and also the number of bp and ratio covered by coding regions (exons). If the masked
 assembly is given it will also include the number of unmasked bp in each window.
 
-It takes as input two of the repeatmasker output files, *.ori.out (but just *.out also works, only slower), and *.out.gff
-
 The runtime depends on the overall repeat content and on how fragmented the assembly is. I have tried my best to optimize, 
 but if your assembly is long and fragmented, it takes long to loop through many small contigs, and if there are many repeats, 
 it takes long to sum all of them up per window. Short windows increase the total number of windows computed and plotted, 
 which also increases the runtime. In any case, the longest runtime i managed to achieve with my data was 3:30 min.
+
+### different possible input files
+
+It takes as input two of the repeatmasker output files, `*.out` (but  `*.ori.out` also works), and `*.out.gff`. I have noticed that there
+are some repeat categories that are missing from `*ori.out`, and I am unsure why. In my case it was specifically low complexity regions
+that are in the repeatmasker `.tbl` summary and in `.out` but not in `ori.out`. My script can parse both, but double check which
+one you want to use.
 
 Good luck!
 
@@ -126,7 +131,6 @@ Good luck!
 -h, --help            show this help message and exit
   --masker_outfile MASKER_OUTFILE
                         repeatmasker output file ending in .out 
-                            (I really recommend .ori.out, but both work, the other one is just slower)
   --masker_out_gff MASKER_OUT_GFF
                         repeatmasker output file ending in .out.gff
                             If not given it will be assumed to have the same basename as .out and inferred automatically.
@@ -170,7 +174,7 @@ Good luck!
 
 # Transcript Surroundings mode
 
-Creates count tables of repeat presence per base in the transcript surroundings and then plots them. The tables can be generated based on orthofinder and CAFE output directly (`--compute_tables_from_OG`) or from lists of transcript IDs (`--compute_tables_from_list`)
+Creates count tables of repeat presence per base in the transcript surroundings and then plots them. The tables can be generated based on orthofinder and CAFE output directly (`--compute_tables_from_OG`) or from lists of transcript IDs (`--compute_tables_from_list`). Also plots individual polynomial regressions for each repeat class with 95% confidence interval, data here can be smoothed with `--polreg_win_smooth` in either overlapping or nonoverlapping windows.
 
 ## Quick start
 !! existing tables of the same name from previous runs will be overwritten
@@ -185,6 +189,7 @@ python3 ReVis_transcript_surroundings.py \
   --orthogroups ../../example_data/N0.tsv \
   --CAFE5_results ../../example_data/CAFE5_Base_family_results.txt \
   --species_name B_siliquastri \
+  --overlapping_windows \
   --bp 500 --GF_size_percentile 90 --verbose
 ```
 ```
@@ -196,6 +201,7 @@ python3 ReVis_transcript_surroundings.py \
     --all_list ../../example_data/overlap_all_transcripts_B_siliquastri.txt \
     --sig_list ../../example_data/overlap_sig_transcripts_B_siliquastri.txt \
     --species_name B_siliquastri \
+    --overlapping_windows \
     --bp 10000 \
     --GF_size_percentile 90 \
     --verbose
@@ -211,12 +217,14 @@ python3 ReVis_transcript_surroundings.py \
   --all_after_table ../../example_data/B_siliquastri_cumulative_repeats_after_all_transcripts.txt \
   --sig_after_table ../../example_data/B_siliquastri_cumulative_repeats_after_sig_transcripts_90th_GF_size_percentile.txt \
   --num_transcripts ../../example_data/B_siliquastri_transcript_numbers.txt \
-  --species_name B_siliquastri --verbose
+  --species_name B_siliquastri \ 
+  --overlapping_windows \
+  --verbose
 ```
 
 ## Summary
 
-The data is generated and saved into four tables prior to plotting. Each table has a row for each repeat category, and each column is one base. The number in the cell is how often this base position is annotated with a repeat of one category in all the transcripts considered. It also generates a file where it saves the number of transcripts considered for foreground and background respectively, so that the repeat counts from the tables can be normalized into a percentage for comparability.
+The data is generated and saved into four tables prior to plotting. Each table has a row for each repeat category, and each column is one base. The number in the cell is how often this base position is annotated with a repeat of one category in all the transcripts considered. It also generates a file where it saves the number of transcripts considered for foreground and background respectively, so that the repeat counts from the tables can be normalized into a percentage for comparability. The repeats are _not_ overlap filtered the way they can be for the whole genome histogram since that would distort the statistical analysis.
 
 Since I get the foreground and background transcripts from orthofinder and CAFE analysis of a set of species, these are the data structures that I have tested this code with the most. This is also why they are mostly refered to as "sig" (significant) for the foreground transcripts and "all" for the background transcripts. I did try to implement an option where you can pass lists of transcript IDs (corresponding to your annotation) in the command line directly for the foreground and background transcripts, if you are not using orthofinder/cafe, but I didn't exactly test it rigorously so it may not work.
 

@@ -19,6 +19,47 @@ from statsmodels.sandbox.regression.predstd import wls_prediction_std
 from scipy.stats import wilcoxon
 
 
+
+def manual_yticks(max_percentage:int, ax, fs):
+    func_set = False
+    if max_percentage>20:
+        max_percentage=int(max_percentage)
+        plt.yticks(range(0, max_percentage+1, 10), fontsize = fs)
+    elif max_percentage >14:
+        max_percentage=int(max_percentage)
+        plt.yticks(range(0, max_percentage+1, 5), fontsize = fs)
+    elif max_percentage > 6:
+        max_percentage=int(max_percentage)
+        plt.yticks(range(0, max_percentage+1, 2), fontsize = fs)
+    elif max_percentage > 1:
+        try:
+            plt.yticks(range(0, max_percentage+1, 0.5), fontsize = fs)
+        except:
+            list_ticks = [x / 10.0 for x in range(0, int(max_percentage*10), 5)]
+            plt.yticks(list_ticks, fontsize = fs)
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 else ( f"{int(x)}%" if x == 0 else f'{x:.1f}%') ))
+        func_set = True
+    elif max_percentage>0.5:
+        try:
+            plt.yticks(range(0, max_percentage, 0.1), fontsize = fs)
+        except:
+            list_ticks = [x / 100.0 for x in range(0, int(max_percentage*100), 1)]
+            plt.yticks(list_ticks, fontsize = fs)
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 else ( f"{int(x)}%" if x == 0 else f'{x:.2f}%') ))
+        func_set = True
+    else:
+        print(f"\t\t\t max percentage: {max_percentage}")
+        try:
+            plt.yticks(range(0, max_percentage, 0.05), fontsize = fs)
+        except:
+            list_ticks = [x / 100.0 for x in range(0, int(max_percentage*100), 5)]
+            plt.yticks(list_ticks, fontsize = fs)
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 else ( f"{int(x)}%" if x == 0 else f'{x:.3f}%') ))
+        func_set = True
+    
+    if not func_set:
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 or x<0 else f'{int(x)}%'))
+
 def statistical_enrichment(before_filepath:str, after_filepath:str, num_sig_transcripts:int, num_all_transcripts:int, all_before_filepath:str = "", all_after_filepath:str = "", filename = "cumulative_repeat_presence_around_transcripts_95_perc_CI", modelstats_filename = "pol_reg_sum.txt", legend = True, plot_white_bg = False):
     """
     do the wilcoxon test for all repeat classes
@@ -434,44 +475,7 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
         plt.xticks(range(-num_bp, num_bp+1, int(num_bp/5)), fontsize = fs)
 
         #### MANUALLY SET Y-TICKS
-        func_set = False
-        if max_percentage>20:
-            max_percentage=int(max_percentage)
-            plt.yticks(range(0, max_percentage+1, 10), fontsize = fs)
-        elif max_percentage >14:
-            max_percentage=int(max_percentage)
-            plt.yticks(range(0, max_percentage+1, 5), fontsize = fs)
-        elif max_percentage > 6:
-            max_percentage=int(max_percentage)
-            plt.yticks(range(0, max_percentage+1, 2), fontsize = fs)
-        elif max_percentage > 1:
-            try:
-                plt.yticks(range(0, max_percentage+1, 0.5), fontsize = fs)
-            except:
-                list_ticks = [x / 10.0 for x in range(0, int(max_percentage*10), 5)]
-                plt.yticks(list_ticks, fontsize = fs)
-            ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 else ( f"{int(x)}%" if x == 0 else f'{x:.1f}%') ))
-            func_set = True
-        elif max_percentage>0.5:
-            try:
-                plt.yticks(range(0, max_percentage, 0.1), fontsize = fs)
-            except:
-                list_ticks = [x / 100.0 for x in range(0, int(max_percentage*100), 1)]
-                plt.yticks(list_ticks, fontsize = fs)
-            ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 else ( f"{int(x)}%" if x == 0 else f'{x:.2f}%') ))
-            func_set = True
-        else:
-            print(f"\t\t\t max percentage: {max_percentage}")
-            try:
-                plt.yticks(range(0, max_percentage, 0.05), fontsize = fs)
-            except:
-                list_ticks = [x / 100.0 for x in range(0, int(max_percentage*100), 5)]
-                plt.yticks(list_ticks, fontsize = fs)
-            ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 else ( f"{int(x)}%" if x == 0 else f'{x:.3f}%') ))
-            func_set = True
-        
-        if not func_set:
-            ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 or x<0 else f'{int(x)}%'))
+        manual_yticks(max_percentage, ax, fs)
 
         if legend:
             # plot color legend

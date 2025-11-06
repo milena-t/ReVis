@@ -1,12 +1,12 @@
 ## do the plotting based on existing tables
 
 
-U_NAME=miltr339
+U_NAME=milena
 REP_TABLES=/Users/${U_NAME}/work/PhD_code/PhD_chapter1/data/repeats_tables
 SPECIES=B_siliquastri
 
-# for SPECIES in C_maculatus
-for SPECIES in A_obtectus A_verrucosus B_siliquastri C_chinensis C_maculatus C_septempunctata D_melanogaster D_ponderosae I_luminosus P_pyralis R_ferrugineus T_castaneum T_molitor Z_morio
+for SPECIES in B_siliquastri
+# for SPECIES in A_obtectus A_verrucosus B_siliquastri C_chinensis C_maculatus C_septempunctata D_melanogaster D_ponderosae I_luminosus P_pyralis R_ferrugineus T_castaneum T_molitor Z_morio
 do 
 python3 /Users/${U_NAME}/work/PhD_code/ReVis/src/ReVis/ReVis_transcript_surroundings.py \
     --plot \

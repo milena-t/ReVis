@@ -231,7 +231,7 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
         ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 or x<1 else f'{int(x)}%'))
         
         plt.tight_layout()
-        filename_out = f"{filename}_{rep_class}.png"
+        filename_out = f"{filename}_95perc_CI_fft_{rep_class}.png"
         plt.savefig(filename_out, dpi = 300, transparent = plot_transparent_bg)
         plt.close(fig)
         filename_out = filename_out.split("/")[-1]
@@ -291,18 +291,19 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
                 ax.plot(x_after, all_after_fourier_denoise, color = colors[rep_class], linewidth=1, linestyle = (0, (5, 2)))
                 ax.plot(x_after, all_after_dict[rep_class], color = colors[rep_class], linestyle = (0, (1, 10)), linewidth = 2, alpha = raw_transparency)   
 
-                ax.set_ylim([0, max(all_after_dict[rep_class]+all_before_dict[rep_class])*1.5])
 
-            filename_fourier_denoise = f"{filename}_fft_{rep_class}.png"
+            filename_fourier_denoise = f"{filename}_fft_denoise_{rep_class}.png"
 
             max_percentage=int(max_percentage*1.3)
             if max_percentage == 0 or max_percentage>100:
                 max_percentage= 100
 
-            plt.vlines(x= 0, ymin=0, ymax=max_percentage, colors="#000000", linestyles="dashed", label="transcript border", linewidth=3)
+            plt.vlines(x= 0, ymin=0, ymax=max_percentage*2, colors="#000000", linestyles="dashed", label="transcript border", linewidth=3)
             plt.xticks(range(-num_bp, num_bp+1, int(num_bp/5)), fontsize = fs)
             
             manual_yticks(max_percentage, ax, fs)
+            
+            ax.set_ylim([0,max_percentage*1.5])
 
             if legend:
                 # plot color legend

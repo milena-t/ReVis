@@ -145,6 +145,13 @@ This can be one of two kinds. they are formatted the same, but can be computed o
         if not args.nonoverlapping_windows and not args.overlapping_windows:
             parser.error(f"either --nonoverlapping_windows or --noverlapping_windows is required when using --polreg_win_smooth")
 
+    if args.nonoverlapping_windows:
+        if not args.polreg_win_smooth:
+            parser.error(f"for --nonoverlapping_windows, you need to specify a window length with --polreg_win_smooth")
+    elif args.overlapping_windows:
+        if not args.polreg_win_smooth:
+            parser.error(f"for --overlapping_windows, you need to specify a window length with --polreg_win_smooth")
+
     return args
 
 
@@ -478,7 +485,10 @@ if __name__ == "__main__":
         print(f"\n  * plot polynomial regression for all categories individually...")
     
     if args.polreg_win_smooth:
-        CI.plot_confidence_intervals(before_filepath = sig_before_transcript, after_filepath=sig_after_transcript, num_sig_transcripts = num_sig_transcripts, num_all_transcripts = num_all_transcripts, win_len = args.polreg_win_smooth, overlapping_windows=plot_overlapping_windows, all_before_filepath=all_before_transcript, all_after_filepath=all_after_transcript, filename=f"{args.out_dir}{species}_cumulative_repeat_presence_around_transcripts_95percent_confidence_interval", modelstats_filename =f"{args.out_dir}{species}_polynomial_regression_summary", legend=plot_legend, plot_white_bg=args.plot_white_background)
+        if args.polreg_win_smooth>1:
+            CI.plot_confidence_intervals(before_filepath = sig_before_transcript, after_filepath=sig_after_transcript, num_sig_transcripts = num_sig_transcripts, num_all_transcripts = num_all_transcripts, win_len = args.polreg_win_smooth, overlapping_windows=plot_overlapping_windows, all_before_filepath=all_before_transcript, all_after_filepath=all_after_transcript, filename=f"{args.out_dir}{species}_cumulative_repeat_presence_around_transcripts_{args.polreg_win_smooth}bp_windows_95percent_confidence_interval", modelstats_filename =f"{args.out_dir}{species}_polynomial_regression_summary", legend=plot_legend, plot_white_bg=args.plot_white_background)
+        else:
+            CI.plot_confidence_intervals(before_filepath = sig_before_transcript, after_filepath=sig_after_transcript, num_sig_transcripts = num_sig_transcripts, num_all_transcripts = num_all_transcripts, win_len = args.polreg_win_smooth, overlapping_windows=plot_overlapping_windows, all_before_filepath=all_before_transcript, all_after_filepath=all_after_transcript, filename=f"{args.out_dir}{species}_cumulative_repeat_presence_around_transcripts_95percent_confidence_interval", modelstats_filename =f"{args.out_dir}{species}_polynomial_regression_summary", legend=plot_legend, plot_white_bg=args.plot_white_background)
     elif args.polreg_fourier_denoise:
         CI_fourier.plot_confidence_intervals(before_filepath = sig_before_transcript, after_filepath=sig_after_transcript, num_sig_transcripts = num_sig_transcripts, num_all_transcripts = num_all_transcripts, all_before_filepath=all_before_transcript, all_after_filepath=all_after_transcript, filename=f"{args.out_dir}{species}_cumulative_repeat_presence_around_transcripts_95percent_confidence_interval_fourier", modelstats_filename =f"{args.out_dir}{species}_polynomial_regression_summary", legend=plot_legend, plot_white_bg=args.plot_white_background, plot_fourier_transform=args.polreg_fourier_denoise)
 

@@ -100,7 +100,9 @@ This can be one of two kinds. they are formatted the same, but can be computed o
     windows.add_argument('--nonoverlapping_windows', action="store_true", help="nonoverlapping windows in the plots that calculate a ploynomial regression with confidence interval for the repeat classes")
     windows.add_argument('--overlapping_windows', action="store_true", help="overlapping windows in the plots that calculate a ploynomial regression with confidence interval for the repeat classes")
     
-    parser.add_argument('--polreg_win_smooth', type=int, required=False, help="for the polynomial regression, how long should the windows for the smoothing be. default is 1bp, so no windows", default=1)
+    fourier = parser.add_mutually_exclusive_group(required=False)
+    fourier.add_argument('--polreg_win_smooth', type=int, required=False, help="for the polynomial regression, how long should the windows for the smoothing be. If you don't want any windows or fourier denoising, put 1 (for 1 bp windows)")
+    fourier.add_argument('--polreg_fourier_denoise', action="store_true", required=False, help="for the polynomial regression, use fourier transformation to smooth out the noise (mutually exclusive with window length)")
 
     parser.add_argument('--plot_white_background', action="store_true", help="the plot does NOT have a transparent background, but white instead")
     parser.add_argument('--plot_no_legend', action="store_true", help="the plot does NOT include a legend with the colors for all the repeat categories")
@@ -139,7 +141,7 @@ This can be one of two kinds. they are formatted the same, but can be computed o
             if getattr(args, required) is None:
                 parser.error(f"--{required} is required when using --plot")
 
-    if args.polreg_win_smooth > 1:
+    if args.polreg_win_smooth:
         if not args.nonoverlapping_windows and not args.overlapping_windows:
             parser.error(f"either --nonoverlapping_windows or --noverlapping_windows is required when using --polreg_win_smooth")
 
@@ -475,8 +477,8 @@ if __name__ == "__main__":
         # print(f"\n  * plot confidence intervals for {species}")
         print(f"\n  * plot polynomial regression for all categories individually...")
     
-    if args.polreg_win_smooth>1:
+    if args.polreg_win_smooth:
         CI.plot_confidence_intervals(before_filepath = sig_before_transcript, after_filepath=sig_after_transcript, num_sig_transcripts = num_sig_transcripts, num_all_transcripts = num_all_transcripts, win_len = args.polreg_win_smooth, overlapping_windows=plot_overlapping_windows, all_before_filepath=all_before_transcript, all_after_filepath=all_after_transcript, filename=f"{args.out_dir}{species}_cumulative_repeat_presence_around_transcripts_95percent_confidence_interval", modelstats_filename =f"{args.out_dir}{species}_polynomial_regression_summary", legend=plot_legend, plot_white_bg=args.plot_white_background)
-    else:
-        CI_fourier.plot_confidence_intervals(before_filepath = sig_before_transcript, after_filepath=sig_after_transcript, num_sig_transcripts = num_sig_transcripts, num_all_transcripts = num_all_transcripts, all_before_filepath=all_before_transcript, all_after_filepath=all_after_transcript, filename=f"{args.out_dir}{species}_cumulative_repeat_presence_around_transcripts_95percent_confidence_interval", modelstats_filename =f"{args.out_dir}{species}_polynomial_regression_summary", legend=plot_legend, plot_white_bg=args.plot_white_background)
+    elif args.polreg_fourier_denoise:
+        CI_fourier.plot_confidence_intervals(before_filepath = sig_before_transcript, after_filepath=sig_after_transcript, num_sig_transcripts = num_sig_transcripts, num_all_transcripts = num_all_transcripts, all_before_filepath=all_before_transcript, all_after_filepath=all_after_transcript, filename=f"{args.out_dir}{species}_cumulative_repeat_presence_around_transcripts_95percent_confidence_interval", modelstats_filename =f"{args.out_dir}{species}_polynomial_regression_summary", legend=plot_legend, plot_white_bg=args.plot_white_background, plot_fourier_transform=args.polreg_fourier_denoise)
 

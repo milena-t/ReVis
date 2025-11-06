@@ -28,6 +28,13 @@ def make_fft_of_rep_prop(rep_class_dict, psd_max = 100):
     PSDClean = PSD_fft*indices 
     fhat = indices * fhat
     ffilt = np.fft.ifft(fhat)
+
+    ### test imaginary component --> should only be noise with like 1e-13 or lower
+    if False:
+        ffilt_test = ffilt
+        print(np.max(np.abs(ffilt_test.imag)))
+
+    ffilt = ffilt.real
     return [PSD_fft,freq,L_ind], ffilt
 
 def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_transcripts:int, num_all_transcripts:int, general_legend_names = True, all_before_filepath:str = "", all_after_filepath:str = "", filename = "cumulative_repeat_presence_around_transcripts_95_perc_CI", modelstats_filename = "pol_reg_sum.txt", plot_fourier_transform = True, legend = True, plot_white_bg = False):
@@ -39,6 +46,9 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
     plot_transparent_bg = True
     if plot_white_bg:
         plot_transparent_bg = False
+
+    out_dir_name = "/".join(filename.split("/")[:-1])
+    print(f"individual repeat category plots saved in dir: {out_dir_name}")
     
     before_dict = gff.read_dict_from_file(before_filepath)
     before_dict = { key : [int(v)/num_sig_transcripts*100 for v in value] for key, value in before_dict.items()}
@@ -212,7 +222,7 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
         else:
             labels.append(f"significant transcripts ({num_sig_transcripts})")
             labels.append(f"all CAFE transcripts ({num_all_transcripts})")
-        plt.legend(handles, labels, loc = "upper left", fontsize = fs)
+        plt.legend(handles, labels, loc = "upper left", fontsize = fs, title = "fourier denoised", title_fontsize = fs)
 
         plt.title(f"{species} transcript surroundings {num_bp} bp up and downstream\nrepeat category: {rep_label} with polynomial regression and 95% confidence interval", fontsize = fs*1.25)
         plt.xlabel(f"basepairs upstream and downstream from transcript", fontsize = fs)
@@ -224,6 +234,7 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
         filename_out = f"{filename}_{rep_class}.png"
         plt.savefig(filename_out, dpi = 300, transparent = plot_transparent_bg)
         plt.close(fig)
+        filename_out = filename_out.split("/")[-1]
         print(f"\t * repeat category {rep_label} \t--> Figure saved as: {filename_out}")
 
         if plot_fourier_transform:
@@ -304,7 +315,7 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
             dotted = Line2D([0], [0], color='black', linestyle=':', linewidth=2)
             handles = [solid, dotted]
             labels = []
-            if general_legend_names:
+            if True:
                 labels.append(f"foreground transcripts ({num_sig_transcripts})")
                 labels.append(f"background transcripts ({num_all_transcripts})")
             else:
@@ -322,6 +333,7 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
             # filename_out = f"{filename}_{rep_class}.png"
             plt.savefig(filename_fourier_denoise, dpi = 300, transparent = plot_transparent_bg)
             plt.close(fig)
+            filename_fourier_denoise = filename_fourier_denoise.split("/")[-1]
             print(f"\t\t\t\t\t--> Fourier figure saved: {filename_fourier_denoise}")
 
 

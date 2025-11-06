@@ -173,8 +173,8 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
             if max_after>max_percentage:
                 max_percentage=max_after
 
-            ax.plot(x_before, all_before_fourier_denoise, color = colors[rep_class], linestyle = (0, (1, 10)), linewidth = 2)                    
-            ax.plot(x_after, all_after_fourier_denoise, color = colors[rep_class], linestyle = (0, (1, 10)), linewidth = 2)   
+            ax.plot(x_before, all_before_fourier_denoise, color = colors[rep_class], linestyle = (0, (1, 3)), linewidth = 2)                    
+            ax.plot(x_after, all_after_fourier_denoise, color = colors[rep_class], linestyle = (0, (1, 3)), linewidth = 2)   
             ax.plot(x_before, all_before_ypred, color = colors[rep_class],label = f"{rep_label} pol. reg.\nbackground", linewidth=1, linestyle = (0, (5, 2)))
             ax.plot(x_after, all_after_ypred, color = colors[rep_class], linewidth=1, linestyle = (0, (5, 2)))
             ax.fill_between(x_before, upper_all_before_model,lower_all_before_model, color=colors[rep_class], alpha = 0.2)

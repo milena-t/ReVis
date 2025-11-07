@@ -276,7 +276,11 @@ graph TD;
     gene_annot --> filt_gene_annot{{Class: filtered genome annotation}};
     tr_list --> filt_gene_annot
 
-    
+    loop_tr{loop through foreground and background transcripts}
+    loop_bp{loop through all bases before and after}
+    loop_tr --> loop_bp
+    loop_bp --> loop_tr
+    loop_tr -- loop through all bases --> loop_tr
 
     win_prop --> out_tab@{ shape: docs, label: "output tables" }
 ```   

@@ -269,11 +269,11 @@ python3 ReVis_transcript_surroundings.py \
 ```mermaid
 graph TD;
     infile_out(your_assembly.fna.out);
-    infile_out --> rep_annot{{Class: repeat annotation}};
+    infile_out ==> rep_annot{{Class: repeat annotation}};
     rep_annot --> tr_count(transcript counts foreground and background);
 
     infile_annot(annotation.gff);
-    infile_annot --> gene_annot{{Class: genome annotation}};
+    infile_annot ==> gene_annot{{Class: genome annotation}};
 
     OGs(orthogroups);
     CAFE(CAFE5 outfile);

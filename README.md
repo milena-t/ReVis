@@ -33,6 +33,19 @@ It is also possible to look at the repeat landscape in the up and downstream seq
 
 ![B. siliquastri transcript surroundings repeat landscape](example_data/B_siliquastri_cumulative_repeat_presence_around_transcripts.png) 
 
+### Statistical analysis
+
+I have also implemented statistical analysis to evaluate whether any repeat category is enriched in the foreground transcript surroundings compared to the background transcript surroundings. This can indicate that the repeat category in question is involved with the proliferation of the expanding gene families that make up the foreground transcripts. First, I run a wilcoxon test to see the significance in mean, and to increase indepencence of datapoints I downsample to 20 equidistant points before and after the transcript border. I test for all repeat categories seperately before and after the transcript and plot the p-values. 
+
+<p float="left">
+  <img src="example_data/B_siliquastri_wilcoxon_summary.png" width="35%" />
+</p>
+
+Since many repeat categories show a "curved" shape where the foreground line is higher closer to the transcript border but approaches the background line further away, I also perform polynomial regression and visually assess the 95% confidence interval. Since especially the foreground transcript line is very noisy, I have implemented two denoising methods, `--polreg_fourier_denoise` which does fourier denoising, and `--polreg_win_smooth int` is a sliding window approach where you specify the window length. (I recommend the fourier denoising, but in case that doesn't work the sliding window approach gives relatively similar results).
+
+![fourier denoising example](example_data/B_siliquastri_cumulative_repeat_presence_around_transcripts_fft_denoise_LINE.png)
+![fourier denoised polynomial regression](example_data/B_siliquastri_cumulative_repeat_presence_around_transcripts_95perc_CI_fft_LINE.png)
+
 # ReVis Histograms (genome wide mode)
 
 ## Quick start

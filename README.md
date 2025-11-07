@@ -4,7 +4,7 @@ Visualize the output of repeatmasker.
 
 ## Installation
 
-Download the latest release and unzip it. You can just run the python script as described in quickstart below. You might have to install a few external dependencies manually (see `requirements.txt`) but they are all commonly used libraries easy to install with `pip`.
+Download the latest release and unzip it. You can just run the python script as described in quickstart below. You might have to install a few external dependencies manually (see [requirements.txt](src/ReVis/requirements.txt)) but they are all commonly used libraries easy to install with `pip` such as `numpy` and `matplotlib`pip.
 
 ### Dependencies
 
@@ -256,7 +256,7 @@ You can specify how many bp up and downstream from a transcript border you want 
 You can pass these parameters
 * `bp` (how many bp up- and downstream of a transcript to compute and plot)
 * `gene family size percentile` (recommended! for the sig. table, only genes that are part of actually expanding gene families (whose size is in the upper nth size percentile, not just all sig. evolving orthogroups, are included)
-* If you are doing orthofinder/CAFE: `species name` (matching one in the orthofinder output!!!)
+* If you are doing orthofinder/CAFE: `species name` must match one in the orthofinder output!!!
 
 ```
 options:

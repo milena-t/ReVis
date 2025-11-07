@@ -263,8 +263,6 @@ python3 ReVis_transcript_surroundings.py \
 
 ## how it works 
 
-TODO finish flowchart
-
 <details>
 <summary>Flowchart for ReVis transcript surroundings mode</summary>
 
@@ -303,6 +301,9 @@ graph TD;
     rep_prop --> plot_all([Plot transcript surroundings of all categories])
 
     stats --> stats_out([plot results of statistical analysis]) 
+
+    out_tab -- in table mode --> stats
+    out_tab -- in table mode --> rep_prop
 ```   
 
 </details>

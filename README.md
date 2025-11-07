@@ -294,13 +294,14 @@ graph TD;
     rep_counts ==> rep_prop(repeat proportions at each base);
     tr_count --> rep_prop
 
-    rep_prop --> out_tab@{ shape: docs, label: "output tables, foreground/background and before/after transcript, and transcript counts" };
+    rep_prop --> out_tab@{ shape: docs, label: "output tables foreground/background and before/after transcript, and transcript counts" };
     tr_count --> out_tab
 
     rep_prop ==> stats{statistical analysis};
     rep_prop ==> plot_all([Plot transcript surroundings of all categories])
 
     stats ==> stats_out([plot results of statistical analysis]) 
+    stats --> stats_tab@{ shape: docs, label: "Wilcoxon test output" };
 
     out_tab -. in table mode .-> stats
     out_tab -. in table mode .-> rep_prop

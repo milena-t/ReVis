@@ -262,13 +262,21 @@ TODO finish flowchart
 ```mermaid
 graph TD;
     infile_out(your_assembly.fna.out);
-    infile_out -- parsing --> rep_annot{{Class: repeat annotation}};
+    infile_out --> rep_annot{{Class: repeat annotation}};
+
+    infile_annot(annotation.gff);
+    infile_annot --> gene_annot{{Class: genome annotation}};
 
     OGs(orthogroups);
     CAFE(CAFE5 outfile);
 
     OGs --> tr_list(foreground and background transcripts list);
     CAFE --> tr_list
+
+    gene_annot --> filt_gene_annot{{Class: filtered genome annotation}};
+    tr_list --> filt_gene_annot
+
+    
 
     win_prop --> out_tab@{ shape: docs, label: "output tables" }
 ```   

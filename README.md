@@ -75,6 +75,10 @@ graph TD;
     win_ab --> win_prop
     infile_gff(your_assembly.fna.out.gff);
     infile_gff --> contig_coords(scaffold lengths);
+
+    win_prop --> out_tab@{ shape: docs, label: "output tables" }
+    win_prop --> plot([Plot stacked histogram])
+    contig_coords --> plot
 ```   
 
 </details>

@@ -70,7 +70,9 @@ graph TD;
     infile_out(your_assembly.fna.out);
     infile_out -- parsing --> rep_annot{{Class: repeat annotation}};
     rep_annot -- window_length --> win_ab{{window abundances by category}};
-    rep_annot --> tr_num(transcript counts foreground and background);
+    rep_annot --> tr_count(transcript counts foreground and background);
+    tr_count --> win_prop{{window abundances in percent}}
+    win_ab --> win_prop
     infile_gff(your_assembly.fna.out.gff);
     infile_gff --> contig_coords(scaffold lengths);
 ```   

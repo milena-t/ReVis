@@ -281,26 +281,26 @@ graph TD;
     OGs -.-> tr_list(foreground and background transcripts list);
     CAFE -.-> tr_list
 
-    gene_annot --> filt_gene_annot{{Class: filtered genome annotation}};
+    gene_annot ==> filt_gene_annot{{Class: filtered genome annotation}};
     tr_list --> filt_gene_annot
     
-    filt_gene_annot --> loop_tr{loop through foreground and background transcripts};
-    rep_annot --> loop_tr
+    filt_gene_annot ==> loop_tr{loop through foreground and background transcripts};
+    rep_annot ==> loop_tr
     loop_bp{loop through all bases before and after for each transcript};
     loop_tr --> loop_bp
     loop_bp --> loop_tr
 
-    loop_tr --> rep_counts(repeat counts at each base);
-    rep_counts --> rep_prop(repeat proportions at each base);
+    loop_tr ==> rep_counts(repeat counts at each base);
+    rep_counts ==> rep_prop(repeat proportions at each base);
     tr_count --> rep_prop
 
     rep_prop --> out_tab@{ shape: docs, label: "output tables" };
     tr_count --> out_tab
 
-    rep_prop --> stats{statistical analysis};
-    rep_prop --> plot_all([Plot transcript surroundings of all categories])
+    rep_prop ==> stats{statistical analysis};
+    rep_prop ==> plot_all([Plot transcript surroundings of all categories])
 
-    stats --> stats_out([plot results of statistical analysis]) 
+    stats ==> stats_out([plot results of statistical analysis]) 
 
     out_tab -. in table mode .-> stats
     out_tab -. in table mode .-> rep_prop

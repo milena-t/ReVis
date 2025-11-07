@@ -65,13 +65,15 @@ python3 ReVis.py \
 <summary>Flowchart for ReVis whole genome mode</summary>
 
 
-´´´mermaid
-
-flowchart LR
-    id1[`your_assembly.fna.out`]
-    id2[`your_assembly.fna.out.gff`]
-
-´´´
+```mermaid
+graph LR;
+    cond1{{Condition 1?}};
+    cond1 -- Yes --> A[Operate A];
+    cond1 -- No ----> Stop;
+    A --> cond2{{Condition 2?}};
+    cond2 -- Yes --> B[Operate B];
+    cond2 -- No ----> Stop;
+```   
 
 </details>
 

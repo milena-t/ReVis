@@ -66,9 +66,11 @@ python3 ReVis.py \
 
 
 ```mermaid
-graph LR;
+graph TD;
     infile_out(your_assembly.fna.out);
     infile_out -- parsing --> rep_annot{{Class: repeat annotation}};
+    rep_annot -- window_length --> {{window counts}};
+    rep_annot --> (transcript numbers);
     infile_gff(your_assembly.fna.out.gff);
     infile_gff --> contig_coords(scaffold lengths);
 ```   

@@ -71,9 +71,9 @@ graph TD;
     infile_out -- parsing --> rep_annot{{Class: repeat annotation}};
 
     infile_annot(annotation.gff);
-    infile_annot -- parsing --> gene_annot{{Class: gene annotation}};
+    infile_annot -. parsing .-> gene_annot{{Class: gene annotation}};
     
-    rep_annot --> overlap_filt{{optional overlap filtered repeat annotation}};
+    rep_annot --> overlap_filt{{overlap filtered repeat annotation}};
     overlap_filt --> win_ab{{window abundances by category}};
     rep_annot -. optional .-> win_ab
     
@@ -84,9 +84,9 @@ graph TD;
     infile_gff(your_assembly.fna.out.gff);
     infile_gff --> contig_coords(scaffold lengths);
     
-    win_prop -- species_name --> plot([Plot stacked histogram])
+    win_prop --> plot([Plot stacked histogram])
     contig_coords --> plot
-    gene_annot -- optional --> plot
+    gene_annot -. optional .-> plot
 ```   
 
 </details>

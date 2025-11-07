@@ -180,7 +180,7 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
             ax.fill_between(x_before, upper_all_before_model,lower_all_before_model, color=colors[rep_class], alpha = 0.2)
             ax.fill_between(x_after, upper_all_after_model,lower_all_after_model, color=colors[rep_class], alpha = 0.2, label = "confidence\ninterval")           
 
-        if True: ## print model output
+        if False: ## print model output
             o = sys.stdout
             with open(f'{modelstats_filename}_{rep_class}.txt', 'w') as f:
                 sys.stdout = f

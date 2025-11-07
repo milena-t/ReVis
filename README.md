@@ -252,9 +252,12 @@ python3 ReVis_transcript_surroundings.py \
   --verbose
 ```
 
+## how it works 
+
+TODO finish flowchart
+
 <details>
 <summary>Flowchart for ReVis transcript surroundings mode</summary>
-
 
 ```mermaid
 graph TD;

@@ -67,12 +67,10 @@ python3 ReVis.py \
 
 ```mermaid
 graph LR;
-    cond1{{`your_assembly.fna.out`}};
-    cond1 -- Yes --> A[Operate A];
-    cond1 -- No ----> Stop;
-    A --> cond2{{Condition 2?}};
-    cond2 -- Yes --> B[Operate B];
-    cond2 -- No ----> Stop;
+    infile_out(your_assembly.fna.out);
+    infile_out -- Yes --> A[Operate A];
+    infile_gff(your_assembly.fna.out.gff);
+    infile_gff --> B[Operate B];
 ```   
 
 </details>

@@ -35,10 +35,10 @@ It is also possible to look at the repeat landscape in the up and downstream seq
 
 ### Statistical analysis
 
-I have also implemented statistical analysis to evaluate whether any repeat category is enriched in the foreground transcript surroundings compared to the background transcript surroundings. This can indicate that the repeat category in question is involved with the proliferation of the expanding gene families that make up the foreground transcripts. First, I run a wilcoxon test to see the significance in mean, and to increase indepencence of datapoints I downsample to 20 equidistant points before and after the transcript border. I test for all repeat categories seperately before and after the transcript and plot the p-values. 
+As part of the gene surroundings mode there is a statistical analysis to evaluate whether any repeat category is enriched in the foreground transcript surroundings compared to the background transcript surroundings. This can indicate that the repeat category in question is involved with the proliferation of the expanding gene families that make up the foreground transcripts. First, I run a wilcoxon test to see the significance in mean, and to increase indepencence of datapoints I downsample to 20 equidistant points before and after the transcript border. I test for all repeat categories seperately before and after the transcript and plot the p-values. 
 
 <p float="left">
-  <img src="example_data/B_siliquastri_wilcoxon_summary.png" width="35%" />
+  <img src="example_data/B_siliquastri_wilcoxon_summary.png" width="50%" />
 </p>
 
 Since many repeat categories show a "curved" shape where the foreground line is higher closer to the transcript border but approaches the background line further away, I also perform polynomial regression and visually assess the 95% confidence interval. Since especially the foreground transcript line is very noisy, I have implemented two denoising methods, `--polreg_fourier_denoise` which does fourier denoising, and `--polreg_win_smooth int` is a sliding window approach where you specify the window length. (I recommend the fourier denoising, but in case that doesn't work the sliding window approach gives relatively similar results).
@@ -202,7 +202,7 @@ python3 ReVis_transcript_surroundings.py \
   --orthogroups ../../example_data/N0.tsv \
   --CAFE5_results ../../example_data/CAFE5_Base_family_results.txt \
   --species_name B_siliquastri \
-  --overlapping_windows \
+  --polreg_fourier_denoise \
   --bp 500 --GF_size_percentile 90 --verbose
 ```
 ```
@@ -214,7 +214,7 @@ python3 ReVis_transcript_surroundings.py \
     --all_list ../../example_data/overlap_all_transcripts_B_siliquastri.txt \
     --sig_list ../../example_data/overlap_sig_transcripts_B_siliquastri.txt \
     --species_name B_siliquastri \
-    --overlapping_windows \
+    --polreg_fourier_denoise \
     --bp 10000 \
     --GF_size_percentile 90 \
     --verbose
@@ -231,7 +231,7 @@ python3 ReVis_transcript_surroundings.py \
   --sig_after_table ../../example_data/B_siliquastri_cumulative_repeats_after_sig_transcripts_90th_GF_size_percentile.txt \
   --num_transcripts ../../example_data/B_siliquastri_transcript_numbers.txt \
   --species_name B_siliquastri \ 
-  --overlapping_windows \
+  --polreg_fourier_denoise \
   --verbose
 ```
 
@@ -260,7 +260,7 @@ You can pass these parameters
 
 ```
 options:
-  -h, --help            show this help message and exit
+    -h, --help            show this help message and exit
   --compute_tables_from_OG
                         it will compute all the tables required for plotting and then also make the plot
   --plot                it will ONLY plot and you have to pass the table filepaths as input (if you go more than 1kb up/downstream, computing the tables will take a long time)
@@ -268,7 +268,7 @@ options:
                         it will compute all the tables from two lists of transcript IDs, a foreground and a background list (or a 'significant' and 'all' list respectively)
   --out_dir OUT_DIR     path to output directory. If not given all files will be saved in current working directory
   --masker_outfile MASKER_OUTFILE
-                        repeatmasker output file ending in .out (.ori.out, is recommended, but both work, the other one is just slower)
+                        repeatmasker output file ending in .out
   --annotation_gff ANNOTATION_GFF
                         genome annotation based on the same assembly as the repeatmasker output
   --orthogroups ORTHOGROUPS
@@ -291,7 +291,15 @@ options:
                         species identifier string, MUST match one species name in the orthofinder output
   --bp BP               how many bp up and downstream of the transcript borders should be included. Default is 500 for testing purposes, but to see patterns you should use at least 5kbp
   --GF_size_percentile GF_SIZE_PERCENTILE
-                        only gene families in the upper nth percentile of gene family size areincluded in the significant gene families. This helps ensure that only gene families that are really expandingin species_name specifically are included, and not the ones that are significant because they are expanding in other species.The default is 90 percent, which includes almost all gene families except the ones with only 1 or 0 members in most cases
+                        only gene families in the upper nth percentile of gene family size areincluded in the significant gene families. DOES NOT APPLY TO COMPUTE_TABLES_FROM_LIST! This helps ensure that only gene families that are really expandingin species_name specifically are included, and not the ones that are significant because they are expanding in other species.The default is 90 percent, which includes almost all gene families except the ones with only 1 or 0 members in most cases
+  --nonoverlapping_windows
+                        nonoverlapping windows in the plots that calculate a ploynomial regression with confidence interval for the repeat classes
+  --overlapping_windows
+                        overlapping windows in the plots that calculate a ploynomial regression with confidence interval for the repeat classes
+  --polreg_win_smooth POLREG_WIN_SMOOTH
+                        for the polynomial regression, how long should the windows for the smoothing be. If you don't want any windows or fourier denoising, put 1 (for 1 bp windows)
+  --polreg_fourier_denoise
+                        for the polynomial regression, use fourier transformation to smooth out the noise (mutually exclusive with window length)
   --plot_white_background
                         the plot does NOT have a transparent background, but white instead
   --plot_no_legend      the plot does NOT include a legend with the colors for all the repeat categories

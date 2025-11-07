@@ -268,7 +268,7 @@ graph TD;
     infile_gff --> contig_coords(scaffold lengths);
 
     win_prop --> out_tab@{ shape: docs, label: "output tables" }
-    win_prop -- species_name -- out_dir --> plot([Plot stacked histogram])
+    win_prop -- species_name --> plot([Plot stacked histogram])
     contig_coords --> plot
 ```   
 

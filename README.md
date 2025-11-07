@@ -71,7 +71,8 @@ graph TD;
     infile_out -- parsing --> rep_annot{{Class: repeat annotation}};
     infile_annot(annotation.gff);
     infile_annot -- parsing --> gene_annot{{Class: gene annotation}};
-    rep_annot -- maybe overlap filtering --> win_ab{{window abundances by category}};
+    rep_annot --> overlap_filt{{optional overlap filtered repeat annotation}};
+    overlap_filt --> win_ab{{window abundances by category}};
     rep_annot --> tr_count(transcript counts foreground and background);
     tr_count --> win_prop{{window abundances in percent by category}}
     win_ab --> win_prop

@@ -4,7 +4,7 @@ Visualize the output of repeatmasker.
 
 ## Installation
 
-Download the latest release and unzip it. You can just run the python script as described in quickstart below. You might have to install a few external dependencies manually (see [requirements.txt](src/ReVis/requirements.txt)) but they are all commonly used libraries easy to install with `pip` such as `numpy` and `matplotlib`pip.
+Download the latest release and unzip it. You can just run the python script as described in quickstart below. You might have to install a few external dependencies manually (see [requirements.txt](src/ReVis/requirements.txt)) but they are all commonly used libraries easy to install with `pip`.
 
 ### Dependencies
 

@@ -8,7 +8,6 @@ os==built-in / no version attr
 pandas==2.2.2
 random==built-in / no version attr
 re==2.2.1
-repeats_windows==not installed
 scipy==1.13.1
 sklearn==1.6.1
 statistics==built-in / no version attr

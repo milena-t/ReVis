@@ -67,7 +67,7 @@ python3 ReVis.py \
 
 ```mermaid
 graph LR;
-    cond1{{Condition 1?}};
+    cond1{{`your_assembly.fna.out`}};
     cond1 -- Yes --> A[Operate A];
     cond1 -- No ----> Stop;
     A --> cond2{{Condition 2?}};

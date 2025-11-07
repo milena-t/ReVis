@@ -62,14 +62,10 @@ python3 ReVis.py \
 ## how it works
 
 <details>
-<summary>Flowchart</summary>
+<summary>Flowchart for ReVis whole genome mode</summary>
 
 
 ´´´mermaid
-
----
-title: ReVis whole genome surroundings mode
----
 
 flowchart LR
     id1[`your_assembly.fna.out`]

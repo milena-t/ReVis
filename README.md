@@ -300,12 +300,11 @@ graph TD;
     tr_count --> out_tab
 
     rep_prop ==> stats{statistical analysis};
-    rep_prop ==> plot_all([Plot transcript surroundings of all categories])
+    rep_prop --> plot_all([Plot transcript surroundings of all categories])
 
     stats ==> stats_out([plot results of statistical analysis]) 
     stats --> stats_tab@{ shape: docs, label: "Wilcoxon test output" };
 
-    out_tab -. in table mode .-> stats
     out_tab -. in table mode .-> rep_prop
 ```   
 

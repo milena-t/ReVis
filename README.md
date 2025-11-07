@@ -302,8 +302,8 @@ graph TD;
 
     stats --> stats_out([plot results of statistical analysis]) 
 
-    out_tab -- in table mode --> stats
-    out_tab -- in table mode --> rep_prop
+    out_tab -. in table mode .-> stats
+    out_tab -. in table mode .-> rep_prop
 ```   
 
 </details>

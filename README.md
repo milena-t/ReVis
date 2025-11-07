@@ -68,9 +68,9 @@ python3 ReVis.py \
 ```mermaid
 graph LR;
     infile_out(your_assembly.fna.out);
-    infile_out -- Yes --> A[Operate A];
+    infile_out -- parsing --> rep_annot{{Class: repeat annotation}};
     infile_gff(your_assembly.fna.out.gff);
-    infile_gff --> B[Operate B];
+    infile_gff --> contig_coords(scaffold lengths);
 ```   
 
 </details>

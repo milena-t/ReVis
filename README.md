@@ -75,6 +75,7 @@ graph TD;
     
     rep_annot --> overlap_filt{{optional overlap filtered repeat annotation}};
     overlap_filt --> win_ab{{window abundances by category}};
+    rep_annot -. optional .-> win_ab
     
     rep_annot --> tr_count(transcript counts foreground and background);
     tr_count --> win_prop{{window abundances in percent by category}}

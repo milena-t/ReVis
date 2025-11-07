@@ -294,7 +294,7 @@ graph TD;
     rep_counts ==> rep_prop(repeat proportions at each base);
     tr_count --> rep_prop
 
-    rep_prop --> out_tab@{ shape: docs, label: "output tables" };
+    rep_prop --> out_tab@{ shape: docs, label: "output tables, foreground/background and before/after transcript, and transcript counts" };
     tr_count --> out_tab
 
     rep_prop ==> stats{statistical analysis};

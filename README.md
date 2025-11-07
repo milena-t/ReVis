@@ -9,17 +9,11 @@ Download the latest release and unzip it. You can just run the python script as 
 ### Dependencies
 
  *  On uppmax, load biopython/1.80-py3.10.8 to use argparse (base python doesn't include it).
- *  Libraries imported by any script:
-    - sys, re, os, subprocess, argparse
-    - tqdm, random, time
-    - dataclasses, enum, pandas, tempfile, SeqIO
-    - matplotlib
-
-(Sorry if I forgot any, I'm sure the compiler will tell you if you miss something)
+ *  libraries listed in [requirements.txt](src/ReVis/requirements.txt) (Sorry if I forgot any, I'm sure the compiler will tell you if you miss something)
 
 # Run modes
 
-You can make two different kinds of plots with ReVis:
+You can make two different kinds of plots with ReVis: Genome wide repeat abundance histogram and a line plot showing the repeat abunance in the gene surroundings.
 
 ## Genome wide
 
@@ -64,6 +58,23 @@ python3 ReVis.py \
 
 
 (TODO: fix default for no given output directory! --> explicitly use `--out_dir ./` for now)
+
+## how it works
+
+<details>
+<summary>Flowchart</summary>
+
+´´´mermaid
+---
+title: ReVis whole genome surroundings mode
+---
+flowchart LR
+    id1[`your_assembly.fna.out`]
+    id2[`your_assembly.fna.out.gff`]
+
+´´´
+
+</details>
 
 ## Input options
 

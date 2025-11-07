@@ -287,10 +287,9 @@ graph TD;
     filt_gene_annot ==> loop_tr(loop through foreground and background transcripts);
     rep_annot ==> loop_tr
     loop_bp(loop through all bases before and after for each transcript);
-    subgraph calculate transcript surroundings
+    
     loop_tr --> loop_bp
     loop_bp --> loop_tr
-    end
 
     loop_tr ==> rep_counts(repeat counts at each base);
     rep_counts ==> rep_prop(repeat proportions at each base);

@@ -485,8 +485,8 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
             # plt.title(f"{species} transcript surroundings {num_bp} bp up and downstream \n({num_sig_transcripts} significant transcripts of {all_transcripts} in CAFE analysis)", fontsize = fs*1.25)
             
         # plot dotted/bold legend
-        solid = Line2D([0], [0], color='black', linestyle='-', linewidth=2)
-        dotted = Line2D([0], [0], color='black', linestyle=':', linewidth=2)
+        solid = Line2D([0], [0], color=colors[rep_class], linestyle='-', linewidth=2)
+        dotted = Line2D([0], [0], color=colors[rep_class], linestyle=':', linewidth=2)
         handles = [solid, dotted]
         labels = []
         

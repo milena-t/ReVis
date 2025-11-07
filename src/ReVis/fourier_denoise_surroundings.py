@@ -212,8 +212,8 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
             plt.gca().add_artist(legend_colors)
             
         # plot dotted/bold legend
-        solid = Line2D([0], [0], color='black', linestyle='-', linewidth=2)
-        dotted = Line2D([0], [0], color='black', linestyle=':', linewidth=2)
+        solid = Line2D([0], [0], color=colors[rep_class], linestyle='-', linewidth=2)
+        dotted = Line2D([0], [0], color=colors[rep_class], linestyle=':', linewidth=2)
         handles = [solid, dotted]
         labels = []
         if True:
@@ -273,9 +273,9 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
                 # raise RuntimeError(f"test until {rep_class}")
             
             raw_transparency = 0.4
-            ax.plot(x_before, before_fourier_denoise, label = f"{rep_label} fourier transform\nforeground", color = colors[rep_class], linewidth = 3, linestyle = (0, (5, 2)))
+            ax.plot(x_before, before_fourier_denoise, label = f"fourier\ndenoise\nforeground", color = colors[rep_class], linewidth = 3)#, linestyle = (0, (5, 2)))
             ax.plot(x_before, before_dict[rep_class], color = colors[rep_class], linewidth=2, alpha = raw_transparency)
-            ax.plot(x_after, after_fourier_denoise, color = colors[rep_class], linewidth=3, linestyle = (0, (5, 2)))
+            ax.plot(x_after, after_fourier_denoise, color = colors[rep_class], linewidth=3)#, linestyle = (0, (5, 2)))
             ax.plot(x_after, after_dict[rep_class], color = colors[rep_class], linewidth=2, alpha = raw_transparency)
 
             if all_before_dict !={} and all_after_dict !={} and num_all_transcripts!=0:
@@ -286,9 +286,9 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
                 if max_after>max_percentage:
                     max_percentage=max_after
 
-                ax.plot(x_before, all_before_fourier_denoise, color = colors[rep_class],label = f"{rep_label} fourier transform \nbackground", linewidth=1, linestyle = (0, (5, 2)))
+                ax.plot(x_before, all_before_fourier_denoise, color = colors[rep_class],label = f"fourier\ndenoise\nbackground", linewidth=1 )#, linestyle = (0, (5, 2)))
                 ax.plot(x_before, all_before_dict[rep_class], color = colors[rep_class], linestyle = (0, (1, 10)), linewidth = 2, alpha = raw_transparency)                    
-                ax.plot(x_after, all_after_fourier_denoise, color = colors[rep_class], linewidth=1, linestyle = (0, (5, 2)))
+                ax.plot(x_after, all_after_fourier_denoise, color = colors[rep_class], linewidth=1 )#, linestyle = (0, (5, 2)))
                 ax.plot(x_after, all_after_dict[rep_class], color = colors[rep_class], linestyle = (0, (1, 10)), linewidth = 2, alpha = raw_transparency)   
 
 
@@ -312,8 +312,8 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
                 plt.gca().add_artist(legend_colors)
                 
             # plot dotted/bold legend
-            solid = Line2D([0], [0], color='black', linestyle='-', linewidth=2)
-            dotted = Line2D([0], [0], color='black', linestyle=':', linewidth=2)
+            solid = Line2D([0], [0], color=colors[rep_class], linestyle='-', linewidth=2, alpha = raw_transparency)
+            dotted = Line2D([0], [0], color=colors[rep_class], linestyle=':', linewidth=2, alpha = raw_transparency)
             handles = [solid, dotted]
             labels = []
             if True:

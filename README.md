@@ -76,7 +76,7 @@ graph TD;
     infile_gff(your_assembly.fna.out.gff);
     infile_gff --> contig_coords(scaffold lengths);
 
-    win_prop -- species_name -- out_dir --> plot([Plot stacked histogram])
+    win_prop -- species_name --> plot([Plot stacked histogram])
     contig_coords --> plot
 ```   
 

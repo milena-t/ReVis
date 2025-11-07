@@ -288,6 +288,12 @@ graph TD;
     tr_count --> rep_prop
 
     rep_prop --> out_tab@{ shape: docs, label: "output tables" };
+    tr_count --> out_tab
+
+    rep_prop --> stats{statistical analysis};
+    rep_prop --> plot_all([Plot transcript surroundings of all categories])
+
+    stats --> stats_out([plot results of statistical analysis]) 
 ```   
 
 </details>

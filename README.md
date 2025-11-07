@@ -263,6 +263,7 @@ TODO finish flowchart
 graph TD;
     infile_out(your_assembly.fna.out);
     infile_out --> rep_annot{{Class: repeat annotation}};
+    rep_annot --> tr_count(transcript counts foreground and background);
 
     infile_annot(annotation.gff);
     infile_annot --> gene_annot{{Class: genome annotation}};
@@ -278,13 +279,15 @@ graph TD;
     
     filt_gene_annot --> loop_tr{loop through foreground and background transcripts}
     rep_annot --> loop_tr
-    loop_bp{loop through all bases before and after}
+    loop_bp{loop through all bases (before and after) for each transcript}
     loop_tr --> loop_bp
     loop_bp --> loop_tr
 
+    loop_tr --> rep_counts(repeat counts at each base)
+    rep_counts --> rep_prop(repeat proportions at each base)
+    tr_count --> rep_prop
 
-
-    win_prop --> out_tab@{ shape: docs, label: "output tables" }
+    rep_prop --> out_tab@{ shape: docs, label: "output tables" }
 ```   
 
 </details>

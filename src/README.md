@@ -12,3 +12,4 @@
 
 * !! implement a runtimeError if the .ori.out (or .out) file contains contigs not present in the assembly! currently only counts 0 repeats if that is the case.
   * In my *C. maculatus* not superscaffolded repeatmasked assembly (ENA download) in .ori.out the contig names are somehow parsed wrong and all are called `ENA` instead of the actual `utg000[...]` name in the assembly and annotation
+

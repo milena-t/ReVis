@@ -37,10 +37,10 @@ def make_fft_of_rep_prop(rep_class_dict, psd_max = 100):
     ffilt = ffilt.real
     return [PSD_fft,freq,L_ind], ffilt
 
-def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_transcripts:int, num_all_transcripts:int, general_legend_names = True, all_before_filepath:str = "", all_after_filepath:str = "", filename = "cumulative_repeat_presence_around_transcripts_95_perc_CI", modelstats_filename = "pol_reg_sum.txt", plot_fourier_transform = True, legend = True, plot_white_bg = False):
+def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_transcripts:int, num_all_transcripts:int, general_legend_names = True, all_before_filepath:str = "", all_after_filepath:str = "", filename = "cumulative_repeat_presence_around_transcripts_CI", modelstats_filename = "pol_reg_sum.txt", plot_fourier_transform = True, legend = True, plot_white_bg = False):
     """
     make a separate plot for each TE category with the foreground/background and before/after lines in it 
-    do the polynomial regressions and see the 95% confidence intervals
+    do the polynomial regressions and see the 83% confidence intervals (83 percent is enough to test visually for significance by checking overlapping confidence intervals)
     I followed this tutorial: https://ostwalprasad.github.io/machine-learning/Polynomial-Regression-using-statsmodel.html
     """
     plot_transparent_bg = True
@@ -153,10 +153,12 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
         all_after_ypred = all_after_model.predict(p_after) 
 
         ## calculate predicted confidence interval
-        _, upper_before_model,lower_before_model = wls_prediction_std(before_model, alpha=0.05)
-        _, upper_all_before_model,lower_all_before_model = wls_prediction_std(all_before_model, alpha=0.05)
-        _, upper_after_model,lower_after_model = wls_prediction_std(after_model, alpha=0.05)
-        _, upper_all_after_model,lower_all_after_model = wls_prediction_std(all_after_model, alpha=0.05)
+        conf_int = 0.83
+        a = 1-conf_int
+        _, upper_before_model,lower_before_model = wls_prediction_std(before_model, alpha=a)
+        _, upper_all_before_model,lower_all_before_model = wls_prediction_std(all_before_model, alpha=a)
+        _, upper_after_model,lower_after_model = wls_prediction_std(after_model, alpha=a)
+        _, upper_all_after_model,lower_all_after_model = wls_prediction_std(all_after_model, alpha=a)
 
         ax.plot(x_before_reshape, before_fourier_denoise, color = colors[rep_class], linewidth=2)
         ax.plot(x_after_reshape, after_fourier_denoise, color = colors[rep_class], linewidth=2)
@@ -224,14 +226,15 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
             labels.append(f"all CAFE transcripts ({num_all_transcripts})")
         plt.legend(handles, labels, loc = "upper left", fontsize = fs, title = "fourier denoised", title_fontsize = fs)
 
-        plt.title(f"{species} transcript surroundings {num_bp} bp up and downstream\nrepeat category: {rep_label} with polynomial regression and 95% confidence interval", fontsize = fs*1.25)
+        conf_int_int = int(conf_int*100)
+        plt.title(f"{species} transcript surroundings {num_bp} bp up and downstream\nrepeat category: {rep_label} with polynomial regression and {conf_int_int}% confidence interval", fontsize = fs*1.25)
         plt.xlabel(f"basepairs upstream and downstream from transcript", fontsize = fs)
 
         plt.ylabel(f"percent of transcripts in which this base is a repeat", fontsize = fs)
         ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 or x<1 else f'{int(x)}%'))
         
         plt.tight_layout()
-        filename_out = f"{filename}_95perc_CI_fft_{rep_class}.png"
+        filename_out = f"{filename}_CI_fft_{rep_class}.png"
         plt.savefig(filename_out, dpi = 300, transparent = plot_transparent_bg)
         plt.close(fig)
         filename_out = filename_out.split("/")[-1]
@@ -264,7 +267,7 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
                         ax.set_ylim([0, upper_lim])
                     plt.title(f"{rep_class}")
                     plt.legend()
-                    filename_PSD = filename.replace("_95_perc_CI", "_psd")
+                    filename_PSD = filename.replace("_CI", "_psd")
                     filename_PSD = f"{filename_PSD}_{rep_class}.png"
                     plt.savefig(filename_PSD, dpi = 300, transparent = plot_transparent_bg)
                     print(f"{rep_class} PSD plot saved as: {filename_PSD}")
@@ -323,8 +326,8 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
                 labels.append(f"significant transcripts ({num_sig_transcripts})")
                 labels.append(f"all CAFE transcripts ({num_all_transcripts})")
             plt.legend(handles, labels, loc = "upper left", fontsize = fs)
-
-            plt.title(f"{species} transcript surroundings {num_bp} bp up and downstream\nrepeat category: {rep_label} with polynomial regression and 95% confidence interval", fontsize = fs*1.25)
+            conf_int_int = int(conf_int*100)
+            plt.title(f"{species} transcript surroundings {num_bp} bp up and downstream\nrepeat category: {rep_label} with polynomial regression and {conf_int_int}% confidence interval", fontsize = fs*1.25)
             plt.xlabel(f"basepairs upstream and downstream from transcript", fontsize = fs)
 
             plt.ylabel(f"percent of transcripts in which this base is a repeat", fontsize = fs)

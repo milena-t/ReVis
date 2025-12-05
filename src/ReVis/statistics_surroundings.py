@@ -425,10 +425,12 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
         all_after_ypred = all_after_model.predict(p_after) 
 
         ## calculate predicted confidence interval
-        _, upper_before_model,lower_before_model = wls_prediction_std(before_model, alpha=0.05)
-        _, upper_all_before_model,lower_all_before_model = wls_prediction_std(all_before_model, alpha=0.05)
-        _, upper_after_model,lower_after_model = wls_prediction_std(after_model, alpha=0.05)
-        _, upper_all_after_model,lower_all_after_model = wls_prediction_std(all_after_model, alpha=0.05)
+        conf_int = 0.83
+        a = 1-conf_int
+        _, upper_before_model,lower_before_model = wls_prediction_std(before_model, alpha=a)
+        _, upper_all_before_model,lower_all_before_model = wls_prediction_std(all_before_model, alpha=a)
+        _, upper_after_model,lower_after_model = wls_prediction_std(after_model, alpha=a)
+        _, upper_all_after_model,lower_all_after_model = wls_prediction_std(all_after_model, alpha=a)
 
         rep_label = rep_class.replace("_", " ")
         ax.plot(x_before_reshape, before_dict[rep_class], color = colors[rep_class], linewidth=2)
@@ -497,8 +499,8 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
             labels.append(f"significant transcripts ({num_sig_transcripts})")
             labels.append(f"all CAFE transcripts ({num_all_transcripts})")
         plt.legend(handles, labels, loc = "upper left", fontsize = fs, title=legend_title, title_fontsize=fs)
-
-        plt.title(f"{species} transcript surroundings {num_bp} bp up and downstream\nrepeat category: {rep_label} with polynomial regression and 95% confidence interval", fontsize = fs*1.25)
+        conf_int_int = int(conf_int*100)
+        plt.title(f"{species} transcript surroundings {num_bp} bp up and downstream\nrepeat category: {rep_label} with polynomial regression and {conf_int_int}% confidence interval", fontsize = fs*1.25)
         plt.xlabel(f"basepairs upstream and downstream from transcript", fontsize = fs)
 
         plt.ylabel(f"percent of transcripts in which this base is a repeat", fontsize = fs)

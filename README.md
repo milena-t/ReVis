@@ -35,10 +35,10 @@ As part of the gene surroundings mode there is a statistical analysis to evaluat
   <img src="example_data/B_siliquastri_wilcoxon_summary.png" width="50%" />
 </p>
 
-Since many repeat categories show a "curved" shape where the foreground line is higher closer to the transcript border but approaches the background line further away, I also perform polynomial regression and visually assess the 95% confidence interval. Since especially the foreground transcript line is very noisy, I have implemented two denoising methods, `--polreg_fourier_denoise` which does fourier denoising, and `--polreg_win_smooth int` is a sliding window approach where you specify the window length. (I recommend the fourier denoising, but in case that doesn't work the sliding window approach gives relatively similar results).
+Since many repeat categories show a "curved" shape where the foreground line is higher closer to the transcript border but approaches the background line further away, I also perform polynomial regression and visually assess the 95% confidence interval. Since especially the foreground transcript line is very noisy, I have implemented two denoising methods, `--polreg_fourier_denoise` which does fourier denoising, and `--polreg_win_smooth int` is a sliding window approach where you specify the window length. (I recommend the fourier denoising, but in case that doesn't work the sliding window approach gives relatively similar results). 
 
 ![fourier denoising example](example_data/B_siliquastri_cumulative_repeat_presence_around_transcripts_fft_denoise_LINE.png)
-![fourier denoised polynomial regression](example_data/B_siliquastri_cumulative_repeat_presence_around_transcripts_95perc_CI_fft_LINE.png)
+![fourier denoised polynomial regression](example_data/B_siliquastri_cumulative_repeat_presence_around_transcripts_CI_fft_LINE.png)
 
 # ReVis Histograms (genome wide mode)
 

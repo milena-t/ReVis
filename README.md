@@ -231,6 +231,9 @@ python3 ReVis_transcript_surroundings.py \
   --polreg_fourier_denoise \
   --bp 500 --GF_size_percentile 90 --verbose
 ```
+
+Generate the tables from two lists of transcripts
+
 ```
 python3 ReVis_transcript_surroundings.py \
     --compute_tables_from_list \

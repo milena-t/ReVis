@@ -244,8 +244,7 @@ python3 ReVis_transcript_surroundings.py \
     --sig_list ../../example_data/overlap_sig_transcripts_B_siliquastri.txt \
     --species_name B_siliquastri \
     --polreg_fourier_denoise \
-    --bp 10000 \
-    --GF_size_percentile 90 \
+    --bp 500 \
     --verbose
 ```
 

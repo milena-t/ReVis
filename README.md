@@ -4,12 +4,12 @@ Visualize the output of repeatmasker.
 
 ## Installation
 
-Download the latest release and unzip it. You can just run the python script as described in quickstart below. You might have to install a few external dependencies manually (see [requirements.txt](src/ReVis/requirements.txt)) but they are all commonly used libraries easy to install with `pip`.
+Download the latest release and unzip it. You can just run the python script as described in quickstart below. You might have to install a few external dependencies manually (see [requirements.txt](requirements.txt)) but they are all commonly used libraries easy to install with `pip`.
 
 ### Dependencies
 
  *  On uppmax, load biopython/1.80-py3.10.8 to use argparse (base python doesn't include it).
- *  libraries listed in [requirements.txt](src/ReVis/requirements.txt) (Sorry if I forgot any, I'm sure the compiler will tell you if you miss something)
+ *  libraries listed in [requirements.txt](requirements.txt) (Sorry if I forgot any, I'm sure the compiler will tell you if you miss something)
 
 # Run modes
 

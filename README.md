@@ -1,6 +1,6 @@
 # ReVis
 
-Visualize the output of repeatmasker. 
+Analyze the output of repeatmasker. 
 
 ## Installation
 

@@ -31,13 +31,16 @@ def manual_yticks(max_percentage:int, ax, fs):
     elif max_percentage > 6:
         max_percentage=int(max_percentage)
         plt.yticks(range(0, max_percentage+1, 2), fontsize = fs)
+    elif max_percentage > 3:
+        max_percentage=int(max_percentage)
+        plt.yticks(range(0, max_percentage+1, 1), fontsize = fs)
     elif max_percentage > 1:
         try:
             plt.yticks(range(0, max_percentage+1, 0.5), fontsize = fs)
         except:
             list_ticks = [x / 10.0 for x in range(0, int(max_percentage*10), 5)]
             plt.yticks(list_ticks, fontsize = fs)
-        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 else ( f"{int(x)}%" if x == 0 else f'{x:.1f}%') ))
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{x:.2f}%' ))
         func_set = True
     elif max_percentage>0.5:
         try:
@@ -45,7 +48,7 @@ def manual_yticks(max_percentage:int, ax, fs):
         except:
             list_ticks = [x / 100.0 for x in range(0, int(max_percentage*100), 1)]
             plt.yticks(list_ticks, fontsize = fs)
-        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 else ( f"{int(x)}%" if x == 0 else f'{x:.2f}%') ))
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 else f'{x:.2f}%' ))
         func_set = True
     else:
         print(f"\t\t\t max percentage: {max_percentage}")
@@ -54,7 +57,7 @@ def manual_yticks(max_percentage:int, ax, fs):
         except:
             list_ticks = [x / 100.0 for x in range(0, int(max_percentage*100), 5)]
             plt.yticks(list_ticks, fontsize = fs)
-        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 else ( f"{int(x)}%" if x == 0 else f'{x:.3f}%') ))
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 else f'{x:.3f}%' ))
         func_set = True
     
     if not func_set:
@@ -398,19 +401,20 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
             all_after_dict[rep_class] = list(all_after_df_win[0])
         
         elif win_len == 1:
+            ## no windows
             legend_title = f""
             x_before = range(-num_bp, 0)
             x_after = range(0, num_bp)
         
-        # make polynomial features
-        polynomial_features= PolynomialFeatures(degree = 4)
+        ## make polynomial features
         ## I tried a few degrees but 4 looks the most reasonable
+        polynomial_features = PolynomialFeatures(degree = 4)
         x_before_reshape = np.array(x_before).reshape(-1,1)
-        # print(f"after reshaping: {x_before_reshape.shape}")
         p_before = polynomial_features.fit_transform(x_before_reshape)
         x_after_reshape = np.array(x_after).reshape(-1,1)
-        # print(f"after reshaping: {x_after_reshape.shape}")
         p_after = polynomial_features.fit_transform(x_after_reshape)
+        # print(f"after reshaping: {x_before_reshape.shape}")
+        # print(f"after reshaping: {x_after_reshape.shape}")
 
         # model polynomial regression
         before_model = sm.WLS(before_dict[rep_class], p_before, weights=np.full_like(before_dict[rep_class], num_sig_transcripts)).fit()

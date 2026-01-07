@@ -40,7 +40,7 @@ def manual_yticks(max_percentage:int, ax, fs):
         except:
             list_ticks = [x / 10.0 for x in range(0, int(max_percentage*10), 5)]
             plt.yticks(list_ticks, fontsize = fs)
-        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{x:.2f}%' ))
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{x:.1f}%' ))
         func_set = True
     elif max_percentage>0.5:
         try:
@@ -61,7 +61,7 @@ def manual_yticks(max_percentage:int, ax, fs):
         func_set = True
     
     if not func_set:
-        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 or x<0 else f'{int(x)}%'))
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 else f'{int(x)}%'))
 
 def statistical_enrichment(before_filepath:str, after_filepath:str, num_sig_transcripts:int, num_all_transcripts:int, all_before_filepath:str = "", all_after_filepath:str = "", filename = "cumulative_repeat_presence_around_transcripts_95_perc_CI", modelstats_filename = "pol_reg_sum.txt", legend = True, plot_white_bg = False):
     """

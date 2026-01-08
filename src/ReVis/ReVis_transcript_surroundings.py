@@ -320,7 +320,7 @@ def plot_TE_abundance(before_filepath:str, after_filepath:str, sig_transcripts:i
     dotted = Line2D([0], [0], color='black', linestyle=':', linewidth=2)
     handles = [solid, dotted]
     labels = []
-    if general_legend_names:
+    if True:
         labels.append(f"foreground transcripts ({num_sig_transcripts})")
         labels.append(f"background transcripts ({all_transcripts})")
     else:

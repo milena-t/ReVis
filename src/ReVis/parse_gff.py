@@ -204,6 +204,8 @@ string_to_category = { # define aliases when some strings should map to the same
     "dispersed_repeat": FeatureCategory.Repeat,
     "region": FeatureCategory.Region, # since it has no parent_ID
     "repeat_region": FeatureCategory.Region, # since it has no parent_ID
+    "cDNA_match" : FeatureCategory.Region, # since it has no parent_ID
+    "match" : FeatureCategory.Region, # since it has no parent_ID
     
 }
 
@@ -220,7 +222,7 @@ class Feature:
     the gff columns are:
     contig,source,category_,start,stop,score,strandedness,frame,otherproperties
     """
-    def __init__(self, feature_id:str, contig:str, category:FeatureCategory, start:int, end:int, strandedness:str, frame:str, parent_id=None):
+    def __init__(self, feature_id:str, contig:str, category:FeatureCategory, start:int, end:int, strandedness:str, frame:str, parent_id=None, other=None):
         
         self.feature_id = feature_id
 
@@ -230,6 +232,7 @@ class Feature:
         self.end = end
         self.strandedness = strandedness
         self.frame = frame
+        self.other = other
 
         # since this is general for all features, parent ID is by default None and child ID an empty list, 
         # since they're not always present
@@ -249,11 +252,12 @@ class Feature:
             \tParent ID: {self.parent_id}, 
             \tchild ID: {self.child_ids_list}
             \tOn contig: {self.contig}, from {self.start} to {self.end} (on strand {self.strandedness})
+            \tother parsed properties: {self.other}
             """
         )
 
 
-def parse_gff3_general(filepath:str, verbose = True, only_genes = False, keep_feature_category=None):
+def parse_gff3_general(filepath:str, verbose = True, only_genes = False, keep_feature_category=None, other_attribute_string=""):
     """
     Read a gff file specified in the filepath and parse it into a dictionary of Feature IDs and instances of the Feature class
     {
@@ -262,6 +266,8 @@ def parse_gff3_general(filepath:str, verbose = True, only_genes = False, keep_fe
         Exon_ID :        Feature (with parent feature (transcript)) (no child features)
     }
     Output can be limited to only Gene features, or include every annotated feature
+    if a specific attribute from the attributes column of the gff is if interest that can be added as an optional
+    attribute of the feature class with 'other_attribute_string'
     """
 
     genome_annotation:dict = {}
@@ -272,7 +278,7 @@ def parse_gff3_general(filepath:str, verbose = True, only_genes = False, keep_fe
         if only_genes:
             print(f"------------------------------------------------------\n!! only_genes = True !!  ==> all non-gene features are excluded\n------------------------------------------------------")
         if keep_feature_category is not None:
-            print(f"------------------------------------------------------\n!! only features of {keep_feature_category} included \n------------------------------------------------------")
+            print(f"--------------------------------------------------------\n!! only features of {keep_feature_category} included \n--------------------------------------------------------")
     with open(filepath, "r") as file:
         linelist = file.readlines()
 
@@ -309,7 +315,7 @@ def parse_gff3_general(filepath:str, verbose = True, only_genes = False, keep_fe
             # for the child of Gene features, some annotations use "transcript" and some use "mRNA"
             if verbose:
                 if category_ == "mRNA":
-                    count_mRNA+=1
+                    count_mRNA +=1
                 elif category_ == "transcript":
                     count_trans +=1
                 elif category_ == "gene":
@@ -332,7 +338,7 @@ def parse_gff3_general(filepath:str, verbose = True, only_genes = False, keep_fe
             
             ## check that ID and Parent are detected correctly
             if "ID" not in attributes:
-                    raise RuntimeError(f"no id property found for gene in line: {line}")
+                raise RuntimeError(f"no id property found for gene in line: {line}")
             if "Parent" not in attributes and not category==FeatureCategory.Gene and not category==FeatureCategory.Region:
                 raise RuntimeError(f"feature is not a gene and no parentid property found for feature in line: {line}")
             
@@ -345,9 +351,12 @@ def parse_gff3_general(filepath:str, verbose = True, only_genes = False, keep_fe
                     test_break = True
                 else:
                     raise RuntimeError(f"Feature {attributes['ID']} has a parent ID {parent_id} that does not exist prior to it.")           
-
+            if other_attribute_string != "" and other_attribute_string in attributes:
+                other_attribute = attributes[other_attribute_string]
+            else:
+                other_attribute = None
             ## add Feature to the output dict
-            new_feature=Feature(feature_id=attributes["ID"],contig = contig,category=category,start=int(start),end=int(stop),strandedness=strandedness, frame=frame, parent_id=parent_id)
+            new_feature=Feature(feature_id=attributes["ID"],contig = contig,category=category,start=int(start),end=int(stop),strandedness=strandedness, frame=frame, parent_id=parent_id, other=other_attribute)
             genome_annotation[new_feature.feature_id]=new_feature
 
     if verbose:

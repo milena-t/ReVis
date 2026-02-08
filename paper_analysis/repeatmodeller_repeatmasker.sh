@@ -55,17 +55,17 @@ fi
 echo "REPEAT LIBRARY: ${LIBRARIES_DIR}/${SPECIES_IDENT}_repeats-families.fa"
 echo "ASSEMBLY: $ASSEMBLY"
 
-echo "  --> truncate assembly fasta headers to max 50 characters because repeatmasker wants that"
-head -n 1 $ASSEMBLY
+# echo "  --> truncate assembly fasta headers to max 50 characters because repeatmasker wants that"
+# head -n 1 $ASSEMBLY
 
 # cut to 49 characters
 # echo "sed -i 's/^(>.{48}).*/\1/' $ASSEMBLY"
 # sed -E -i 's/^(>.{48}).*/\1/' $ASSEMBLY
 
 # cut after first underscore
-echo "'s/^>([^_]*)_.*/>\1/' $ASSEMBLY"
-sed -r -i 's/^>([^_]*)_.*/>\1/' $ASSEMBLY
-head -n 1 $ASSEMBLY
+# echo "'s/^>([^_]*)_.*/>\1/' $ASSEMBLY"
+# sed -r -i 's/^>([^_]*)_.*/>\1/' $ASSEMBLY
+# head -n 1 $ASSEMBLY
 
 echo "  --> index the assembly to match the new fasta headers"
 samtools faidx $ASSEMBLY # indexed file will be in the same directory as $ASSEMBLY, not working directory

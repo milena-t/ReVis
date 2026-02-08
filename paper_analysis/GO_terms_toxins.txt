@@ -1,0 +1,5 @@
+GO:0090729,toxin_activity
+GO:0009404,toxin_metabolic_process
+GO:0009403,toxin_biosynthetic_process
+GO:0019534,toxin_transmembrane_transporter_activity
+GO:0009636,response_to_toxic_substance

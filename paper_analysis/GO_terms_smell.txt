@@ -1,0 +1,4 @@
+GO:0007608,sensory_perception_of_smell
+GO:0050911,detection_of_chemical_stimulus_involved_in_sensory_perception_of_smell
+GO:0004984,olfactory_receptor_activity
+GO:0170020,ionotropic_olfactory_receptor_activity

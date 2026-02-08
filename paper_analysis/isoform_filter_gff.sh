@@ -15,6 +15,6 @@ ANNOT_GFF=/proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/annotation/GCF_0
 FILTERED_GTF=/proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/annotation/GCF_009193385.2_Nvit_psr_1.1_genomic_isoform_filtered.gff
 AGAT_PATH=/proj/naiss2023-6-65/Milena/gene_family_analysis/filter_longest_isoform/
 
-perl ${AGAT_PATH}agat_sp_keep_longest_isoform.pl -gff $ANNOT_GFF -o $FILTERED_GTF
+agat_sp_keep_longest_isoform.pl -gff $ANNOT_GFF -o $FILTERED_GTF
 
 

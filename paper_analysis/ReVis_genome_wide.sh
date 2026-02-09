@@ -8,6 +8,7 @@
 #SBATCH --mail-user milena.trabert@ebc.uu.se
 
 module load Biopython/1.86-gfbf-2025b
+source /proj/naiss2023-6-65/Milena/python_venvs/venv/bin/activate
 
 REVIS_PATH=/proj/naiss2023-6-65/Milena/ReVis_paper/ReVis/src/ReVis/
 ASSEMBLY_DIR=/proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/assembly

@@ -12,10 +12,12 @@ source /proj/naiss2023-6-65/Milena/python_venvs/venv/bin/activate
 
 REVIS_PATH=/proj/naiss2023-6-65/Milena/ReVis_paper/ReVis/src/ReVis/
 ASSEMBLY_DIR=/proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/assembly/
+ANNOTATION_DIR=/proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/annotation/
 
 python3 ${REVIS_PATH}ReVis.py \
     --masker_outfile ${ASSEMBLY_DIR}GCF_009193385.2_Nvit_psr_1.1_genomic_short_headers.fna.out \
     --masker_out_gff ${ASSEMBLY_DIR}GCF_009193385.2_Nvit_psr_1.1_genomic_short_headers.fna.out.gff \
+    --annotation_gff ${ANNOTATION_DIR}GCF_009193385.2_Nvit_psr_1.1_genomic.gff \
     --out_dir /proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/ReVis_plots \
     --species_name N_vitripennis \
     --window_length 1e6 \

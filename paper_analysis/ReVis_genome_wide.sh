@@ -9,7 +9,7 @@
 
 module load Biopython/1.86-gfbf-2025b
 
-REVIS_PATH=/Users/miltr339/work/PhD_code/ReVis/src/ReVis/
+REVIS_PATH=/proj/naiss2023-6-65/Milena/ReVis_paper/ReVis/src/ReVis/
 ASSEMBLY_DIR=/proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/assembly
 
 python3 ${REVIS_PATH}ReVis.py \

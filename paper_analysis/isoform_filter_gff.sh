@@ -15,7 +15,7 @@ ANNOT_GFF=/proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/annotation/GCF_0
 FILTERED_GTF=/proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/annotation/GCF_009193385.2_Nvit_psr_1.1_genomic_isoform_filtered.gff
 ASSEMBLY=/proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/assembly/GCF_009193385.2_Nvit_psr_1.1_genomic_short_headers.fna
 
-gffread $ANNOT_GFF -g $ASSEMBLY -M -K -o $FILTERED_GTF
-# agat_sp_keep_longest_isoform.pl -gff $ANNOT_GFF -o $FILTERED_GTF
+# gffread $ANNOT_GFF -g $ASSEMBLY -M -K -o $FILTERED_GTF
+agat_sp_keep_longest_isoform.pl -gff $ANNOT_GFF -o $FILTERED_GTF
 
 

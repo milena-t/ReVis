@@ -14,7 +14,7 @@ REVIS_PATH=/proj/naiss2023-6-65/Milena/ReVis_paper/ReVis/src/ReVis/
 ASSEMBLY_DIR=/proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/assembly/
 ANNOTATION_DIR=/proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/annotation/
 
-python3 ReVis_transcript_surroundings.py \
+python3 ${REVIS_PATH}ReVis_transcript_surroundings.py \
     --compute_tables_from_list \
     --out_dir /proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/ReVis_plots \
     --masker_outfile ${ASSEMBLY_DIR}GCF_009193385.2_Nvit_psr_1.1_genomic_short_headers.fna.out \

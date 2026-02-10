@@ -68,12 +68,12 @@ if __name__ == "__main__":
     outfile_transcripts_bg = "Nvit_background_transcripts_list.txt"
 
     GO_terms = {
-        "toxins" : "GO_terms_toxins.txt",
+        "toxins" : "GO_terms_toxins.txt", # not really any GO terms related to toxins, so I am only using the olfactory
         "smell" : "GO_terms_smell.txt"
     }
 
-    # go_toxins = read_GO_terms_dict(GO_terms["toxins"])
-    # not really any GO terms related to toxins, so I am only using the olfactory
+    ## TODO it's all isoforms right now! filter only to longest at some point!
+
     go_smell = read_GO_terms_dict(GO_terms["smell"])
     IDs_smell = get_Dbxref_IDs_of_GO_terms(Gene_ontology_file, go_smell)
 
@@ -92,6 +92,7 @@ if __name__ == "__main__":
             outfile_string_all[GO_term] = tr_IDs
             outfile.write(f"{GO_term}:{tr_IDs_string}\n")
     
+    ## get foreground transcripts
     all_list_tr_ID = []
     for GO_term, list_str in outfile_string_all.items():
         all_list_tr_ID.extend(list_str)

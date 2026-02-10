@@ -9,13 +9,13 @@
 
 #filter gff files for the longest isoforms
 
-module load AGAT/1.4.1-GCCcore-13.3.0
+module load AGAT/1.6.1-GCCcore-13.3.0 instead
 
 ANNOT_GFF=/proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/annotation/GCF_009193385.2_Nvit_psr_1.1_genomic.gff
 FILTERED_GTF=/proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/annotation/GCF_009193385.2_Nvit_psr_1.1_genomic_isoform_filtered.gff
 ASSEMBLY=/proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/assembly/GCF_009193385.2_Nvit_psr_1.1_genomic_short_headers.fna
 
-agat_sp_keep_longest_isoform.pl -gff $ANNOT_GFF -o $FILTERED_GTF
+agat_sp_keep_longest_isoform.pl --gff $ANNOT_GFF -o $FILTERED_GTF
 
 # module load gffread/0.12.7-GCCcore-13.3.0
 # gffread $ANNOT_GFF -g $ASSEMBLY -M -K -o $FILTERED_GTF

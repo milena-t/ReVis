@@ -18,7 +18,7 @@ python3 ${REVIS_PATH}ReVis_transcript_surroundings.py \
     --compute_tables_from_list \
     --out_dir /proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/ReVis_plots \
     --masker_outfile ${ASSEMBLY_DIR}GCF_009193385.2_Nvit_psr_1.1_genomic_short_headers.fna.out \
-    --annotation_gff ${ANNOTATION_DIR}GCF_009193385.2_Nvit_psr_1.1_genomic.gff \
+    --annotation_gff ${ANNOTATION_DIR}GCF_009193385.2_Nvit_psr_1.1_genomic_isoform_filtered.gff \
     --all_list /proj/naiss2023-6-65/Milena/ReVis_paper/ReVis/paper_analysis/Nvit_background_transcripts_list.txt \
     --sig_list /proj/naiss2023-6-65/Milena/ReVis_paper/ReVis/paper_analysis/Nvit_foreground_transcripts_list.txt \
     --species_name N_vitripennis \

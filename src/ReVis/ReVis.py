@@ -31,12 +31,13 @@ python3 ReVis.py --masker_outfile your_assembly.fna.ori.out --masker_out_gff you
 
 ------------------------- dependencies
 
- *  On uppmax, load biopython/1.80-py3.10.8 to use argparse (base python doesn't include it).
+ *  On uppmax (pelle) the new biopython does not include all dependencies. I recommend using a python venv instead 
+    and installing them mannually, it's not that many
  *  Libraries imported in this script and in parse_repeats.py and parse_gff.py:
         - sys, re, os, subprocess, argparse
         - tqdm, random, time
         - dataclasses, enum, pandas, tempfile, SeqIO
-        - matplotlib
+        - matplotlib, scikit-learn, scipy, numpy
         (they can all be installed through pip. Sorry if I forgot any, I'm sure the compiler will tell you)
 
 ------------------------- documentation

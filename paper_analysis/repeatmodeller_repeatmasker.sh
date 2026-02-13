@@ -31,10 +31,13 @@ Good blog post with more detailed explanations: https://darencard.net/blog/2022-
 # LIBRARIES_DIR=$2
 # SPECIES_IDENT=$3
 
-ASSEMBLY="/proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/assembly/GCF_009193385.2_Nvit_psr_1.1_genomic_short_headers.fna"
-LIBRARIES_DIR="/proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/Nvit_repeat_library"
-SPECIES_IDENT=N_vitripennis
+# ASSEMBLY="/proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/assembly/GCF_009193385.2_Nvit_psr_1.1_genomic_short_headers.fna"
+# LIBRARIES_DIR="/proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/Nvit_repeat_library"
+# SPECIES_IDENT=N_vitripennis
 
+ASSEMBLY="/proj/naiss2023-6-65/Milena/ReVis_paper/Brsri_analysis/assembly/GCF_032445375.1_Brsri_v3_genomic.fna"
+LIBRARIES_DIR="/proj/naiss2023-6-65/Milena/ReVis_paper/Brsri_analysis/Brsri_repeat_library"
+SPECIES_IDENT=B_r_redtenbacheri
 
 ## make custom repeat library based on the species assembly
 # RepeatModeler uses a NCBI BLASTDB as input to the repeat modeling pipeline, BuildDatabase is a wrapper to make this database for all future steps

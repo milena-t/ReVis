@@ -194,9 +194,7 @@ def plot_repeat_abundance(species_abundances, species_categories, gff_filepath, 
                 rep_percentage = rep_proportion*100
 
                 ax.bar(curr_window_pos+curr_contig_start, rep_percentage, width=curr_window_length, label=category, bottom=bottom, color = colors[category])
-
-                bottom += rep_percentage
-            
+                bottom += rep_percentage  
 
         if include_genes_line:
 

@@ -47,7 +47,7 @@ def make_cumulative_TE_table(orthogroups_path, n:int, species:str, repeats_annot
         all_transcript_IDs = orthogroups_path
 
     print(f"\t*  parse gene-annotation {genome_annot_path}")
-    genes_dict = gff.parse_gff3_general(genome_annot_path, verbose=False, keep_feature_category=gff.FeatureCategory.Transcript)
+    genes_dict = gff.parse_gff3_general(genome_annot_path, verbose=False)# , keep_feature_category=gff.FeatureCategory.Transcript)
     print(f"\t*  parse repeat-annotation {repeats_annot_path}")
     repeats_dict = repeats.parse_repeats_repeatmasker_outfile(repeats_annot_path, verbose=False)
 

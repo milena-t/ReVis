@@ -1,0 +1,11 @@
+# one-sided wilcoxon test for all repeat categories
+# pairwise differences within repeat category, downsampled to every 500 bases
+rep_class	pvalue_before	test_statistic_before	pvalue_after	test_statistic_after
+DNA	1.0	0.0	1.0	0.0
+LINE	0.9430065155029297	63.0	0.9995746612548828	22.0
+LTR	1.0	0.0	0.9998693466186523	16.0
+RC	0.9734153747558594	54.0	1.0	0.0
+Simple_repeat	1.0	0.0	0.9996461868286133	21.0
+Unknown	0.0021104812622070312	179.0	0.026584625244140625	157.0
+rRNA	1.0	0.0	0.9842781327270538	12.0
+tRNA	0.9986569588620642	0.0	0.9993515521005205	0.0

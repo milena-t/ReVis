@@ -44,15 +44,15 @@ SPECIES_IDENT=B_r_redtenbacheri
 
 #### make the custom repeat libraries with repeatmodeller
 
-if [ -d $LIBRARIES_DIR ]; then
-  echo "Directory '$LIBRARIES_DIR' already exists, assume it has a repeat library in it: ${SPECIES_IDENT}_repeats-families.fa"
-else
-  mkdir -p "$LIBRARIES_DIR"
-  BuildDatabase -name "${LIBRARIES_DIR}/${SPECIES_IDENT}_repeats" $ASSEMBLY  # this takes like 15 mins for Cmac
-  echo "=====================> build database done"
+# if [ -d $LIBRARIES_DIR ]; then
+#   echo "Directory '$LIBRARIES_DIR' already exists, assume it has a repeat library in it: ${SPECIES_IDENT}_repeats-families.fa"
+# else
+#   mkdir -p "$LIBRARIES_DIR"
+#   BuildDatabase -name "${LIBRARIES_DIR}/${SPECIES_IDENT}_repeats" $ASSEMBLY  # this takes like 15 mins for Cmac
+#   echo "=====================> build database done"
   RepeatModeler -database "${LIBRARIES_DIR}/${SPECIES_IDENT}_repeats" -threads 20 -LTRStruct -recoverDir RM_2571214.SunFeb151737252026  # this takes over a day for Cmac
   echo "=====================> repeatmodeller done"
-fi
+# fi
 
 
 echo "REPEAT LIBRARY: ${LIBRARIES_DIR}/${SPECIES_IDENT}_repeats-families.fa"

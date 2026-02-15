@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH -A uppmax2026-1-8
 #SBATCH -c 20
-#SBATCH -t 4-00:00:00
+#SBATCH -t 6-00:00:00
 #SBATCH -J repeatmasking_Nvit
 #SBATCH -o repeatmasking_Nvit.log
 #SBATCH --mail-type=ALL
@@ -50,7 +50,7 @@ SPECIES_IDENT=B_r_redtenbacheri
 #   mkdir -p "$LIBRARIES_DIR"
 #   BuildDatabase -name "${LIBRARIES_DIR}/${SPECIES_IDENT}_repeats" $ASSEMBLY  # this takes like 15 mins for Cmac
 #   echo "=====================> build database done"
-  RepeatModeler -database "${LIBRARIES_DIR}/${SPECIES_IDENT}_repeats" -threads 20 -LTRStruct -recoverDir RM_2571214.SunFeb151737252026  # this takes over a day for Cmac
+  RepeatModeler -database "${LIBRARIES_DIR}/${SPECIES_IDENT}_repeats" -threads 20 -LTRStruct  # this takes over a day for Cmac
   echo "=====================> repeatmodeller done"
 # fi
 

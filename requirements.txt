@@ -3,7 +3,7 @@ argparse==1.1
 dataclasses==built-in / no version attr
 enum==built-in / no version attr
 matplotlib==3.9.0
-numpy==1.26.4
+numpy==1.26.4 ## this version does np.NaN, version 2.x does np.nan and they are not backwards compatible
 os==built-in / no version attr
 pandas==2.2.2
 random==built-in / no version attr

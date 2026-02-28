@@ -61,11 +61,13 @@ def get_trIDs_from_Dbxref(annotation:dict, Dbxref_list:str):
 
 if __name__ == "__main__":
 
-    Gene_ontology_file = "Nvit_gene_ontology.gaf"
-    annotation_file = "Nvit_genomic.gff"
-    outfile_transcripts = "Nvit_GO_smell_transcripts_list.txt"
-    outfile_transcripts_all = "Nvit_foreground_transcripts_list.txt"
-    outfile_transcripts_bg = "Nvit_background_transcripts_list.txt"
+    annot_dir = "/proj/naiss2023-6-65/Milena/ReVis_paper/Brsri_analysis/annotation/"
+    Gene_ontology_file = f"{annot_dir}GCF_032445375.1-RS_2024_02_gene_ontology.gaf"
+    annotation_file = f"{annot_dir}GCF_032445375.1_Brsri_v3_genomic_isoform_filtered.gff"
+    outfiles_dir = "/proj/naiss2023-6-65/Milena/ReVis_paper/Brsri_analysis/Brsri_Revis_enrichment_analysis"
+    outfile_transcripts = f"{outfiles_dir}Brsri_GO_smell_transcripts_list.txt"
+    outfile_transcripts_all = f"{outfiles_dir}Brsri_foreground_transcripts_list.txt"
+    outfile_transcripts_bg = f"{outfiles_dir}Brsri_background_transcripts_list.txt"
 
     GO_terms = {
         "toxins" : "GO_terms_toxins.txt", # not really any GO terms related to toxins, so I am only using the olfactory

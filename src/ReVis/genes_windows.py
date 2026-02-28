@@ -136,7 +136,10 @@ def get_assembly_gene_numbers(annotation_filepath, gff_filepath, window_length, 
             assembly_length_incl += contig_lengths[contig][1]
 
             windows_contig = get_window_intervals(contig_lengths[contig], window_length)
-            contig_genes = annotation[contig]
+            try:
+                contig_genes = annotation[contig]
+            except:
+                raise RuntimeError(f"annotation parsed by contig does not contain {contig}! {len(annotation)} contigs available: \n{annotation.keys()}")
             
             contig_abundances, contig_categories, overlap_removed_bp = rep_windows.get_contig_abundances(contig_genes, windows_contig, verbose=False, gene_number = True, calc_gene_density = calc_gene_density, filter_overlap_previous=False)
             

@@ -72,8 +72,6 @@ if __name__ == "__main__":
         "smell" : "GO_terms_smell.txt"
     }
 
-    ## TODO it's all isoforms right now! filter only to longest at some point!
-
     go_smell = read_GO_terms_dict(GO_terms["smell"])
     IDs_smell = get_Dbxref_IDs_of_GO_terms(Gene_ontology_file, go_smell)
 

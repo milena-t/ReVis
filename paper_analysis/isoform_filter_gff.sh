@@ -11,9 +11,13 @@
 
 module load AGAT/1.6.1-GCCcore-13.3.0
 
-ANNOT_GFF=/proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/annotation/GCF_009193385.2_Nvit_psr_1.1_genomic.gff
-FILTERED_GTF=/proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/annotation/GCF_009193385.2_Nvit_psr_1.1_genomic_isoform_filtered.gff
-ASSEMBLY=/proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/assembly/GCF_009193385.2_Nvit_psr_1.1_genomic_short_headers.fna
+# ANNOT_GFF=/proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/annotation/GCF_009193385.2_Nvit_psr_1.1_genomic.gff
+# FILTERED_GTF=/proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/annotation/GCF_009193385.2_Nvit_psr_1.1_genomic_isoform_filtered.gff
+# ASSEMBLY=/proj/naiss2023-6-65/Milena/ReVis_paper/Nvit_analysis/assembly/GCF_009193385.2_Nvit_psr_1.1_genomic_short_headers.fna
+
+ANNOT_GFF=/proj/naiss2023-6-65/Milena/ReVis_paper/Brsri_analysis/annotation/GCF_032445375.1_Brsri_v3_genomic.gff
+FILTERED_GTF=/proj/naiss2023-6-65/Milena/ReVis_paper/Brsri_analysis/annotation/GCF_032445375.1_Brsri_v3_genomic_isoform_filtered.gff
+ASSEMBLY=/proj/naiss2023-6-65/Milena/ReVis_paper/Brsri_analysis/assembly/GCF_032445375.1_Brsri_v3_genomic.fna.masked
 
 perl /proj/naiss2023-6-65/Milena/gene_family_analysis/filter_longest_isoform/agat_sp_keep_longest_isoform.pl --gff $ANNOT_GFF -o $FILTERED_GTF
 

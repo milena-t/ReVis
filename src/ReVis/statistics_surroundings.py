@@ -139,8 +139,8 @@ def statistical_enrichment(before_filepath:str, after_filepath:str, num_sig_tran
         diff_after = [after_dict[rep_class][i] - all_after_dict[rep_class][i] for i in range(0, num_bp, win_len)]
 
         if all(base_diff == 0 for base_diff in diff_before):
-            res_before_pvalue = np.NaN
-            res_before_statistic = np.NaN
+            res_before_pvalue = np.nan
+            res_before_statistic = np.nan
             print(f"before transcript -> Wilcoxon test could not be run for absent repeat class: {rep_class}")# \n\t{diff_before}")
         else:
             res_before = wilcoxon(diff_before, alternative="greater") #alternative greater because we only consider TE enrichment and not TE depletion
@@ -148,8 +148,8 @@ def statistical_enrichment(before_filepath:str, after_filepath:str, num_sig_tran
             res_before_statistic = res_before.statistic            
 
         if all(base_diff == 0 for base_diff in diff_after):
-            res_after_pvalue = np.NaN
-            res_after_statistic = np.NaN
+            res_after_pvalue = np.nan
+            res_after_statistic = np.nan
             print(f"after transcript -> Wilcoxon test could not be run for absent repeat class: {rep_class}")# \n\t{diff_after}")
         else:
             res_after = wilcoxon(diff_after, alternative="greater") #alternative greater because we only consider TE enrichment and not TE depletion

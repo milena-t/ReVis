@@ -2,13 +2,17 @@
 
 Analyze the output of repeatmasker. 
 
+## Citation
+
+Please cite `https://doi.org/10.5281/zenodo.18669483`, thank you!
+
 ## Installation
 
 Download the latest release and unzip it. You can just run the python script as described in quickstart below. You might have to install a few external dependencies manually (see [requirements.txt](requirements.txt)) but they are all commonly used libraries easy to install with `pip`.
 
 ### Dependencies
 
- *  On uppmax, load biopython/1.80-py3.10.8 to use argparse (base python doesn't include it).
+ *  The easiest thing is to create a new python virtual environment as described [here](https://www.w3schools.com/python/python_virtualenv.asp) and install all libraries inside of it.
  *  libraries listed in [requirements.txt](requirements.txt) (Sorry if I forgot any, I'm sure the compiler will tell you if you miss something)
 
 # Run modes

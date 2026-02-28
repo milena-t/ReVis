@@ -21,7 +21,7 @@ python3 ${REVIS_PATH}ReVis.py \
     --merge_gene_windows 5 \
     --out_dir /proj/naiss2023-6-65/Milena/ReVis_paper/Brsri_analysis/ReVis_plots \
     --species_name B_roccius_r \
-    --window_length 1e6 \
+    --window_length 5e6 \
     --plot_overlap_filtered \
     --verbose \
     --plot

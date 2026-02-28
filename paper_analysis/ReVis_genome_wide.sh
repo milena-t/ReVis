@@ -19,7 +19,7 @@ python3 ${REVIS_PATH}ReVis.py \
     --masker_out_gff ${ASSEMBLY_DIR}GCF_032445375.1_Brsri_v3_genomic.fna.out.gff \
     --annotation_gff ${ANNOTATION_DIR}GCF_032445375.1_Brsri_v3_genomic.gff \
     --merge_gene_windows 5 \
-    --out_dir /proj/naiss2023-6-65/Milena/ReVis_paper/ReVis/paper_analysis/results \
+    --out_dir /proj/naiss2023-6-65/Milena/ReVis_paper/Brsri_analysis/ReVis_plots \
     --species_name B_roccius_r \
     --window_length 1e6 \
     --plot_overlap_filtered \

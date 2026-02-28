@@ -444,7 +444,6 @@ def parse_gff3_by_contig(filepath:str, verbose = True, featurecategory = [Featur
                 new_feature=Feature(feature_id=attributes["ID"],contig = contig,category=category,start=int(start),end=int(stop),strandedness=strandedness, frame=frame)
                 if new_feature.contig not in genome_annotation:
                     genome_annotation[new_feature.contig]=[new_feature]
-                    print(f"NW_026962382.1 read as {new_feature.contig} added to annotation dict")
                 else:
                     genome_annotation[new_feature.contig].append(new_feature)
 

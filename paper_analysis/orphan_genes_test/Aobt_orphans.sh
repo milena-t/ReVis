@@ -18,7 +18,7 @@ python3 ${REVIS_PATH}ReVis_transcript_surroundings.py \
     --compute_tables_from_list \
     --out_dir /proj/naiss2023-6-65/Milena/ReVis_paper/test_orphans \
     --masker_outfile ${ASSEMBLY_DIR}assembly_genomic.fna.out \
-    --annotation_gff ${ANNOTATION_DIR}braker_isoform_filtered.gff \
+    --annotation_gff ${ANNOTATION_DIR}braker.gtf \
     --all_list /proj/naiss2023-6-65/Milena/ReVis_paper/test_orphans/Aobt_BUSCOs.txt \
     --sig_list /proj/naiss2023-6-65/Milena/ReVis_paper/test_orphans/Aobt_orphans.txt \
     --species_name A_obtectus \

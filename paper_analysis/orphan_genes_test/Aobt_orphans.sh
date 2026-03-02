@@ -25,3 +25,5 @@ python3 ${REVIS_PATH}ReVis_transcript_surroundings.py \
     --polreg_fourier_denoise \
     --bp 10000 \
     --verbose
+
+    # g52254.t1

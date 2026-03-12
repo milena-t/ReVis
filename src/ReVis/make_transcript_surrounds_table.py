@@ -73,6 +73,8 @@ def make_cumulative_TE_table(orthogroups_path, n:int, species:str, repeats_annot
     all_transcripts_list = []
     if verbose:
         print(f"\t*  calculate surroundings for {len(all_transcript_IDs)} genes")
+        all_transcript_IDs = [tr_ID for tr_ID in all_transcript_IDs if len(tr_ID)>0]
+        print(f"\t   ({len(all_transcript_IDs)} left of real IDs with length>0)")
     for transcript_id in tqdm(all_transcript_IDs):
         transcript_id = transcript_id.strip()
         try:

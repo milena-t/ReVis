@@ -29,5 +29,5 @@ python3 ${REVIS_PATH}ReVis_transcript_surroundings.py \
     --sig_list /proj/naiss2023-6-65/Milena/ReVis_paper/test_orphans/Cmac_orphans.txt \
     --species_name C_maculatus \
     --polreg_fourier_denoise \
-    --bp 10000 \
+    --bp 50000 \
     --verbose

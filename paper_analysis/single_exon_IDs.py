@@ -5,7 +5,7 @@ get all single-exon gene IDs and multi-exon gene IDs as separate lists
 import parse_gff as gff
 
 def make_lists(annot_path, se_path, me_path):
-    annot = gff.parse_gff3_general(annot_path, keep_feature_category=gff.FeatureCategory.Transcript)
+    annot = gff.parse_gff3_general(annot_path)
     print(len(annot))
 
 

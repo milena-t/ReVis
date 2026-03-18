@@ -310,7 +310,7 @@ def parse_gff3_general(filepath:str, verbose = True, only_genes = False, keep_fe
             if only_genes and category != FeatureCategory.Gene:
                 # If there's only genes supposed to be included, skip everything that isn't a gene
                 continue
-            if keep_feature_category != category_ and keep_feature_category != None:
+            if keep_feature_category != category and keep_feature_category != None:
                 continue
             # for the child of Gene features, some annotations use "transcript" and some use "mRNA"
             if verbose:

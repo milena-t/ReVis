@@ -324,7 +324,8 @@ def parse_gff3_general(filepath:str, verbose = True, only_genes = False, keep_fe
                     count_exon +=1
             
             attributes={}
-            for attr in attributes_.strip().split(";"):
+            att_list = attributes_.strip().split(";")
+            for attr in att_list:
                 attr = attr.strip()
                 try:
                     key,value=attr.split(separator)[-2:]
@@ -337,7 +338,7 @@ def parse_gff3_general(filepath:str, verbose = True, only_genes = False, keep_fe
             
             ## check that ID and Parent are detected correctly
             if "ID" not in attributes:
-                raise RuntimeError(f"no id property found for gene in line: {line}\nattributes: {attributes_.strip().split(";")}\nseparator determined: '{separator}'")
+                raise RuntimeError(f"no id property found for gene in line: {line}\nattributes: {att_list}\nseparator determined: '{separator}'")
             if "Parent" not in attributes and not category==FeatureCategory.Gene and not category==FeatureCategory.Region:
                 raise RuntimeError(f"feature is not a gene and no parentid property found for feature in line: {line}")
             

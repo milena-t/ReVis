@@ -304,7 +304,7 @@ def parse_gff3_general(filepath:str, verbose = True, only_genes = False, keep_fe
                 continue
             
             # more info on file format and columns here: https://www.ensembl.org/info/website/upload/gff.html?redirect=no
-            contig,source,category_,start,stop,score,strandedness,frame,attributes_=[c for c in line.split("\t") if len(c)>0]
+            contig,source,category_,start,stop,score,strandedness,frame,attributes_=[c.strip() for c in line.split("\t") if len(c)>0]
             category = categorize_string(category_)
 
             if only_genes and category != FeatureCategory.Gene:
@@ -329,12 +329,11 @@ def parse_gff3_general(filepath:str, verbose = True, only_genes = False, keep_fe
                 try:
                     key,value=attr.split(separator)[-2:]
                 except:
-                    continue
 
-                if "," in attr:
-                    attributes[key]=value.split(",")[0]
-                else:
-                    attributes[key]=value
+                    if "," in attr:
+                        attributes[key]=value.split(",")[0]
+                    else:
+                        attributes[key]=value
             
             ## check that ID and Parent are detected correctly
             if "ID" not in attributes:

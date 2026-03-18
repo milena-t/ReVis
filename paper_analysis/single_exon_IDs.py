@@ -14,6 +14,6 @@ if __name__ == "__main__":
     annot_path=f"{workdir}GCF_032445375.1_Brsri_v3_genomic_isoform_filtered.gff"
     se_file = f"{workdir}single_exons_list.txt"
     me_file = f"{workdir}multi_exons_list.txt" 
-    
-    make_lists(annot_path=annot_path)
+
+    make_lists(annot_path=annot_path, se_path=se_file, me_path=me_file)
 

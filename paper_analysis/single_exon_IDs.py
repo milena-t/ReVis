@@ -10,18 +10,18 @@ def make_lists(annot_path, se_path, me_path):
     me_list = []
     # print(annot["rna-XM_063365854.1"])
     for gene_ID, gene_feature in annot.items():
-        if gene_feature.category == gff.FeatureCategory.Transcript:
-            if len(gene_feature.child_ids_list) == 1:
-                se_list.append(gene_ID)
-            elif len(gene_feature.child_ids_list) > 1:
+        # if gene_feature.category == gff.FeatureCategory.Transcript:
+        if len(gene_feature.child_ids_list) == 1 and annot[gene_feature.child_ids_list[0]].category == gff.FeatureCategory.Exon:
+            se_list.append(gene_ID)
+        elif len(gene_feature.child_ids_list) > 1 and annot[gene_feature.child_ids_list[0]].category == gff.FeatureCategory.Exon:
                 me_list.append(gene_ID)
     with open(se_path, "w") as se, open(me_path, "w")as me:
         se.write(",".join(se_list))
         me.write(",".join(me_list))
 
-    print(f"outfiles written:\n\t* {se_path}\n\t* {me_path}")
+    print(f"outfiles written:\n\t* ({len(se_list)}) : {se_path}\n\t* ({len(me_list)}) : {me_path}")
 
-
+## TODO something is wrong, AGAT says 662 single exon genes
             
             
 

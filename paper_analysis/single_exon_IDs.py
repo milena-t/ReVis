@@ -5,10 +5,10 @@ get all single-exon gene IDs and multi-exon gene IDs as separate lists
 import parse_gff as gff
 
 def make_lists(annot_path, se_path, me_path):
-    annot = gff.parse_gff3_general(annot_path)
+    annot = gff.parse_gff3_general(annot_path, keep_feature_category=gff.FeatureCategory.Transcript)
     se_list = []
     me_list = []
-    print(annot["gene-LOC134530730"])
+    print(annot["rna-XM_063365854.1"])
     # for gene_ID, gene_feature in annot.items():
     #     if gene_feature.category == gff.FeatureCategory.Transcript:
     #         

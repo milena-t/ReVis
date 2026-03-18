@@ -366,9 +366,9 @@ def parse_gff3_general(filepath:str, verbose = True, only_genes = False, keep_fe
         print(f"\tparsing time: {execution_time:.2f} seconds")
         print(f"\t  * gene features: {count_gene}")
         if count_mRNA>0:
-            print(f"\t  * mRNA features: {count_mRNA} (0 'transcript' features)")
+            print(f"\t  * mRNA features: {count_mRNA}")
         if count_trans>0:
-            print(f"\t  * transcript features: {count_trans} (0 mRNA features)")
+            print(f"\t  * transcript features: {count_trans}")
         print(f"\t  * exon features: {count_exon}")
         print(f"\t  * total number of features: {len(genome_annotation)}")
 

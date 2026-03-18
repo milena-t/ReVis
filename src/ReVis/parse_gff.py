@@ -281,7 +281,6 @@ def parse_gff3_general(filepath:str, verbose = True, only_genes = False, keep_fe
             print(f"--------------------------------------------------------\n!! only features of {keep_feature_category} included \n--------------------------------------------------------")
     with open(filepath, "r") as file:
         linelist = file.readlines()
-        print(f"{len(linelist)} lines in file")
 
         # in the attributes column, the "ID" tag and the actual ID can be two things:
         #  * ID=gene1234 (gff2 i think?)

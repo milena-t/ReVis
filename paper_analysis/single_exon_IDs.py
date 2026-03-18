@@ -6,7 +6,13 @@ import parse_gff as gff
 
 def make_lists(annot_path, se_path, me_path):
     annot = gff.parse_gff3_general(annot_path, only_genes=True)
-    print(len(annot))
+    se_list = []
+    me_list = []
+    print(annot["gene-LOC134530730"])
+    # for gene_ID, gene_feature in annot.items():
+    #     if gene_feature.category == gff.FeatureCategory.Transcript:
+    #         
+            
 
 
 if __name__ == "__main__":

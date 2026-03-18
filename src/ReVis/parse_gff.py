@@ -287,7 +287,7 @@ def parse_gff3_general(filepath:str, verbose = True, only_genes = False, keep_fe
         #  * ID gene1234 (gff3)
         # determine separator (" " or "=") so that I don't have to test in every line
         # look 10 lines from the end to avoid leading or tailing comment lines in the file
-        tail_line = linelist[-10].split("\t")[-1].split(";")[0]
+        tail_line = linelist[-100].split("\t")[-1].split(";")[0]
         separator = " "
         if "=" in tail_line:
             separator = "="

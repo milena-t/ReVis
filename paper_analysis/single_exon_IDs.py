@@ -8,10 +8,21 @@ def make_lists(annot_path, se_path, me_path):
     annot = gff.parse_gff3_general(annot_path)# , keep_feature_category=gff.FeatureCategory.Transcript)
     se_list = []
     me_list = []
-    print(annot["rna-XM_063365854.1"])
-    # for gene_ID, gene_feature in annot.items():
-    #     if gene_feature.category == gff.FeatureCategory.Transcript:
-    #         
+    # print(annot["rna-XM_063365854.1"])
+    for gene_ID, gene_feature in annot.items():
+        if gene_feature.category == gff.FeatureCategory.Transcript:
+            if len(gene_feature.child_ids_list) == 1:
+                se_list.append(gene_ID)
+            elif len(gene_feature.child_ids_list) > 1:
+                me_list.append(gene_ID)
+    with open(se_path, "w") as se, open(me_path, "w")as me:
+        se.write(",".join(se_list))
+        me.write(",".join(me_list))
+
+    print(f"outfiles written:\n\t* {se_path}\n\t* {me_path}")
+
+
+            
             
 
 

@@ -330,11 +330,12 @@ def parse_gff3_general(filepath:str, verbose = True, only_genes = False, keep_fe
                 try:
                     key,value=attr.split(separator)[-2:]
                 except:
+                    continue
 
-                    if "," in attr:
-                        attributes[key]=value.split(",")[0]
-                    else:
-                        attributes[key]=value
+                if "," in attr:
+                    attributes[key]=value.split(",")[0]
+                else:
+                    attributes[key]=value
             
             ## check that ID and Parent are detected correctly
             if "ID" not in attributes:

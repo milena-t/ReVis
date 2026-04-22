@@ -18,7 +18,7 @@ python3 ${REVIS_PATH}ReVis_transcript_surroundings.py \
     --compute_tables_from_list \
     --out_dir /proj/naiss2023-6-65/Milena/ReVis_paper/Brsri_analysis/ReVis_plots \
     --masker_outfile ${ASSEMBLY_DIR}GCF_032445375.1_Brsri_v3_genomic.fna.out \
-    --annotation_gff ${ANNOTATION_DIR}GCF_032445375.1_Brsri_v3_genomic_isoform_filtered.gff \
+    --annotation_gff ${ANNOTATION_DIR}GCF_032445375.1_Brsri_v3_genomic_isoform_filtered_AGAT_cleaned.gff \
     --all_list /proj/naiss2023-6-65/Milena/ReVis_paper/Brsri_analysis/Brsri_Revis_enrichment_analysisBrsri_background_transcripts_list.txt \
     --sig_list /proj/naiss2023-6-65/Milena/ReVis_paper/Brsri_analysis/Brsri_Revis_enrichment_analysisBrsri_foreground_transcripts_list.txt \
     --species_name B_rossius_r \

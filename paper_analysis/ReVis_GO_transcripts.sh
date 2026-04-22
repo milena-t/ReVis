@@ -2,8 +2,8 @@
 #SBATCH -A uppmax2026-1-8
 #SBATCH -c 1
 #SBATCH -t 2:00:00
-#SBATCH -J ReVis_transcript_Nvit
-#SBATCH -o ReVis_transcript_Nvit.log
+#SBATCH -J ReVis_transcript_Brsri
+#SBATCH -o ReVis_transcript_Brsri.log
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user milena.trabert@ebc.uu.se
 

@@ -19,7 +19,10 @@ ANNOT_GFF=/proj/naiss2023-6-65/Milena/ReVis_paper/Brsri_analysis/annotation/GCF_
 FILTERED_GTF=/proj/naiss2023-6-65/Milena/ReVis_paper/Brsri_analysis/annotation/GCF_032445375.1_Brsri_v3_genomic_isoform_filtered.gff
 ASSEMBLY=/proj/naiss2023-6-65/Milena/ReVis_paper/Brsri_analysis/assembly/GCF_032445375.1_Brsri_v3_genomic.fna.masked
 
+# interactive -A uppmax2026-1-8 -t 5:00:00
 perl /proj/naiss2023-6-65/Milena/gene_family_analysis/filter_longest_isoform/agat_sp_keep_longest_isoform.pl --gff $ANNOT_GFF -o $FILTERED_GTF
+ANNOT_GFF_ID=${ANNOT_GFF_RAW}_AGAT_ID.gff
+agat_sp_manage_IDs.pl --gff $FILTERED_GTF -o $ANNOT_GFF_ID
 
 # module load gffread/0.12.7-GCCcore-13.3.0
 # gffread $ANNOT_GFF -g $ASSEMBLY -M -K -o $FILTERED_GTF

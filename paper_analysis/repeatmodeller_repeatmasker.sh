@@ -2,8 +2,8 @@
 #SBATCH -A uppmax2026-1-8
 #SBATCH -c 20
 #SBATCH -t 6-00:00:00
-#SBATCH -J repeatmasking_Nvit
-#SBATCH -o repeatmasking_Nvit.log
+#SBATCH -J repeatmasking_Saus
+#SBATCH -o repeatmasking_Saus.log
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user milena.trabert@ebc.uu.se
 

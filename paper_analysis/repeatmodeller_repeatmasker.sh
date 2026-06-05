@@ -35,24 +35,28 @@ Good blog post with more detailed explanations: https://darencard.net/blog/2022-
 # LIBRARIES_DIR="/proj/coleoptera-genomics-2025/snic2021-6-30/Milena/ReVis_paper/Nvit_analysis/Nvit_repeat_library"
 # SPECIES_IDENT=N_vitripennis
 
-ASSEMBLY="/proj/coleoptera-genomics-2025/snic2021-6-30/Milena/ReVis_paper/Brsri_analysis/assembly/GCF_032445375.1_Brsri_v3_genomic.fna"
-LIBRARIES_DIR="/proj/coleoptera-genomics-2025/snic2021-6-30/Milena/ReVis_paper/Brsri_analysis/Brsri_repeat_library"
-SPECIES_IDENT=B_r_redtenbacheri
+# ASSEMBLY="/proj/coleoptera-genomics-2025/snic2021-6-30/Milena/ReVis_paper/Brsri_analysis/assembly/GCF_032445375.1_Brsri_v3_genomic.fna"
+# LIBRARIES_DIR="/proj/coleoptera-genomics-2025/snic2021-6-30/Milena/ReVis_paper/Brsri_analysis/Brsri_repeat_library"
+# SPECIES_IDENT=B_r_redtenbacheri
+
+ASSEMBLY="/proj/coleoptera-genomics-2025/snic2021-6-30/Milena/ReVis_paper/Saus_analysis/assembly/GCA_976980505.1_icSteAust9.1_genomic.fna"
+LIBRARIES_DIR="/proj/coleoptera-genomics-2025/snic2021-6-30/Milena/ReVis_paper/Saus_analysis/Saus_repeat_library"
+SPECIES_IDENT=S_austini 
 
 ## make custom repeat library based on the species assembly
 # RepeatModeler uses a NCBI BLASTDB as input to the repeat modeling pipeline, BuildDatabase is a wrapper to make this database for all future steps
 
 #### make the custom repeat libraries with repeatmodeller
 
-# if [ -d $LIBRARIES_DIR ]; then
-#   echo "Directory '$LIBRARIES_DIR' already exists, assume it has a repeat library in it: ${SPECIES_IDENT}_repeats-families.fa"
-# else
-#   mkdir -p "$LIBRARIES_DIR"
-#   BuildDatabase -name "${LIBRARIES_DIR}/${SPECIES_IDENT}_repeats" $ASSEMBLY  # this takes like 15 mins for Cmac
-#   echo "=====================> build database done"
+if [ -d $LIBRARIES_DIR ]; then
+  echo "Directory '$LIBRARIES_DIR' already exists, assume it has a repeat library in it: ${SPECIES_IDENT}_repeats-families.fa"
+else
+  mkdir -p "$LIBRARIES_DIR"
+  BuildDatabase -name "${LIBRARIES_DIR}/${SPECIES_IDENT}_repeats" $ASSEMBLY  # this takes like 15 mins for Cmac
+  echo "=====================> build database done"
   RepeatModeler -database "${LIBRARIES_DIR}/${SPECIES_IDENT}_repeats" -threads 20 -LTRStruct  # this takes over a day for Cmac
   echo "=====================> repeatmodeller done"
-# fi
+fi
 
 
 echo "REPEAT LIBRARY: ${LIBRARIES_DIR}/${SPECIES_IDENT}_repeats-families.fa"

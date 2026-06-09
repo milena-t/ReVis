@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ReVis</title>
+<style>
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  background-color: #ebeaee;
+  /*max-width: 1500px;*/
+  margin: 2em auto;
+  padding: 0 1em;
+  line-height: 1.5;
+  color: #24292f;
+}
+h1, h2, h3, h4, h5, h6 { margin-top: 1.6em; }
+h1 { padding-bottom: .3em; }
+h2 { padding-bottom: .3em; } /* border-bottom: 1px solid #d0d7de; */
+code {
+  background: #eff1f3;
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  font-size: 90%;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+pre {
+  background: #f6f8fa;
+  padding: 1em;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 1em 0; }
+table th, table td { border: 1px solid #909bb5; padding: 6px 10px; }
+table th { background: #d0d4df; }
+img { max-width: 100%; height: auto; }
+details { margin: 0.8em 0; }
+summary { cursor: pointer; }
+iframe { border: 1px solid #d0d7de; border-radius: 4px; }
+a { color: #343f4d; }
+
+</style>
+<style>
+
+/* Style the tab */
+.tab {
+  overflow: hidden;
+  border: 1px solid #909bb5;
+  background-color: #d0d4df;
+}
+
+/* Style the buttons that are used to open the tab content */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #909bb5;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #909bb5;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #909bb5;
+  border-top: none;
+}
+
+/* Style the scrollable table that displays csv files */
+.tableframe {
+    height:30vh; 
+    overflow:auto; 
+    border:1px solid #909bb5;
+}
+
+#sidebar-contents{
+    grid-area: sidebar-contents;
+    padding: 1em;
+    top:0;
+    height:max-content;
+    max-height: 80vh;
+    overflow-y: auto;
+    position:sticky;
+    display: grid;
+    grid-template: 
+    "sidebar-element"
+    / 1fr;
+}
+*{
+    border : 0 ;
+    margin : 0 ; 
+    padding : 0 ;
+    color: #394053;
+    font-family: Arial !important;
+}
+#outer-box{
+    background-color: #ebeaee;
+    display : grid ;
+    grid-template:
+    "header-image header-image"
+    "sidebar-contents main-body"
+    "footer footer" 
+    / 1fr 4fr;
+}
+#header-image{
+    grid-area: header-image;
+    height: 12em
+}
+.center-content{
+    display: grid;
+    grid-template-columns: auto;
+    justify-content: center;
+}
+#sidebar-contents{
+    grid-area: sidebar-contents;
+    padding: 1em;
+    top:0;
+    height:max-content;
+    max-height: 80vh;
+    overflow-y: auto;
+    position:sticky;
+    display: grid;
+    grid-template: 
+    "sidebar-element"
+    / 1fr;
+}
+
+.sidebar-element{
+    background-color: #C2C8D6;
+    padding: 1em;
+    
+    border-bottom-style: solid;
+    border-bottom-color: #394053;
+    border-bottom-width: 0.1em;
+    
+}
+h1{
+    padding-top:1.5em;
+    padding-bottom:0.5em
+}
+h2{
+    padding-top:0.5em;
+    padding-bottom:0.5em;
+}
+p{
+    padding-bottom:0.5em;
+    text-indent:0px;
+}
+#main-body{
+    grid-area: main-body;
+    padding :1em;
+    max-width: 1250px;
+    padding-right: 4em;
+}
+#footer{
+    background-color: #929cb5;
+    grid-area: footer;
+    padding: 1em;
+}
+.project-link{
+    display: block;
+}
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+}
+
+</style>
+<script>
+function openTab(evt, cityName) {
+  // only change tabs on the same level to allow nested tabs etc.
+  const tab = document.getElementById(cityName);
+  const parenttab = tab.parentNode;
+
+  // Hide sibling tab panels.
+  for (const el of document.getElementsByClassName("tabcontent")) {
+    if (el.parentNode === parenttab) el.style.display = "none";
+  }
+
+  // Clear "active" only on tablinks at the same level. A tablink's grandparent
+  // (button -> .tab div -> parenttab) is the panel container.
+  for (const btn of document.getElementsByClassName("tablinks")) {
+    if (btn.parentNode.parentNode === parenttab) btn.classList.remove("active");
+  }
+
+  tab.style.display = "block";
+  evt.currentTarget.classList.add("active");
+}
+
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".tab").forEach(function (tabBar) {
+    var firstBtn = tabBar.querySelector("button.tablinks");
+    if (firstBtn) firstBtn.click();
+  });
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script>
+    function loadCSVTable(csvPath, elementId) {
+      Papa.parse(csvPath, {
+        download: true,
+        header: false,
+        complete: function(results) {
+          const rows = results.data;
+          let html = "<table style='width:100%; border-collapse:collapse;'>";
+    
+          rows.forEach(row => {
+            html += "<tr>";
+            row.forEach(cell => {
+              html += `<td style="border:1px solid #ccc; padding:4px;">${cell}</td>`;
+            });
+            html += "</tr>";
+          });
+    
+          html += "</table>";
+          document.getElementById(elementId).innerHTML = html;
+        }
+      });
+    }
+</script>
+
+
+</head>
+
+<body>
+    <div id="outer-box">
+        <div id="header-image" class="center-content">
+            <h1>ReVis: (Re)peat (Vis)ualizer</h1>
+        </div>
+
+        <div id="sidebar-contents">
+            <p>Table of contents</p>
+        </div>
+        <script src="automatic_sidebar.js"></script>
+
+
+        <div id="main-body">
+            <h1 id="Installation">Installation</h1>
+            <p>
+                Download the latest release and unzip it, and then you can just run the python script as described in quickstart below. 
+                You might have to install a few external dependencies manually (see requirements.txt) but they are all commonly used libraries easy to install with pip.
+            </p>
+
+            <details>
+                <summary>See dependencies list</summary>
+                <p>
+                    It is important that <code>numpy</code> is at least <code>v2.x</code>, because this program uses <code>np.nan</code>. <code>numpy v1.x</code> uses <code>np.NaN</code> instead, 
+                    and will not work! If you have <code>numpy v1.x</code> installed and do not want to update it, you can change all instances of <code>np.nan</code> to <code>np.NaN</code>
+                    and it will work.
+                </p>
+                <iframe
+                    src="requirements.txt"
+                    frameBorder="0"
+                    class=""
+                    scrolling="auto"
+                    style="width:100%; height:30vh;">
+                </iframe>
+            </details>
+            
+            <p>
+                I suggest creating a new python virtual environment (this works similarly to conda) and installing the dependencies manually. 
+                See tutorial <a href="https://www.w3schools.com/python/python_virtualenv.asp">here</a>.
+            </p>
+            
+
+            <h1 id="Citation">Citation</h1>
+            <p>Please cite Trabert <i>et al.</i> 2026 with this DOI: <code>https://doi.org/10.5281/zenodo.18669483</code>. Thank you! <a href="https://doi.org/10.5281/zenodo.18669483">Link</a> to zenodo.</p> 
+
+        </div>
+    </div>
+</body>
+</html>

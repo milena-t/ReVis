@@ -18,14 +18,14 @@ h1, h2, h3, h4, h5, h6 { margin-top: 0.25em; }
 h1 { padding-bottom: .3em; }
 h2 { padding-bottom: .3em; } /* border-bottom: 1px solid #d0d7de; */
 code {
-  background: #eff1f3;
+  background: #d0d4df;
   padding: 0.1em 0.35em;
   border-radius: 4px;
   font-size: 90%;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 pre {
-  background: #f6f8fa;
+  background: #ebeaee;
   padding: 0.25em;
   border-radius: 6px;
   overflow-x: auto;
@@ -33,11 +33,11 @@ pre {
 pre code { background: none; padding: 0; }
 table { border-collapse: collapse; margin: 1em 0; }
 table th, table td { border: 1px solid #909bb5; padding: 6px 10px; }
-table th { background: #d0d4df; }
+table th { background: #ebeaee; }
 img { max-width: 100%; height: auto; }
-details { margin: 0.8em 0; }
+details { margin: 0.8em 0; background-color: #ebeaee;}
 summary { cursor: pointer; }
-iframe { border: 1px solid #d0d7de; border-radius: 4px; }
+iframe { border: 1px solid #ebeaee; border-radius: 4px; }
 a { color: #343f4d; }
 
 ul {
@@ -197,6 +197,8 @@ p{
     width: 50%;
 }
 
+
+
 </style>
 <script>
 function openTab(evt, cityName) {
@@ -254,8 +256,73 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-    mermaid.initialize({ startOnLoad: true });
-</script>    
+    mermaid.initialize({ 
+        startOnLoad: true,
+        theme: 'base',
+        primaryColor: '#C2C8D6',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#394053', 
+        lineColor: '#394053',
+        themeVariables: {
+            background: 'transparent',
+        }
+        });
+</script>  
+<style>
+    /* Flowchart nodes */
+.mermaid svg .node rect,
+.mermaid svg .node polygon,
+.mermaid svg .node circle,
+.mermaid svg .node ellipse,
+.mermaid svg .node path{
+  fill: #C2C8D6 !important;
+  stroke: #394053 !important;
+}
+
+
+/* Edge labels */
+.mermaid svg .edgeLabel,
+.mermaid svg .edgeLabel span,
+.mermaid svg .edgeLabel p {
+  background-color: #ebeaee !important;
+  color: #394053 !important;
+}
+/* Edge label background box (--text-->) */
+.mermaid svg .edgeLabel rect {
+  fill: #ebeaee !important;
+  opacity: 1 !important;
+}
+
+
+/* Arrows */
+.mermaid svg .edgePath path,
+.mermaid svg .edgePath path,
+.mermaid svg .flowchart-link {
+  stroke: #394053 !important;
+  stroke-width: 2px !important;
+}
+
+/* Arrowhead marker */
+.mermaid svg marker path {
+  fill: #394053 !important;
+  stroke: #394053 !important;
+}
+
+.mermaid svg {
+  background-color: #ebeaee !important;
+}
+.mermaid svg .background {
+  fill: #ebeaee !important;
+}
+.mermaid svg rect#background {
+  fill: #ebeaee !important;
+}
+
+/* Mermaid injects a background rect — hide it */
+.mermaid svg > rect:first-child {
+  fill: #ebeaee !important;
+}
+</style>  
 
 
 </head>
@@ -301,7 +368,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 See tutorial <a href="https://www.w3schools.com/python/python_virtualenv.asp">here</a>.
             </p>
 
-            <h1>Summary</h1>
+            <h1 id="summary">Summary</h1>
 
             <p>
                 ReVis has two different run modes, a genome-wide mode that is purely for visualizing repeat abundance in a histogram across scaffolds, 
@@ -335,7 +402,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 </p>
             </div>
 
-            <h1>Quick start</h1>
+            <h1 id="quick-start">Quick start</h1>
 
 
             <div class="tab">
@@ -376,35 +443,6 @@ python3 ReVis.py \
                     <li>window length (<code>int</code> basepairs, can be in scientific notation like 1e6 for 1Mb)</li>
                     <li><code>plot</code> or <code>table</code> mode</li>
                 </ul>
-
-                <details>
-                    <summary>toggle down for flowchart of how it works</summary>
-                
-                    <pre class="mermaid">
-                        graph TD;
-                        infile_out(your_assembly.fna.out);
-                        infile_out -- parsing --> rep_annot{{Class: repeat annotation}};
-
-                        infile_annot(annotation.gff);
-                        infile_annot -. parsing .-> gene_annot{{Class: gene annotation}};
-                        
-                        rep_annot --> overlap_filt{{overlap filtered repeat annotation}};
-                        overlap_filt --> win_ab{{window abundances by category}};
-                        rep_annot -. optional .-> win_ab
-                        
-                        rep_annot --> tr_count(transcript counts foreground and background);
-                        tr_count --> win_prop{{window abundances in percent by category}}
-                        win_ab --> win_prop
-                        
-                        infile_gff(your_assembly.fna.out.gff);
-                        infile_gff --> contig_coords(scaffold lengths);
-                        
-                        win_prop --> plot([Plot stacked histogram])
-                        contig_coords --> plot
-                        gene_annot -. optional .-> plot
-                    </pre>
-                
-                </details>
 
             </div>
             
@@ -493,7 +531,7 @@ python3 ReVis.py \
 
 
 
-            <h1>Genome-wide mode</h1>
+            <h1 id="genome-wide">Genome-wide mode</h1>
 
             <p>
                 Download the latest release and just run <code>ReVis.py</code> like a normal python script. 
@@ -555,15 +593,201 @@ python3 ReVis.py \
                 Short windows increase the total number of windows computed and plotted, which also increases the runtime. In any case, the longest runtime i managed to achieve with my data 
                 was 3:30 min.
             </p>
+            <details>
+                <summary>toggle down for flowchart of how it works</summary>
+            
+                <pre class="mermaid">
+                    graph TD;
+                    infile_out(your_assembly.fna.out);
+                    infile_out -- parsing --> rep_annot{{Class: repeat annotation}};
+
+                    infile_annot(annotation.gff);
+                    infile_annot -. parsing .-> gene_annot{{Class: gene annotation}};
+                    
+                    rep_annot -- overlap filtering --> overlap_filt{{overlap filtered repeat annotation}};
+                    overlap_filt --> win_ab{{window abundances by category}};
+                    rep_annot -. optional .-> win_ab
+                    
+                    rep_annot --> tr_count(transcript counts foreground and background);
+                    tr_count --> win_prop{{window abundances in percent by category}}
+                    win_ab --> win_prop
+                    
+                    infile_gff(your_assembly.fna.out.gff);
+                    infile_gff --> contig_coords(scaffold lengths);
+                    
+                    win_prop --> plot([Plot stacked histogram])
+                    contig_coords --> plot
+                    gene_annot -. optional .-> plot
+                </pre>
+            
+            </details>
+
+            <h2>different possible input files</h2>
+            <p>
+                There is two very similar repeatmasker output files, <code>*.out</code> and <code>*.ori.out</code>.
+                I have noticed that there are some repeat categories that are missing from <code>*.ori.out</code>, and I am unsure why. 
+                In my case it was specifically <i>low complexity regions</i> that are in the repeatmasker <code>.tbl</code> summary and in <code>.out</code> but not in <code>ori.out</code>. 
+                My script can parse both, but double check which one you want to use!
+            </p>
+            <p>
+                Good luck!
+            </p>
 
 
-            <h1>Troubleshooting</h1>
+
+            <h1 id="gene-surroundings">Gene surroundings mode</h1>
+
+            <p>
+                <span style="color: #909bb5">I am using "gene" and "transcript" kind of interchangeably in this section, but for the gff file they are not identical. ReVis was programmed with 
+                    transcript feature IDs in mind (which is why the script for this runmode is called <i style="color: #909bb5">ReVis_transcript_surroundings.py</i>), but gene IDs should also work (no guarantee here)</span>
+            </p>
+
+            <p>
+                This mode creates count tables of repeat presence per base in the transcript surroundings and then plots them. 
+                The tables can be generated based on orthofinder and CAFE output directly (<code>--compute_tables_from_OG</code>) or from lists of transcript IDs (<code>--compute_tables_from_list</code>). 
+                It also plots individual polynomial regressions for each repeat class with 83% confidence interval. Curves can be smoothed with <code>--polreg_win_smooth</code> 
+                using means of either overlapping or nonoverlapping windows, or <code>--polreg_fourier_denoise</code> using fourier denoising.
+            </p>
+
+            <h2>Details</h2>
+
+            <p>
+                The data is generated and saved into four tables prior to plotting. Each table has a row for each repeat category, and each column is one base. 
+                The number in the cell is how often this base position is annotated with a repeat of one category in all the transcripts considered. 
+                The repeats are <i>not</i> overlap filtered the way they can be for the whole genome histogram since that would distort the statistical analysis.
+            </p>
+            <p>The statistical analysis consists of:</p>
+            <ul>
+                <li>Wilcoxon test</li>
+                <li>Polynomial regression</li>
+            </ul>
+
+            <div class="tab">
+                <button class="tablinks" onclick="openTab(event, 'stats_wilcoxon')">Wilcoxon test</button>
+                <button class="tablinks" onclick="openTab(event, 'stats_polynomial')">Polynomial regression</button>
+            </div>
+
+            <div id="stats_wilcoxon" class="tabcontent">
+                <p style="margin-top: .5em">
+                    Test for enrichment of repeats in foreground transcripts via difference in mean using the Wilcoxon test. Downsampled to every (see output plot) bp to increase sample independence.
+                    This is a one-sided test that only tests for enrichment not depletion.
+                </p>
+                <p>
+                    <img loading="lazy" src="example_data/B_siliquastri_wilcoxon_summary.png" width="34%" />
+                </p>
+            </div>
+            
+            <div id="stats_polynomial" class="tabcontent">
+                <p style="margin-top: .5em">
+                    Test for enrichment by fitting polynomial regression curves to foreground and background curves, calculating the confidence interval, and checking for overlap.
+                    A significan tidfference can be determined through nonoverlapping 83% confidence intervals (not 95%! see <a href="https://statisticsbyjim.com/hypothesis-testing/confidence-intervals-compare-means/">this blog post</a>, 
+                    as well as <a href="https://rss.onlinelibrary.wiley.com/doi/abs/10.2307/2983411">Goldstein and Healy (1995)</a>.)
+                </p>
+                <p><b>Example for LINEs:</b></p>
+                <p>Fourier denoising</p>
+                <p>
+                    <img loading="lazy" src="example_data/B_siliquastri_cumulative_repeat_presence_around_transcripts_fft_denoise_LINE.png" width="65%" />
+                </p>
+                <p>83% confidence intervals: significant enrichment of LINEs ca 3 kb up- and downstream.</p>
+                <p>
+                    <img loading="lazy" src="example_data/B_siliquastri_cumulative_repeat_presence_around_transcripts_CI_fft_LINE.png" width="65%" />
+                </p>
+            </div>
+
+            <p style="margin-top: .5em">
+                These are the output tables:
+            </p>
+            <ul>
+                <li>from foreground sequences:
+                    <ul>
+                        <li><code>before transcript</code> (upstream)</li>
+                        <li><code>after transcript</code> (downstream)</li>
+                    </ul>
+                </li>
+                <li>from background sequences:
+                    <ul>
+                        <li><code>before transcript</code> (upstream)</li>
+                        <li><code>after transcript</code> (downstream)</li>
+                    </ul>
+                </li>
+                <li>one file that contains the <code>number of transcripts</code> used to calculate the foreground and background tables, to use for calculating the percentages when plotting</li>
+            </ul>
+
+            <p>
+                You can specify how many bp up and downstream from a transcript border you want to check (default 500). 
+                This is not a fast program, so I have found that 10k bp is a nice compromise of seeing interesting dynamics and it not taking too long. 
+                The test plot with <i>B. siliquastri</i> took less than 10 mins for 10k bp, but more repeat rich genomes will take longer, as will longer foreground and background lists. 
+                When I run it with a different species that has a 1 Gb genome, 70% repeats and I set 10 kb up and downstream it takes almost two hours.
+            </p>
+            <p>
+                You can pass these additional parameters:
+            </p>
+            <ul>
+                <li><code>--bp</code> (how many bp up- and downstream of a transcript to compute and plot)</li>
+                <li><code>--polreg_fourier_denoise</code> or <code>--polreg_win_smooth</code>for smoothing the curves for the statistical analysis</li>
+            </ul>
+
+            <details>
+                <summary>toggle down for flowchart of how it works</summary>
+            
+                <pre class="mermaid">
+                    graph TD;
+                    infile_out(your_assembly.fna.out);
+                    infile_out ==> rep_annot{{Class: repeat annotation}};
+                    rep_annot --> tr_count(transcript counts foreground and background);
+
+                    infile_annot(annotation.gff);
+                    infile_annot ==> gene_annot{{Class: genome annotation}};
+
+                    OGs(orthogroups);
+                    CAFE(CAFE5 outfile);
+
+                    OGs -.-> tr_list(foreground and background transcripts list);
+                    CAFE -.-> tr_list
+
+                    gene_annot ==> filt_gene_annot{{Class: filtered genome annotation}};
+                    tr_list --> filt_gene_annot
+                    
+                    filt_gene_annot ==> loop_tr(loop through foreground and background transcripts);
+                    rep_annot ==> loop_tr
+                    loop_bp(loop through all bases before and after for each transcript);
+                    loop_tr --> loop_bp
+                    loop_bp --> loop_tr
+
+                    loop_tr ==> rep_counts(repeat counts at each base);
+                    rep_counts ==> rep_prop(repeat proportions at each base);
+                    tr_count --> rep_prop
+
+                    rep_prop --> out_tab@{ shape: docs, label: "output tables foreground/background and before/after transcript, and transcript counts" };
+                    tr_count --> out_tab
+
+                    rep_prop ==> stats{statistical analysis};
+                    rep_prop --> plot_all([Plot transcript surroundings of all categories])
+
+                    stats ==> stats_out([plot results of statistical analysis]) 
+                    stats --> stats_tab@{ shape: docs, label: "Wilcoxon test output" };
+
+                    out_tab -. in table mode .-> rep_prop
+
+                </pre>
+            
+            </details>
+
+
+
+            <h1 id="troubleshooting">Troubleshooting</h1>
 
             <ul>
                 <li><b>If annotation parsing does not work:</b>
                 <p>
                     Potentially there is something wrong with the nested feature IDs in the gff, try to use <a href="https://agat.readthedocs.io/en/latest/tools/agat_sq_manage_IDs.html">agat_sq_manage_IDs.pl</a>
-                    to make a version that forces a correct feature nestedness. Mind that this 
+                    to make a version that forces a correct feature nestedness. Mind that this changes transcript IDs! You might have to associate them to potential foreground and background lists.
+                </p>
+                </li>
+
+                <li><b>python error about np.NaN:</b>
+                <p>
+                    You are likely using <code>numpy v1.x</code> and not the required <code>numpy v2.x</code>
                 </p>
                 </li>
             </ul>

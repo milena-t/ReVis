@@ -5,8 +5,9 @@
 *.fasta
 *.gff
 *.out
-
+*.gaf
 *.tsv
+
 
 # *.png
 

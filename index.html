@@ -14,7 +14,7 @@ body {
   line-height: 1.5;
   color: #24292f;
 }
-h1, h2, h3, h4, h5, h6 { margin-top: 1.6em; }
+h1, h2, h3, h4, h5, h6 { margin-top: 0.25em; }
 h1 { padding-bottom: .3em; }
 h2 { padding-bottom: .3em; } /* border-bottom: 1px solid #d0d7de; */
 code {
@@ -26,7 +26,7 @@ code {
 }
 pre {
   background: #f6f8fa;
-  padding: 1em;
+  padding: 0.25em;
   border-radius: 6px;
   overflow-x: auto;
 }
@@ -39,6 +39,22 @@ details { margin: 0.8em 0; }
 summary { cursor: pointer; }
 iframe { border: 1px solid #d0d7de; border-radius: 4px; }
 a { color: #343f4d; }
+
+ul {
+  /* user-agent styles */
+  display: block;
+  list-style-type: disc;
+  margin-block-start: 0em;
+  margin-block-end: 0em;
+  padding-inline-start: 40px;
+}
+ol {
+  /* user-agent styles */
+  display: block;
+  margin-block-start: 0em;
+  margin-block-end: 0em;
+  padding-inline-start: 40px;
+}
 
 </style>
 <style>
@@ -117,7 +133,8 @@ a { color: #343f4d; }
 }
 #header-image{
     grid-area: header-image;
-    height: 12em
+    height: 12em;
+    background-color: #C2C8D6;
 }
 .center-content{
     display: grid;
@@ -148,7 +165,7 @@ a { color: #343f4d; }
     
 }
 h1{
-    padding-top:1.5em;
+    padding-top:0.5em;
     padding-bottom:0.5em
 }
 h2{
@@ -235,14 +252,19 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
 </script>
+<script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true });
+</script>    
 
 
 </head>
 
 <body>
     <div id="outer-box">
-        <div id="header-image" class="center-content">
-            <h1>ReVis: (Re)peat (Vis)ualizer</h1>
+        <div id="header-image">
+            <h1 style="margin-top: 0em;font-size: 400%;padding-bottom: 0em;"  class="center-content">ReVis</h1>
+            <p style="font-size: 175%;"  class="center-content"><b>(Re)peat (Vis)ualizer</b></p>
         </div>
 
         <div id="sidebar-contents">
@@ -275,10 +297,231 @@ document.addEventListener("DOMContentLoaded", function () {
             </details>
             
             <p>
-                I suggest creating a new python virtual environment (this works similarly to conda) and installing the dependencies manually. 
+                If you are installing several dependencies manually, I suggest creating a new python virtual environment (this works similarly to conda). 
                 See tutorial <a href="https://www.w3schools.com/python/python_virtualenv.asp">here</a>.
             </p>
+
+            <h1>Summary</h1>
+
+            <p>
+                ReVis has two different run modes, a genome-wide mode that is purely for visualizing repeat abundance in a histogram across scaffolds, 
+                and a gene surroundings mode that includes statistical analysis to compare repeat abundance in the surroundings of two sets of genes.
+            </p>
+
+            <div class="tab">
+                <button class="tablinks" onclick="openTab(event, 'summary_genome_wide')">Genome-wide mode</button>
+                <button class="tablinks" onclick="openTab(event, 'summary_gene_surroundings')">Gene surroundings mode</button>
+            </div>
+
+            <div id="summary_genome_wide" class="tabcontent">
+                <p style="margin-top: .5em">
+                    A genome-wide stacked histogram showing repeat abundance as annotated by Repeatmasker. Optionally, one or two gene annotations of the same
+                    assembly can be included to show the gene density in the same windows.
+                </p>
+                <p>
+                    <img loading="lazy" src="example_data/repeat_abundance_with_gene_numbers_in_B_siliquastri.png" width="65%" />
+                </p>
+            </div>
             
+            <div id="summary_gene_surroundings" class="tabcontent">
+                <p style="margin-top: .5em">
+                    The user can provide a set of foreground and background gene IDs and an interval length in the transcript-surroundings mode. 
+                    The cumulative abundance of each repeat category is plotted for both foreground and background set for individual bases, not averaged over windows, 
+                    and statistical analysis is performed (see details below).
+                </p>
+                <p>
+                    <img loading="lazy" src="example_data/B_siliquastri_cumulative_repeat_presence_around_transcripts.png" width="65%" />
+                    <img loading="lazy" src="example_data/B_siliquastri_wilcoxon_summary.png" width="34%" />
+                </p>
+            </div>
+
+            <h1>Quick start</h1>
+
+
+            <div class="tab">
+                <button class="tablinks" onclick="openTab(event, 'quick_start_genome_wide')">Genome-wide mode</button>
+                <button class="tablinks" onclick="openTab(event, 'quick_start_gene_surroundings')">Gene surroundings mode</button>
+            </div>
+
+            <div id="quick_start_genome_wide" class="tabcontent">
+                <p style="margin-top: .5em">
+                    see all possible options with the <code>python3 ReVis.py -h</code> flag or at the end of this documentation.
+                </p>
+                <pre>
+                    <code>
+python3 ReVis.py \
+    --masker_outfile your_assembly.fna.out \
+    --masker_out_gff your_assembly.fna.out.gff \
+    --out_dir ./ \
+    --species_name Y_species \
+    --window_length 1e6 \
+    --plot_overlap_filtered \
+    --verbose \
+    --plot</code>
+                </pre>
+                <p style="margin-top: 1em"><b>Input files</b> (file extensions taken from repeatmasker output defaults)</p>
+                <ul>
+                    <li>repeat annotations: <code>your_assembly.fna.out</code></li>
+                    <li>scaffold sizes: <code>your_assembly.fna.out.gff</code> (contains ##sequence-region comments with the contig name and length, so you don't need to give an assembly)</li>
+                    <li>Optional input files (not included above):
+                        <ul>
+                            <li><code>assembly_gene_annotation_1.gff</code></li>
+                            <li><code>assembly_gene_annotation_2.gff</code></li>
+                        </ul>
+                    </li>
+                </ul>
+                <p style="margin-top: 1em"><b>Parameters</b></p>
+                <ul>
+                    <li>Species name (<code>str</code> formatted like D_melanogaster for Drosophila melanogaster)</li>
+                    <li>window length (<code>int</code> basepairs, can be in scientific notation like 1e6 for 1Mb)</li>
+                    <li><code>plot</code> or <code>table</code> mode</li>
+                </ul>
+
+                <details>
+                    <summary>toggle down for flowchart of how it works</summary>
+                
+                    <pre class="mermaid">
+                        graph TD;
+                        infile_out(your_assembly.fna.out);
+                        infile_out -- parsing --> rep_annot{{Class: repeat annotation}};
+
+                        infile_annot(annotation.gff);
+                        infile_annot -. parsing .-> gene_annot{{Class: gene annotation}};
+                        
+                        rep_annot --> overlap_filt{{overlap filtered repeat annotation}};
+                        overlap_filt --> win_ab{{window abundances by category}};
+                        rep_annot -. optional .-> win_ab
+                        
+                        rep_annot --> tr_count(transcript counts foreground and background);
+                        tr_count --> win_prop{{window abundances in percent by category}}
+                        win_ab --> win_prop
+                        
+                        infile_gff(your_assembly.fna.out.gff);
+                        infile_gff --> contig_coords(scaffold lengths);
+                        
+                        win_prop --> plot([Plot stacked histogram])
+                        contig_coords --> plot
+                        gene_annot -. optional .-> plot
+                    </pre>
+                
+                </details>
+
+            </div>
+            
+
+            <div id="quick_start_gene_surroundings" class="tabcontent">
+                <p style="margin-top: .5em">
+                    see all possible options with the <code>python3 ReVis_transcript_surroundings.py -h</code> flag or at the end of this documentation.
+                </p>
+                <p>
+                    The computation here is split into two parts because part 1 can take very long:
+                </p>
+                <ol style="margin-bottom: 1em">
+                    <li>compute tables of by-base transcript presence counts for each repeat category </li>
+                    <li>make plots and compute statistical analysis based on tables </li>
+                </ol>
+                <div class="tab">
+                    <button class="tablinks" onclick="openTab(event, 'quickstart_gene_surroundings_tables')">1. Compute tables and plots from scratch</button>
+                    <button class="tablinks" onclick="openTab(event, 'quickstart_gene_surroundings_plots')">2. Make plots from tables</button>
+                    <button class="tablinks" onclick="openTab(event, 'quickstart_gene_surroundings_cafe')">(compute from Orthofinder and CAFE5)</button>
+                </div>
+    
+                <div id="quickstart_gene_surroundings_tables" class="tabcontent">
+                    <p style="margin-top: .5em">
+                        See the files in <code>example_data</code> to check formatting requirements for the transcript ID lists.
+                    </p>
+                    <pre>
+                        <code>
+    python3 ReVis_transcript_surroundings.py \
+        --compute_tables_from_list \
+        --out_dir ../../example_data \
+        --masker_outfile ../../example_data/bruchidius_siliquastri_repeats.fna.out \
+        --annotation_gff ../../example_data/bruchidius_siliquastri.gff \
+        --all_list ../../example_data/overlap_all_transcripts_B_siliquastri.txt \
+        --sig_list ../../example_data/overlap_sig_transcripts_B_siliquastri.txt \
+        --species_name B_siliquastri \
+        --polreg_fourier_denoise \
+        --bp 500 \
+        --verbose</code>
+                    </pre>
+                </div>
+                
+                <div id="quickstart_gene_surroundings_plots" class="tabcontent">
+                    <p style="margin-top: .5em">
+                        If you have generated the tables in a previous run
+                    </p>
+                    <pre>
+                        <code>
+    python3 ReVis_transcript_surroundings.py \
+        --plot \
+        --out_dir ../../example_data \
+        --all_before_table ../../example_data/B_siliquastri_cumulative_repeats_before_all_transcripts.txt \
+        --sig_before_table ../../example_data/B_siliquastri_cumulative_repeats_before_sig_transcripts_90th_GF_size_percentile.txt \
+        --all_after_table ../../example_data/B_siliquastri_cumulative_repeats_after_all_transcripts.txt \
+        --sig_after_table ../../example_data/B_siliquastri_cumulative_repeats_after_sig_transcripts_90th_GF_size_percentile.txt \
+        --num_transcripts ../../example_data/B_siliquastri_transcript_numbers.txt \
+        --species_name B_siliquastri \ 
+        --polreg_fourier_denoise \
+        --verbose</code>
+                    </pre>
+                </div>
+
+                <div id="quickstart_gene_surroundings_cafe" class="tabcontent">
+                    <p style="margin-top: .5em">
+                        The original purpose of this tool was to look at transcripts that are in significantly rapidly <i>expanding</i> gene families according to CAFE5.
+                        When you have the same pipeline, you can provide these output files and the software will infer foreground and background transcript ID lists from 
+                        that automatically
+                    </p>
+                
+                    <pre>
+                        <code>
+    python3 ReVis_transcript_surroundings.py \
+        --compute_tables_from_OG \
+        --out_dir ../../example_data \
+        --masker_outfile ../../example_data/bruchidius_siliquastri_repeats.fna.out \
+        --annotation_gff ../../example_data/bruchidius_siliquastri.gff \
+        --orthogroups ../../example_data/N0.tsv \
+        --CAFE5_results ../../example_data/CAFE5_Base_family_results.txt \
+        --species_name B_siliquastri \
+        --polreg_fourier_denoise \
+        --bp 500 --GF_size_percentile 90 --verbose</code>
+                    </pre>
+                    <p><code>--GF_size_percentile</code> ensures that the only transcript IDs are in truly expanding gene families, not just gene families that are in significantly rapidly 
+                    evolving orthogroups accodring to CAFE, because this might include orthogroups that are expanding in other species only and not the one of interest here.</p>
+                </div>
+            </div>
+
+
+
+            <h1>Genome-wide mode</h1>
+
+            <p>
+                download the latest release and just run ReVis.py like a normal python script. 
+                The dependencies are listed in requirements.txt, they are only commonly used python packages and can be installed with pip.
+            </p>
+
+            <p>
+                The script is using the output files generated by repeatmasker, the masked assembly, and optionally one or two genome annotations based on the same assembly (contig names have to match!). 
+                Results can be plotted in a stacked histogram (plot mode) or returned as tsv files (table mode, requires the annotation!).
+            </p>
+                
+            <p>
+                Contigs are sorted by size decreasing in the plot.
+            </p>
+
+
+
+
+            <h1>Troubleshooting</h1>
+
+            <ul>
+                <li><b>If annotation parsing does not work:</b>
+                <p>
+                    Potentially there is something wrong with the nested feature IDs in the gff, try to use <a href="https://agat.readthedocs.io/en/latest/tools/agat_sq_manage_IDs.html">agat_sq_manage_IDs.pl</a>
+                    to make a version that forces a correct feature nestedness. Mind that this 
+                </p>
+                </li>
+            </ul>
 
             <h1 id="Citation">Citation</h1>
             <p>Please cite Trabert <i>et al.</i> 2026 with this DOI: <code>https://doi.org/10.5281/zenodo.18669483</code>. Thank you! <a href="https://doi.org/10.5281/zenodo.18669483">Link</a> to zenodo.</p> 

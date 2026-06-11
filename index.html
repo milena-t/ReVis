@@ -324,6 +324,16 @@ document.addEventListener("DOMContentLoaded", function () {
 }
 </style>  
 
+<style>
+.left-div {
+   float: left;
+   width: 50%;
+}
+.right-div {
+   float: right;
+   width: 50%;
+}
+</style>
 
 </head>
 
@@ -335,20 +345,25 @@ document.addEventListener("DOMContentLoaded", function () {
         </div>
 
         <div id="sidebar-contents">
-            <p>Table of contents</p>
+            <p>Table of contents:</p>
         </div>
         <script src="automatic_sidebar.js"></script>
 
 
         <div id="main-body">
             <h1 id="Installation">Installation</h1>
+            <p>Github repository: <a href="https://github.com/milena-t/ReVis">link</a></p>
+            
             <p>
-                Download the latest release and unzip it, and then you can just run the python script as described in quickstart below. 
+                Download the latest release (<a href="https://github.com/milena-t/ReVis/releases">here</a>) and unzip it, and then you can just run the python script as described in quickstart below.
+                There is no makefile or compilation necessary, just an existing python3 installation. 
                 You might have to install a few external dependencies manually (see requirements.txt) but they are all commonly used libraries easy to install with pip.
             </p>
 
             <details>
                 <summary>See dependencies list</summary>
+                
+                <p style="margin-top: .5em">Installation for example like this: <code>pip install argparse==1.1</code></p>
                 <p>
                     It is important that <code>numpy</code> is at least <code>v2.x</code>, because this program uses <code>np.nan</code>. <code>numpy v1.x</code> uses <code>np.NaN</code> instead, 
                     and will not work! If you have <code>numpy v1.x</code> installed and do not want to update it, you can change all instances of <code>np.nan</code> to <code>np.NaN</code>
@@ -375,36 +390,39 @@ document.addEventListener("DOMContentLoaded", function () {
                 and a gene surroundings mode that includes statistical analysis to compare repeat abundance in the surroundings of two sets of genes.
             </p>
 
-            <div class="tab">
-                <button class="tablinks" onclick="openTab(event, 'summary_genome_wide')">Genome-wide mode</button>
-                <button class="tablinks" onclick="openTab(event, 'summary_gene_surroundings')">Gene surroundings mode</button>
-            </div>
-
-            <div id="summary_genome_wide" class="tabcontent">
+            <div class="left-div">
+                <h2>Genome-wide mode</h2>
                 <p style="margin-top: .5em">
                     A genome-wide stacked histogram showing repeat abundance as annotated by Repeatmasker. Optionally, one or two gene annotations of the same
-                    assembly can be included to show the gene density in the same windows.
+                    assembly can be included to show the gene density in the same windows (or smoothed over several windows as shown in the plot below).
                 </p>
-                <p>
-                    <img loading="lazy" src="example_data/repeat_abundance_with_gene_numbers_in_B_siliquastri.png" width="75%" />
+                <p style="float:left; margin-top:1em">
+                    <img loading="lazy" src="example_data/repeat_abundance_with_gene_numbers_in_B_siliquastri.png" width="95%" />
                 </p>
             </div>
-            
-            <div id="summary_gene_surroundings" class="tabcontent">
+            <div class="right-div">
+                <h2>Gene surroundings mode</h2>
                 <p style="margin-top: .5em">
+                    Repeat abundance in up- and downstream regions of genes. 
                     The user can provide a set of foreground and background gene IDs and an interval length in the transcript-surroundings mode. 
                     The cumulative abundance of each repeat category is plotted for both foreground and background set for individual bases, not averaged over windows, 
                     and statistical analysis is performed (see details below).
                 </p>
+                <p style="float:right; margin-top:.5em">
+                    <img loading="lazy" src="example_data/B_siliquastri_cumulative_repeat_presence_around_transcripts.png" width="100%" />
+                </p>
                 <p>
-                    <img loading="lazy" src="example_data/B_siliquastri_cumulative_repeat_presence_around_transcripts.png" width="75%" />
+                    <span style="color: #909bb5">This mode works with gff files, and is tested with transcript IDs, but it can take any type of feature if it 
+                    has an ID that is annotated in the gff3 format.</span>
                 </p>
             </div>
 
-            <h1 id="quick-start">Quick start</h1>
+            <div style="clear: both;"></div>
+            
+            <h1 id="quick-start" >Quick start</h1>
 
 
-            <div class="tab">
+            <div class="tab" style="width:100">
                 <button class="tablinks" onclick="openTab(event, 'quick_start_genome_wide')">Genome-wide mode</button>
                 <button class="tablinks" onclick="openTab(event, 'quick_start_gene_surroundings')">Gene surroundings mode</button>
             </div>
@@ -682,8 +700,7 @@ python3 ReVis.py \
                     A significan tidfference can be determined through nonoverlapping 83% confidence intervals (not 95%! see <a href="https://statisticsbyjim.com/hypothesis-testing/confidence-intervals-compare-means/">this blog post</a>, 
                     as well as <a href="https://rss.onlinelibrary.wiley.com/doi/abs/10.2307/2983411">Goldstein and Healy (1995)</a>.)
                 </p>
-                <p><b>Example for LINEs:</b></p>
-                <p>Fourier denoising</p>
+                <p><b>Fourier denoising (LINEs):</b> <code>--polreg_fourier_denoise</code></p>
                 <p>
                     <img loading="lazy" src="example_data/B_siliquastri_cumulative_repeat_presence_around_transcripts_fft_denoise_LINE.png" width="65%" />
                 </p>
@@ -691,6 +708,17 @@ python3 ReVis.py \
                 <p>
                     <img loading="lazy" src="example_data/B_siliquastri_cumulative_repeat_presence_around_transcripts_CI_fft_LINE.png" width="65%" />
                 </p>
+
+                <p><b>Window medians (LINEs):</b></p>
+                <p>Overlapping (sliding) windows: <code>--polreg_win_smooth 100</code>, <code>--overlapping_windows</code></p>
+                <p>
+                    <img loading="lazy" src="example_data/B_siliquastri_cumulative_repeat_presence_around_transcripts_100bp_overlap_windows_confidence_interval_LINE.png" width="65%" />
+                </p>
+                <p>Nonoverlapping windows: <code>--polreg_win_smooth 100</code>, <code>--nonoverlapping_windows</code></p>
+                <p>
+                    <img loading="lazy" src="example_data/B_siliquastri_cumulative_repeat_presence_around_transcripts_100bp_nonoverlap_windows_confidence_interval_LINE.png" width="65%" />
+                </p>
+
             </div>
 
             <p style="margin-top: .5em">
@@ -764,7 +792,7 @@ python3 ReVis.py \
                     rep_prop --> plot_all([Plot transcript surroundings of all categories])
 
                     stats ==> stats_out([plot results of statistical analysis]) 
-                    stats --> stats_tab@{ shape: docs, label: "Wilcoxon test output" };
+                    stats --> stats_tab@{ shape: docs, label: "Wilcoxon test (and polynomial regression) output as text" };
 
                     out_tab -. in table mode .-> rep_prop
 

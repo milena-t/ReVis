@@ -21,8 +21,8 @@ code {
   background: #d0d4df;
   padding: 0.1em 0.35em;
   border-radius: 4px;
-  font-size: 90%;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  /*font-size: 90%;*/
+  font-family: monospace;
 }
 pre {
   background: #d0d4df;
@@ -120,7 +120,7 @@ ol {
     margin : 0 ; 
     padding : 0 ;
     color: #394053;
-    font-family: Arial !important;
+    font-family: Arial;
 }
 #outer-box{
     background-color: #ebeaee;
@@ -429,19 +429,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
             <div id="quick_start_genome_wide" class="tabcontent">
                 <p style="margin-top: .5em">
-                    see all possible options with the <code>python3 ReVis.py -h</code> flag or at the end of this documentation.
+                    see all possible options with the <code>python3 ReVis.py -h</code> flag.
                 </p>
                 <pre>
                     <code>
-python3 ReVis.py \
-    --masker_outfile your_assembly.fna.out \
-    --masker_out_gff your_assembly.fna.out.gff \
-    --out_dir ./ \
-    --species_name Y_species \
-    --window_length 1e6 \
-    --plot_overlap_filtered \
-    --verbose \
-    --plot</code>
+    python3 ReVis.py \
+        --masker_outfile your_assembly.fna.out \
+        --masker_out_gff your_assembly.fna.out.gff \
+        --out_dir ./ \
+        --species_name Y_species \
+        --window_length 1e6 \
+        --plot_overlap_filtered \
+        --verbose \
+        --plot</code>
                 </pre>
                 <p style="margin-top: 1em"><b>Input files</b> (file extensions taken from repeatmasker output defaults)</p>
                 <ul>
@@ -466,7 +466,7 @@ python3 ReVis.py \
 
             <div id="quick_start_gene_surroundings" class="tabcontent">
                 <p style="margin-top: .5em">
-                    see all possible options with the <code>python3 ReVis_transcript_surroundings.py -h</code> flag or at the end of this documentation.
+                    see all possible options with the <code>python3 ReVis_transcript_surroundings.py -h</code> flag.
                 </p>
                 <p>
                     The computation here is split into two parts because part 1 can take very long:
@@ -489,11 +489,11 @@ python3 ReVis.py \
                         <code>
     python3 ReVis_transcript_surroundings.py \
         --compute_tables_from_list \
-        --out_dir ../../example_data \
-        --masker_outfile ../../example_data/bruchidius_siliquastri_repeats.fna.out \
-        --annotation_gff ../../example_data/bruchidius_siliquastri.gff \
-        --all_list ../../example_data/overlap_all_transcripts_B_siliquastri.txt \
-        --sig_list ../../example_data/overlap_sig_transcripts_B_siliquastri.txt \
+        --out_dir example_data \
+        --masker_outfile example_data/bruchidius_siliquastri_repeats.fna.out \
+        --annotation_gff example_data/bruchidius_siliquastri.gff \
+        --all_list example_data/overlap_all_transcripts_B_siliquastri.txt \
+        --sig_list example_data/overlap_sig_transcripts_B_siliquastri.txt \
         --species_name B_siliquastri \
         --polreg_fourier_denoise \
         --bp 500 \
@@ -509,12 +509,12 @@ python3 ReVis.py \
                         <code>
     python3 ReVis_transcript_surroundings.py \
         --plot \
-        --out_dir ../../example_data \
-        --all_before_table ../../example_data/B_siliquastri_cumulative_repeats_before_all_transcripts.txt \
-        --sig_before_table ../../example_data/B_siliquastri_cumulative_repeats_before_sig_transcripts_90th_GF_size_percentile.txt \
-        --all_after_table ../../example_data/B_siliquastri_cumulative_repeats_after_all_transcripts.txt \
-        --sig_after_table ../../example_data/B_siliquastri_cumulative_repeats_after_sig_transcripts_90th_GF_size_percentile.txt \
-        --num_transcripts ../../example_data/B_siliquastri_transcript_numbers.txt \
+        --out_dir example_data \
+        --all_before_table example_data/B_siliquastri_cumulative_repeats_before_all_transcripts.txt \
+        --sig_before_table example_data/B_siliquastri_cumulative_repeats_before_sig_transcripts_90th_GF_size_percentile.txt \
+        --all_after_table example_data/B_siliquastri_cumulative_repeats_after_all_transcripts.txt \
+        --sig_after_table example_data/B_siliquastri_cumulative_repeats_after_sig_transcripts_90th_GF_size_percentile.txt \
+        --num_transcripts example_data/B_siliquastri_transcript_numbers.txt \
         --species_name B_siliquastri \ 
         --polreg_fourier_denoise \
         --verbose</code>
@@ -532,11 +532,11 @@ python3 ReVis.py \
                         <code>
     python3 ReVis_transcript_surroundings.py \
         --compute_tables_from_OG \
-        --out_dir ../../example_data \
-        --masker_outfile ../../example_data/bruchidius_siliquastri_repeats.fna.out \
-        --annotation_gff ../../example_data/bruchidius_siliquastri.gff \
-        --orthogroups ../../example_data/N0.tsv \
-        --CAFE5_results ../../example_data/CAFE5_Base_family_results.txt \
+        --out_dir example_data \
+        --masker_outfile example_data/bruchidius_siliquastri_repeats.fna.out \
+        --annotation_gff example_data/bruchidius_siliquastri.gff \
+        --orthogroups example_data/N0.tsv \
+        --CAFE5_results example_data/CAFE5_Base_family_results.txt \
         --species_name B_siliquastri \
         --polreg_fourier_denoise \
         --bp 500 --GF_size_percentile 90 --verbose</code>

@@ -143,7 +143,7 @@ This can be one of two kinds. they are formatted the same, but can be computed o
 
     if args.polreg_win_smooth:
         if not args.nonoverlapping_windows and not args.overlapping_windows:
-            parser.error(f"either --nonoverlapping_windows or --noverlapping_windows is required when using --polreg_win_smooth")
+            parser.error(f"either --nonoverlapping_windows or --overlapping_windows is required when using --polreg_win_smooth")
 
     if args.nonoverlapping_windows:
         if not args.polreg_win_smooth:

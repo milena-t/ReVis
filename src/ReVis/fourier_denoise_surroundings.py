@@ -1,5 +1,5 @@
 """
-calculate and plot the confidence intervals of the individual TE categories in the transcript surroundings
+calculate and plot the confidence intervals of the individual TE categories in the transcript/gene surroundings
 """
 
 
@@ -94,7 +94,7 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
         'Simple_repeat' : "#827376" , #Taupe gray
     }
 
-    fs = 25 # set font size
+    fs = 30 # set font size
 
     rep_classes = list(before_dict.keys())
     num_bp = len(before_dict[rep_classes[0]])
@@ -104,6 +104,9 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
     for rep_class in rep_classes:
 
         rep_label = rep_class.replace("_", " ")
+        plt.rcParams['text.usetex'] = True # use \\textit{{{}}} for species names
+        plt.rcParams['text.latex.preamble'] = r'\usepackage{sfmath} \renewcommand{\familydefault}{\sfdefault}'
+        plt.rcParams['font.family'] = 'sans-serif'
         if legend:
             fig, ax = plt.subplots(1, 1, figsize=(23, 10))
         else:
@@ -219,19 +222,19 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
         handles = [solid, dotted]
         labels = []
         if True:
-            labels.append(f"foreground transcripts ({num_sig_transcripts})")
-            labels.append(f"background transcripts ({num_all_transcripts})")
+            labels.append(f"foreground genes ({num_sig_transcripts})")
+            labels.append(f"background genes ({num_all_transcripts})")
         else:
             labels.append(f"significant transcripts ({num_sig_transcripts})")
             labels.append(f"all CAFE transcripts ({num_all_transcripts})")
         plt.legend(handles, labels, loc = "upper left", fontsize = fs, title = "fourier denoised", title_fontsize = fs)
 
         conf_int_int = int(conf_int*100)
-        plt.title(f"{species} transcript surroundings {num_bp} bp up and downstream\nrepeat category: {rep_label} with polynomial regression and {conf_int_int}% confidence interval", fontsize = fs*1.25)
+        plt.title(f"\\textit{{{species}}} gene surroundings {num_bp} bp up and downstream\nrepeat category: {rep_label} with polynomial regression and {conf_int_int}\% confidence interval", fontsize = fs*1.25)
         plt.xlabel(f"basepairs upstream and downstream from transcript", fontsize = fs)
 
         plt.ylabel(f"percent of transcripts in which this base is a repeat", fontsize = fs)
-        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 or x<1 else f'{int(x)}%'))
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 or x<1 else f'{int(x)}\%'))
         
         plt.tight_layout()
         filename_out = f"{filename}_CI_fft_{rep_class}.png"
@@ -320,18 +323,18 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
             handles = [solid, dotted]
             labels = []
             if True:
-                labels.append(f"foreground transcripts ({num_sig_transcripts})")
-                labels.append(f"background transcripts ({num_all_transcripts})")
+                labels.append(f"foreground genes ({num_sig_transcripts})")
+                labels.append(f"background genes ({num_all_transcripts})")
             else:
                 labels.append(f"significant transcripts ({num_sig_transcripts})")
                 labels.append(f"all CAFE transcripts ({num_all_transcripts})")
             plt.legend(handles, labels, loc = "upper left", fontsize = fs)
             conf_int_int = int(conf_int*100)
-            plt.title(f"{species} transcript surroundings {num_bp} bp up and downstream\nrepeat category: {rep_label} with polynomial regression and {conf_int_int}% confidence interval", fontsize = fs*1.25)
+            plt.title(f"\\textit{{{species}}} gene surroundings {num_bp} bp up and downstream\nrepeat category: {rep_label} with polynomial regression and {conf_int_int}\% confidence interval", fontsize = fs*1.25)
             plt.xlabel(f"basepairs upstream and downstream from transcript", fontsize = fs)
 
             plt.ylabel(f"percent of transcripts in which this base is a repeat", fontsize = fs)
-            ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 or x<1 else f'{int(x)}%'))
+            ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 or x<1 else f'{int(x)}\%'))
             
             plt.tight_layout()
             # filename_out = f"{filename}_{rep_class}.png"

@@ -225,7 +225,7 @@ def plot_TE_abundance(before_filepath:str, after_filepath:str, sig_transcripts:i
             v_ = int(v)
             perc = v_/sig_transcripts*100
             if perc>150:
-                print(f"{key} : \t {v_}/{sig_transcripts} * 100 = {perc:.2f}%")
+                print(f"{key} : \t {v_}/{sig_transcripts} * 100 = {perc:.2f}\%")
 
     after_dict = gff.read_dict_from_file(after_filepath)
     after_dict = { key : [int(v)/sig_transcripts*100 for v in value] for key, value in after_dict.items()}
@@ -261,7 +261,10 @@ def plot_TE_abundance(before_filepath:str, after_filepath:str, sig_transcripts:i
         'Simple_repeat' : "#827376" , #Taupe gray
     }
 
-    fs = 25 # set font size
+    fs = 30 # set font size
+    plt.rcParams['text.usetex'] = True # use \\textit{{{}}} for species names
+    plt.rcParams['text.latex.preamble'] = r'\usepackage{sfmath} \renewcommand{\familydefault}{\sfdefault}'
+    plt.rcParams['font.family'] = 'sans-serif'
     if legend:
         fig, ax = plt.subplots(1, 1, figsize=(23, 10))
     else:
@@ -313,7 +316,7 @@ def plot_TE_abundance(before_filepath:str, after_filepath:str, sig_transcripts:i
         ax.set_xlim([-num_bp, num_bp*1.55])
         legend_colors = ax.legend(loc = "center right", fontsize = fs)
         plt.gca().add_artist(legend_colors)
-        # plt.title(f"{species} transcript surroundings {num_bp} bp up and downstream \n({num_sig_transcripts} significant transcripts of {all_transcripts} in CAFE analysis)", fontsize = fs*1.25)
+        # plt.title(f"\\textit{{{species}}} gene surroundings {num_bp} bp up and downstream \n({num_sig_transcripts} significant transcripts of {all_transcripts} in CAFE analysis)", fontsize = fs*1.25)
         
     # plot dotted/bold legend
     solid = Line2D([0], [0], color='black', linestyle='-', linewidth=2)
@@ -321,18 +324,18 @@ def plot_TE_abundance(before_filepath:str, after_filepath:str, sig_transcripts:i
     handles = [solid, dotted]
     labels = []
     if True:
-        labels.append(f"foreground transcripts ({num_sig_transcripts})")
-        labels.append(f"background transcripts ({all_transcripts})")
+        labels.append(f"foreground genes ({num_sig_transcripts})")
+        labels.append(f"background genes ({all_transcripts})")
     else:
         labels.append(f"significant transcripts ({num_sig_transcripts})")
         labels.append(f"all CAFE transcripts ({all_transcripts})")
     plt.legend(handles, labels, loc = "upper left", fontsize = fs)
 
-    plt.title(f"{species} transcript surroundings {num_bp} bp up and downstream", fontsize = fs*1.25)
+    plt.title(f"\\textit{{{species}}} gene surroundings {num_bp} bp up and downstream", fontsize = fs*1.25)
     plt.xlabel(f"basepairs upstream and downstream from transcript", fontsize = fs)
 
-    plt.ylabel(f"percent of transcripts in which this base is a repeat", fontsize = fs)
-    ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 or x<1 else f'{int(x)}%'))
+    plt.ylabel(f"percent of genes in which this base is a repeat", fontsize = fs)
+    ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 or x<1 else f'{int(x)}\%'))
     
     plt.tight_layout()
     plt.savefig(filename, dpi = 300, transparent = plot_transparent_bg)

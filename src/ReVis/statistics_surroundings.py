@@ -1,5 +1,5 @@
 """
-calculate and plot the confidence intervals of the individual TE categories in the transcript surroundings
+calculate and plot the confidence intervals of the individual TE categories in the transcript/gene surroundings
 """
 
 
@@ -40,7 +40,7 @@ def manual_yticks(max_percentage:int, ax, fs):
         except:
             list_ticks = [x / 10.0 for x in range(0, int(max_percentage*10), 5)]
             plt.yticks(list_ticks, fontsize = fs)
-        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{x:.1f}%' ))
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{x:.1f}\%' ))
         func_set = True
     elif max_percentage>0.5:
         try:
@@ -48,7 +48,7 @@ def manual_yticks(max_percentage:int, ax, fs):
         except:
             list_ticks = [x / 100.0 for x in range(0, int(max_percentage*100), 1)]
             plt.yticks(list_ticks, fontsize = fs)
-        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 else f'{x:.2f}%' ))
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 else f'{x:.2f}\%' ))
         func_set = True
     else:
         print(f"\t\t\t max percentage: {max_percentage}")
@@ -57,11 +57,11 @@ def manual_yticks(max_percentage:int, ax, fs):
         except:
             list_ticks = [x / 100.0 for x in range(0, int(max_percentage*100), 5)]
             plt.yticks(list_ticks, fontsize = fs)
-        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 else f'{x:.3f}%' ))
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 else f'{x:.3f}\%' ))
         func_set = True
     
     if not func_set:
-        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 else f'{int(x)}%'))
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 else f'{int(x)}\%'))
 
 def statistical_enrichment(before_filepath:str, after_filepath:str, num_sig_transcripts:int, num_all_transcripts:int, all_before_filepath:str = "", all_after_filepath:str = "", filename = "cumulative_repeat_presence_around_transcripts_95_perc_CI", modelstats_filename = "pol_reg_sum.txt", legend = True, plot_white_bg = False):
     """
@@ -104,7 +104,7 @@ def statistical_enrichment(before_filepath:str, after_filepath:str, num_sig_tran
         'Simple_repeat' : "#827376" , #Taupe gray
     }
 
-    fs = 25 # set font size
+    fs = 30 # set font size
 
     rep_classes = list(before_dict.keys())
     num_bp = len(before_dict[rep_classes[0]]) 
@@ -227,7 +227,7 @@ def plot_modelstats(modelstats_filepath:str, plot_white_bg = True):
         'Simple_repeat' : "#827376" , #Taupe gray
     }
 
-    fs = 25 # set font size
+    fs = 30 # set font size
     fig, ax = plt.subplots(1, 1, figsize=(15, 12))
 
     pbefore = []
@@ -253,7 +253,7 @@ def plot_modelstats(modelstats_filepath:str, plot_white_bg = True):
 
     plt.legend(loc = "lower right", fontsize = fs)
     species_title = species.replace("_", ". ")
-    plt.title(f"{species_title} transcript surroundings repeat enrichment\np-value from wilcoxon test (every {window_length} bases)", fontsize = fs*1.25)
+    plt.title(f"{species_title} gene surroundings repeat enrichment\np-value from wilcoxon test (every {window_length} bases)", fontsize = fs*1.25)
     plt.ylabel(f"p-value", fontsize = fs)
     ax.tick_params(axis ='x', labelsize = fs) 
     ax.tick_params(axis ='y', labelsize = fs) 
@@ -331,12 +331,15 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
         'Simple_repeat' : "#827376" , #Taupe gray
     }
 
-    fs = 25 # set font size
+    fs = 30 # set font size
 
     rep_classes = list(before_dict.keys())
     num_bp = len(before_dict[rep_classes[0]]) 
       
     for rep_class in rep_classes:
+        plt.rcParams['text.usetex'] = True # use \\textit{{{}}} for species names
+        plt.rcParams['text.latex.preamble'] = r'\usepackage{sfmath} \renewcommand{\familydefault}{\sfdefault}'
+        plt.rcParams['font.family'] = 'sans-serif'
         if legend:
             fig, ax = plt.subplots(1, 1, figsize=(23, 10))
         else:
@@ -488,7 +491,7 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
             ax.set_xlim([-num_bp, num_bp*1.55])
             legend_colors = ax.legend(loc = "center right", fontsize = fs)
             plt.gca().add_artist(legend_colors)
-            # plt.title(f"{species} transcript surroundings {num_bp} bp up and downstream \n({num_sig_transcripts} significant transcripts of {all_transcripts} in CAFE analysis)", fontsize = fs*1.25)
+            # plt.title(f"\\textit{{{species}}} gene surroundings {num_bp} bp up and downstream \n({num_sig_transcripts} significant transcripts of {all_transcripts} in CAFE analysis)", fontsize = fs*1.25)
             
         # plot dotted/bold legend
         solid = Line2D([0], [0], color=colors[rep_class], linestyle='-', linewidth=2)
@@ -504,7 +507,7 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
             labels.append(f"all CAFE transcripts ({num_all_transcripts})")
         plt.legend(handles, labels, loc = "upper left", fontsize = fs, title=legend_title, title_fontsize=fs)
         conf_int_int = int(conf_int*100)
-        plt.title(f"{species} transcript surroundings {num_bp} bp up and downstream\nrepeat category: {rep_label} with polynomial regression and {conf_int_int}% confidence interval", fontsize = fs*1.25)
+        plt.title(f"\\textit{{{species}}} gene surroundings {num_bp} bp up and downstream\nrepeat category: {rep_label} with polynomial regression and {conf_int_int}\% confidence interval", fontsize = fs*1.25)
         plt.xlabel(f"basepairs upstream and downstream from transcript", fontsize = fs)
 
         plt.ylabel(f"percent of transcripts in which this base is a repeat", fontsize = fs)

@@ -32,12 +32,16 @@ def plot_repeat_abundance(species_abundances, species_categories, gff_filepath, 
 
     # Width of the bars
     # width = 0.35
-    fs = 25 # fontsize is scaled with the dpi somehow which i have to do extra because i change the aspect ratio manually below
+    fs = 30 # fontsize is scaled with the dpi somehow which i have to do extra because i change the aspect ratio manually below
 
     # set figure aspect ratio
     aspect_ratio = 20 / 12
     height_pixels = 1200  # Height in pixels
     width_pixels = int(height_pixels * aspect_ratio)  # Width in pixels
+
+    plt.rcParams['text.usetex'] = True # use \\textit{{{}}} for species names
+    plt.rcParams['text.latex.preamble'] = r'\usepackage{sfmath} \renewcommand{\familydefault}{\sfdefault}'
+    plt.rcParams['font.family'] = 'sans-serif'
 
     fig, ax = plt.subplots(figsize=(width_pixels / 100, height_pixels / 100), dpi=100)
     # fig = plt.figure(figsize=(width_pixels / 100, height_pixels / 100), dpi=100)
@@ -309,7 +313,7 @@ def plot_repeat_abundance(species_abundances, species_categories, gff_filepath, 
     
     # ax.set_xlabel('Species', fontsize=fs+4)
     ax.set_ylabel(y_label, fontsize=fs)
-    ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 100 and x<5 else f'{int(x)}%'))
+    ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 100 and x<5 else f'{int(x)}\%'))
     species_name_nice = species_name.replace("_", ". ")
 
     if window_length>=1e6:
@@ -322,7 +326,7 @@ def plot_repeat_abundance(species_abundances, species_categories, gff_filepath, 
         rounded = int(window_length / 1e3)
         window_length_ =f'{rounded} kb'
     
-    ax.set_title(f'Repeat abundance in {species_name_nice}, (window length {window_length_}, {incl_perc:.2f}% of assembly shown)', fontsize=fs)
+    ax.set_title(f'Repeat abundance in \\textit{{{species_name_nice}}}, (window length {window_length_}, {incl_perc:.2f}% of assembly shown)', fontsize=fs)
 
     if include_genes_line and include_genes_line2:
         # make legends for repeat lines (hard coded labes in plot command above!)

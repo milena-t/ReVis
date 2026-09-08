@@ -142,7 +142,7 @@ ol {
 #header-image{
     grid-area: header-image;
     height: 12em;
-    background-color: #C2C8D6;
+    background-color: #d0d4df;
 }
 .center-content{
     display: grid;
@@ -164,11 +164,11 @@ ol {
 }
 
 .sidebar-element{
-    background-color: #C2C8D6;
+    background-color: #d0d4df;
     padding: 1em;
     border-radius: 15px 15px 15px 15px;
     border-bottom-style: solid;
-    border-bottom-color: #394053;
+    border-bottom-color: #909bb5;
     border-bottom-width: 0.1em;
     text-decoration: none;
 }
@@ -270,7 +270,7 @@ document.addEventListener("DOMContentLoaded", function () {
     mermaid.initialize({ 
         startOnLoad: true,
         theme: 'base',
-        primaryColor: '#C2C8D6',
+        primaryColor: '#d0d4df',
         primaryTextColor: '#fff',
         primaryBorderColor: '#394053', 
         lineColor: '#394053',
@@ -286,7 +286,7 @@ document.addEventListener("DOMContentLoaded", function () {
 .mermaid svg .node circle,
 .mermaid svg .node ellipse,
 .mermaid svg .node path{
-  fill: #C2C8D6 !important;
+  fill: #d0d4df !important;
   stroke: #394053 !important;
 }
 
@@ -666,8 +666,10 @@ document.addEventListener("DOMContentLoaded", function () {
             <h1 id="gene-surroundings">Gene surroundings mode</h1>
 
             <p>
-                <span style="color: #909bb5">I am using "gene" and "transcript" kind of interchangeably in this section, but for the gff file they are not identical. ReVis was programmed with 
-                    transcript feature IDs in mind (which is why the script for this runmode is called <i style="color: #909bb5">ReVis_transcript_surroundings.py</i>), but gene IDs should also work (no guarantee here)</span>
+                <span style="color: #909bb5">I am using "gene" and "transcript" kind of interchangeably in this section, but for the gff file they are not identical, 'gene' is a top-level 
+                    feature, and 'transcript' is always a child-feature of a gene. 
+                    ReVis was programmed with transcript feature IDs in mind (which is why the script for this runmode is called <i style="color: #909bb5">ReVis_transcript_surroundings.py</i>), 
+                    but depending on your annotation gene IDs can also work (no guarantee). </span>
             </p>
 
             <p>
@@ -686,11 +688,11 @@ document.addEventListener("DOMContentLoaded", function () {
             </p>
             <p>The statistical analysis consists of:</p>
             <ul>
-                <li>Wilcoxon test</li>
-                <li>Polynomial regression</li>
+                <li><b>Wilcoxon test</b> (median difference across up- and downstream region)</li>
+                <li><b>Polynomial regression</b> (difference in shape of the CI across the region)</li>
             </ul>
 
-            <div class="tab">
+            <div class="tab", style="margin-top: 1em;">
                 <button class="tablinks" onclick="openTab(event, 'stats_wilcoxon')">Wilcoxon test</button>
                 <button class="tablinks" onclick="openTab(event, 'stats_polynomial')">Polynomial regression</button>
             </div>
@@ -708,7 +710,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <div id="stats_polynomial" class="tabcontent">
                 <p style="margin-top: .5em">
                     Test for enrichment by fitting polynomial regression curves to foreground and background curves, calculating the confidence interval, and checking for overlap.
-                    A significan tidfference can be determined through nonoverlapping 83% confidence intervals (not 95%! see <a href="https://statisticsbyjim.com/hypothesis-testing/confidence-intervals-compare-means/">this blog post</a>, 
+                    A significant difference can be determined through nonoverlapping 83% confidence intervals (not 95%! see <a href="https://statisticsbyjim.com/hypothesis-testing/confidence-intervals-compare-means/">this blog post</a>, 
                     as well as <a href="https://rss.onlinelibrary.wiley.com/doi/abs/10.2307/2983411">Goldstein and Healy (1995)</a>.)
                 </p>
                 <p><b>Fourier denoising (LINEs):</b> <code>--polreg_fourier_denoise</code></p>
@@ -819,7 +821,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <li><b>If annotation parsing does not work:</b>
                 <p>
                     Potentially there is something wrong with the nested feature IDs in the gff, try to use <a href="https://agat.readthedocs.io/en/latest/tools/agat_sq_manage_IDs.html">agat_sq_manage_IDs.pl</a>
-                    to make a version that forces a correct feature nestedness. Mind that this changes transcript IDs! You might have to associate them to potential foreground and background lists.
+                    to make a version that forces a correct feature nestedness. Mind that this changes transcript IDs! You might have to update existing foreground and background ID lists for the corresponding new IDs.
                 </p>
                 </li>
 

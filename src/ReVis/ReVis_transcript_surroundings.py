@@ -332,7 +332,7 @@ def plot_TE_abundance(before_filepath:str, after_filepath:str, sig_transcripts:i
     plt.legend(handles, labels, loc = "upper left", fontsize = fs)
 
     plt.title(f"\\textit{{{species}}} gene surroundings {num_bp} bp up and downstream", fontsize = fs*1.25)
-    plt.xlabel(f"basepairs upstream and downstream from transcript", fontsize = fs)
+    plt.xlabel(f"basepairs upstream and downstream from gene", fontsize = fs)
 
     plt.ylabel(f"percent of genes in which this base is a repeat", fontsize = fs)
     ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 or x<1 else f'{int(x)}\%'))

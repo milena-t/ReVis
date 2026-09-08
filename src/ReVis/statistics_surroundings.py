@@ -253,7 +253,7 @@ def plot_modelstats(modelstats_filepath:str, plot_white_bg = True):
 
     plt.legend(loc = "lower right", fontsize = fs)
     species_title = species.replace("_", ". ")
-    plt.title(f"{species_title} gene surroundings repeat enrichment\np-value from wilcoxon test (every {window_length} bases)", fontsize = fs*1.25)
+    plt.title(f"\\textit{{{species_title}}}  repeat class enrichment\n(Wilcoxon test p-value, sampling every {window_length} bases)", fontsize = fs*1.25)
     plt.ylabel(f"p-value", fontsize = fs)
     ax.tick_params(axis ='x', labelsize = fs) 
     ax.tick_params(axis ='y', labelsize = fs) 
@@ -508,7 +508,7 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
         plt.legend(handles, labels, loc = "upper left", fontsize = fs, title=legend_title, title_fontsize=fs)
         conf_int_int = int(conf_int*100)
         plt.title(f"\\textit{{{species}}} gene surroundings {num_bp} bp up and downstream\nrepeat category: {rep_label} with polynomial regression and {conf_int_int}\% confidence interval", fontsize = fs*1.25)
-        plt.xlabel(f"basepairs upstream and downstream from transcript", fontsize = fs)
+        plt.xlabel(f"basepairs upstream and downstream from gene", fontsize = fs)
 
         plt.ylabel(f"percent of genes in which this base is a repeat", fontsize = fs)
         

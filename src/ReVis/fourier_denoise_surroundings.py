@@ -231,7 +231,7 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
 
         conf_int_int = int(conf_int*100)
         plt.title(f"\\textit{{{species}}} gene surroundings {num_bp} bp up and downstream\nrepeat category: {rep_label} with polynomial regression and {conf_int_int}\% confidence interval", fontsize = fs*1.25)
-        plt.xlabel(f"basepairs upstream and downstream from transcript", fontsize = fs)
+        plt.xlabel(f"basepairs upstream and downstream from gene", fontsize = fs)
 
         plt.ylabel(f"percent of genes in which this base is a repeat", fontsize = fs)
         ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 or x<1 else f'{int(x)}\%'))
@@ -331,7 +331,7 @@ def plot_confidence_intervals(before_filepath:str, after_filepath:str, num_sig_t
             plt.legend(handles, labels, loc = "upper left", fontsize = fs)
             conf_int_int = int(conf_int*100)
             plt.title(f"\\textit{{{species}}} gene surroundings {num_bp} bp up and downstream\nrepeat category: {rep_label} with polynomial regression and {conf_int_int}\% confidence interval", fontsize = fs*1.25)
-            plt.xlabel(f"basepairs upstream and downstream from transcript", fontsize = fs)
+            plt.xlabel(f"basepairs upstream and downstream from gene", fontsize = fs)
 
             plt.ylabel(f"percent of transcripts in which this base is a repeat", fontsize = fs)
             ax.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: '' if x > 99 or x<1 else f'{int(x)}\%'))
